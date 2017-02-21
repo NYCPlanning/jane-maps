@@ -1,0 +1,22 @@
+{
+  parser: "babel-eslint",
+  "extends": "airbnb",
+  "plugins": [
+    "react"
+  ],
+  "rules": {
+    "max-len": [0, 120, 2, {ignoreComments: true}],
+    "react/prop-types": [2],
+    "react/forbid-prop-types": [0],
+    "react/prefer-es6-class": [0],
+    "react/jsx-no-bind": [0],
+    "no-param-reassign": [0],
+    "radix": [0],
+    "camelcase": [0],
+    "jsx-a11y/no-static-element-interactions": [0],
+  },
+  "env": {
+    "browser": true,
+    "node": true
+  },
+}
