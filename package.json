@@ -1,7 +1,7 @@
 {
   "name": "jane-maps",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.1.0",
+  "description": "a modular web mapping framework for react and mapboxGL",
   "main": "dist/index.js",
   "dependencies": {
     "jquery": "^3.1.1",
