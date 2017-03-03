@@ -21,10 +21,15 @@ const LayerList = React.createClass({
     onLayerToggle: PropTypes.func.isRequired,
   },
 
+  getDefaultProps() {
+    return {
+      selectedLayer: null,
+    };
+  },
+
   getInitialState() {
     return ({
       layers: this.props.layers,
-      selectedLayer: null,
     });
   },
 
@@ -69,7 +74,7 @@ const LayerList = React.createClass({
       let className = this.props.selectedLayer === layer.id ? 'list-item selected' : 'list-item';
       if (!layer.visible) className += ' disabled';
 
-      if (layer.inList !== false) {
+      if (layer.showInLayerList !== false) {
         return (
           <ListItem
             className={className}

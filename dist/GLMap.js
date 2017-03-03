@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', 'react', 'mapbox-gl/dist/mapbox-gl'], factory);
+    define(['exports', 'react'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('react'), require('mapbox-gl/dist/mapbox-gl'));
+    factory(exports, require('react'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.react, global.mapboxGl);
+    factory(mod.exports, global.react);
     global.GLMap = mod.exports;
   }
-})(this, function (exports, _react, _mapboxGl) {
+})(this, function (exports, _react) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -18,8 +18,6 @@
   });
 
   var _react2 = _interopRequireDefault(_react);
-
-  var _mapboxGl2 = _interopRequireDefault(_mapboxGl);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
@@ -62,9 +60,9 @@
     initializeMap: function initializeMap() {
       var self = this;
 
-      _mapboxGl2.default.accessToken = this.props.mapbox_accessToken;
+      mapboxgl.accessToken = this.props.mapbox_accessToken;
 
-      this.mapObject = new _mapboxGl2.default.Map({
+      this.mapObject = new mapboxgl.Map({
         container: this.container,
         style: this.props.mapStyle,
         zoom: this.props.zoom,
@@ -80,7 +78,7 @@
         self.props.onLoad(self.mapObject.getStyle());
       });
 
-      if (this.props.navigationControl) map.addControl(new _mapboxGl2.default.NavigationControl(), 'bottom-right');
+      if (this.props.navigationControl) map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
     },
     flyMap: function flyMap(feature) {
       var zoom = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 15;

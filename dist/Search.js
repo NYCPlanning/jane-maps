@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['module', 'react', 'material-ui/Toolbar', 'material-ui/FontIcon', 'material-ui/IconButton', 'react-autosuggest', 'jquery'], factory);
+    define(['module', 'react', 'material-ui/Toolbar', 'material-ui/FontIcon', 'material-ui/IconButton', 'react-autosuggest'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(module, require('react'), require('material-ui/Toolbar'), require('material-ui/FontIcon'), require('material-ui/IconButton'), require('react-autosuggest'), require('jquery'));
+    factory(module, require('react'), require('material-ui/Toolbar'), require('material-ui/FontIcon'), require('material-ui/IconButton'), require('react-autosuggest'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod, global.react, global.Toolbar, global.FontIcon, global.IconButton, global.reactAutosuggest, global.jquery);
+    factory(mod, global.react, global.Toolbar, global.FontIcon, global.IconButton, global.reactAutosuggest);
     global.Search = mod.exports;
   }
-})(this, function (module, _react, _Toolbar, _FontIcon, _IconButton, _reactAutosuggest, _jquery) {
+})(this, function (module, _react, _Toolbar, _FontIcon, _IconButton, _reactAutosuggest) {
   'use strict';
 
   var _react2 = _interopRequireDefault(_react);
@@ -20,8 +20,6 @@
   var _IconButton2 = _interopRequireDefault(_IconButton);
 
   var _reactAutosuggest2 = _interopRequireDefault(_reactAutosuggest);
-
-  var _jquery2 = _interopRequireDefault(_jquery);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
@@ -80,7 +78,7 @@
 
       apiCall += '&api_key=' + this.props.mapzen_api_key;
 
-      _jquery2.default.getJSON(apiCall, function (data) {
+      $.getJSON(apiCall, function (data) {
         // eslint-disable-line no-undef
         self.setState({
           suggestions: data.features

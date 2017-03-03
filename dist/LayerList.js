@@ -49,10 +49,14 @@
       onLayerToggle: _react.PropTypes.func.isRequired
     },
 
+    getDefaultProps: function getDefaultProps() {
+      return {
+        selectedLayer: null
+      };
+    },
     getInitialState: function getInitialState() {
       return {
-        layers: this.props.layers,
-        selectedLayer: null
+        layers: this.props.layers
       };
     },
     componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
@@ -93,7 +97,7 @@
         var className = _this.props.selectedLayer === layer.id ? 'list-item selected' : 'list-item';
         if (!layer.visible) className += ' disabled';
 
-        if (layer.inList !== false) {
+        if (layer.showInLayerList !== false) {
           return _react2.default.createElement(_ListItem2.default, {
             className: className,
             expanded: _this.props.expanded,

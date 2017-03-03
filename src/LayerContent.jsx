@@ -9,15 +9,12 @@ const LayerContent = React.createClass({
     selectedLayer: React.PropTypes.string,
     onClose: React.PropTypes.func.isRequired,
     onLayerUpdate: React.PropTypes.func.isRequired,
-    context: React.PropTypes.object,
     offset: React.PropTypes.bool.isRequired,
     visible: React.PropTypes.bool.isRequired,
   },
 
   getDefaultProps() {
-    console.log(this.props);
     return {
-      context: null,
       selectedLayer: null,
     };
   },
@@ -27,7 +24,6 @@ const LayerContent = React.createClass({
   },
 
   render() {
-    console.log(this.props)
     const { layers, selectedLayer } = this.props;
 
     const style = {
@@ -51,6 +47,7 @@ const LayerContent = React.createClass({
     // if the layer has a component, mount it
     const components = layers.map((layer) => {
       const LayerComponent = layer.component;
+
 
       return (
         <div
@@ -85,20 +82,17 @@ const LayerContent = React.createClass({
           </div>
 
           {
-              layer.component && (
-                <LayerComponent
-                  layer={layer}
-                  onUpdate={this.props.onLayerUpdate}
-                  context={this.props.context}
-                />
-              )
-            }
-
+            layer.component && (
+              <LayerComponent
+                layer={layer}
+                onUpdate={this.props.onLayerUpdate}
+              />
+            )
+          }
           {
               !layer.component && (
-                <div className="sidebar-tab-content">
-                  <h4>{layer.name}</h4>
-                  <p>You can show and hide this layer using the toggle above </p>
+                <div className="second-drawer-content">
+                  <h4>This layer has no content</h4>
                 </div>
               )
             }

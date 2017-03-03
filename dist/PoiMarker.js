@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', 'react', 'mapbox-gl/dist/mapbox-gl'], factory);
+    define(['exports', 'react'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('react'), require('mapbox-gl/dist/mapbox-gl'));
+    factory(exports, require('react'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.react, global.mapboxGl);
+    factory(mod.exports, global.react);
     global.PoiMarker = mod.exports;
   }
-})(this, function (exports, _react, _mapboxGl) {
+})(this, function (exports, _react) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -18,8 +18,6 @@
   });
 
   var _react2 = _interopRequireDefault(_react);
-
-  var _mapboxGl2 = _interopRequireDefault(_mapboxGl);
 
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : {
@@ -39,16 +37,19 @@
     componentDidMount: function componentDidMount() {
       var el = document.createElement('div');
       el.className = 'marker';
-      el.style.backgroundImage = 'url(/img/orange-marker.png)';
+      // TODO entire marker should be config-driven
+      // url reference breaks depending on how the site is hosted
+      // so for now just reference the marker image on the production domain
+      el.style.backgroundImage = 'url(//capitalplanning.nyc.gov/img/orange-marker.png)';
       el.style.width = '32px';
       el.style.height = '32px';
       el.style.zIndex = 10;
 
-      this.marker = new _mapboxGl2.default.Marker(el, {
+      this.marker = new mapboxgl.Marker(el, { // eslint-disable-line no-undef
         offset: [-16, -32]
       });
 
-      this.label = new _mapboxGl2.default.Popup({
+      this.label = new mapboxgl.Popup({ // eslint-disable-line no-undef
         offset: [6, 0],
         anchor: 'left',
         closeButton: false,

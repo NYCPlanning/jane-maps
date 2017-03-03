@@ -1,5 +1,4 @@
 import React from 'react';
-import mapboxgl from 'mapbox-gl/dist/mapbox-gl';
 
 const GLMap = React.createClass({
   propTypes: {

@@ -112,7 +112,7 @@
       var style = {
         fontIcon: {
           fontSize: '15px',
-          margin: '8px 6px 8px 10px',
+          margin: '8px 9px 8px 9px',
           height: '15px',
           width: '15px',
           color: '#5F5F5F',

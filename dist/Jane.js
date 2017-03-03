@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', 'react', 'react/lib/update', 'material-ui/styles/MuiThemeProvider', 'react-tap-event-plugin', './GLMap', './LayerContent', './LayerList', './PoiMarker', './Search', './SelectedFeaturesPane', './MapHandler'], factory);
+    define(['exports', 'react', 'react/lib/update', './GLMap', './LayerContent', './LayerList', './PoiMarker', './Search', './SelectedFeaturesPane', './MapHandler'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('react'), require('react/lib/update'), require('material-ui/styles/MuiThemeProvider'), require('react-tap-event-plugin'), require('./GLMap'), require('./LayerContent'), require('./LayerList'), require('./PoiMarker'), require('./Search'), require('./SelectedFeaturesPane'), require('./MapHandler'));
+    factory(exports, require('react'), require('react/lib/update'), require('./GLMap'), require('./LayerContent'), require('./LayerList'), require('./PoiMarker'), require('./Search'), require('./SelectedFeaturesPane'), require('./MapHandler'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.react, global.update, global.MuiThemeProvider, global.reactTapEventPlugin, global.GLMap, global.LayerContent, global.LayerList, global.PoiMarker, global.Search, global.SelectedFeaturesPane, global.MapHandler);
+    factory(mod.exports, global.react, global.update, global.GLMap, global.LayerContent, global.LayerList, global.PoiMarker, global.Search, global.SelectedFeaturesPane, global.MapHandler);
     global.Jane = mod.exports;
   }
-})(this, function (exports, _react, _update, _MuiThemeProvider, _reactTapEventPlugin, _GLMap, _LayerContent, _LayerList, _PoiMarker, _Search, _SelectedFeaturesPane, _MapHandler) {
+})(this, function (exports, _react, _update, _GLMap, _LayerContent, _LayerList, _PoiMarker, _Search, _SelectedFeaturesPane, _MapHandler) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -20,10 +20,6 @@
   var _react2 = _interopRequireDefault(_react);
 
   var _update2 = _interopRequireDefault(_update);
-
-  var _MuiThemeProvider2 = _interopRequireDefault(_MuiThemeProvider);
-
-  var _reactTapEventPlugin2 = _interopRequireDefault(_reactTapEventPlugin);
 
   var _GLMap2 = _interopRequireDefault(_GLMap);
 
@@ -83,13 +79,12 @@
     propTypes: {
       poiFeature: _react2.default.PropTypes.object,
       poiLabel: _react2.default.PropTypes.string,
-      mapConfig: _react2.default.PropTypes.object.isRequired,
       layerContentVisible: _react2.default.PropTypes.bool,
       mapInit: _react2.default.PropTypes.object.isRequired,
       style: _react2.default.PropTypes.object,
-      context: _react2.default.PropTypes.object,
       search: _react2.default.PropTypes.bool,
-      searchConfig: _react2.default.PropTypes.object
+      searchConfig: _react2.default.PropTypes.object,
+      fitBounds: _react2.default.PropTypes.array
     },
 
     getDefaultProps: function getDefaultProps() {
@@ -105,25 +100,51 @@
           left: 0,
           overflow: 'hidden'
         },
-        context: null,
         search: false,
-        searchConfig: null
+        searchConfig: null,
+        fitBounds: null
       };
     },
     getInitialState: function getInitialState() {
-      var defaultMapConfig = {
-        layers: []
-      };
-
       return {
         poiFeature: this.props.poiFeature ? this.props.poiFeature : null,
         poiLabel: this.props.poiLabel ? this.props.poiLabel : null,
         mapLoaded: false,
-        mapConfig: this.props.mapConfig ? this.props.mapConfig : defaultMapConfig,
         layerListExpanded: false,
         layerContentVisible: this.props.layerContentVisible,
         selectedFeatures: []
       };
+    },
+    componentWillMount: function componentWillMount() {
+      var mapConfig = {
+        layers: []
+      };
+
+      _react2.default.Children.forEach(this.props.children, function (child) {
+        if (child !== null && child.type.displayName === 'JaneLayer') {
+          if (child.props.selected) {
+            mapConfig.selectedLayer = child.props.id;
+          }
+
+          mapConfig.layers.push({
+            id: child.props.id,
+            name: child.props.name,
+            icon: child.props.icon,
+            visible: child.props.visible,
+            component: child.props.component,
+            listItem: child.props.listItem,
+            interactivityMapLayers: child.props.interactivityMapLayers,
+            highlightPointLayers: child.props.highlightPointLayers,
+            sources: child.props.sources,
+            mapLayers: child.props.mapLayers,
+            initialState: child.props.initialState
+          });
+        }
+      });
+
+      this.setState({
+        mapConfig: mapConfig
+      });
     },
     componentDidMount: function componentDidMount() {
       // this.map is the GLMap Component, not the map object itself
@@ -133,6 +154,12 @@
 
       this.map.mapObject.on('click', this.handleMapLayerClick);
       this.map.mapObject.on('mousemove', this.handleMapMousemove);
+    },
+    componentDidUpdate: function componentDidUpdate(prevProps) {
+      // fit map to fitBounds property if it is different from previous props
+      if (JSON.stringify(prevProps.fitBounds) !== JSON.stringify(this.props.fitBounds)) {
+        this.map.mapObject.fitBounds(this.props.fitBounds);
+      }
     },
     onMapLoad: function onMapLoad() {
       this.setState({ mapLoaded: true });
@@ -211,7 +238,13 @@
       if (this.state.mapConfig.selectedLayer === layerid) {
         this.state.mapConfig.selectedLayer = '';
         if (this.state.layerContentVisible) this.toggleLayerContent();
+      } else {
+        // if layer being turned on is not selected, select it
+        this.state.mapConfig.selectedLayer = layerid;
       }
+
+      // if a layer is being turned on, open the second drawer if it is not already open
+      if (theLayer.visible && !this.state.layerContentVisible) this.toggleLayerContent();
 
       this.setState({
         mapConfig: this.state.mapConfig
@@ -232,31 +265,6 @@
     resetSelectedFeatures: function resetSelectedFeatures() {
       this.setState({
         selectedFeatures: []
-      });
-    },
-    highlightFeature: function highlightFeature(feature) {
-      var map = this.map.mapObject;
-      try {
-        map.removeLayer('highlighted');
-        map.removeSource('highlighted');
-      } catch (err) {
-        // ignore
-      }
-
-      map.addSource('highlighted', {
-        type: 'geojson',
-        data: feature
-      });
-
-      map.addLayer({
-        id: 'highlighted',
-        type: 'circle',
-        source: 'highlighted',
-        paint: {
-          'circle-radius': 14,
-          'circle-color': 'steelblue',
-          'circle-opacity': 0.5
-        }
       });
     },
     toggleLayerContent: function toggleLayerContent() {
@@ -297,8 +305,15 @@
 
       var mapConfig = this.state.mapConfig;
 
+      // remove highlightPoints layer if it exists
+      mapConfig.layers.forEach(function (layer, i) {
+        if (layer.id === 'highlightPoints') mapConfig.layers.splice(i, 1);
+      });
+
       // add legendItems for each layer
       var legendItems = [];
+
+      // TODO combine all these forEach() into one big one
 
       mapConfig.layers.forEach(function (layer) {
         if (layer.visible && layer.legend) {
@@ -326,6 +341,57 @@
         }
       });
 
+      // add highlighted points for each layer
+
+      var highlightPointFeatures = [];
+
+      mapConfig.layers.forEach(function (layer) {
+        if (layer.visible && layer.highlightPointLayers) {
+          // get selected features
+          var layerSelectedFeatures = _this3.state.selectedFeatures.filter(function (feature) {
+            return layer.interactivityMapLayers.indexOf(feature.layer.id) > -1;
+          });
+
+          layerSelectedFeatures.forEach(function (layerSelectedFeature) {
+            highlightPointFeatures.push({
+              type: 'Feature',
+              geometry: layerSelectedFeature.geometry,
+              properties: {}
+            });
+          });
+        }
+      });
+
+      var highlightPointFeatureCollection = {
+        type: 'FeatureCollection',
+        features: highlightPointFeatures
+      };
+
+      mapConfig.layers.push({
+        id: 'highlightPoints',
+        visible: 'true',
+        showInLayerList: false,
+        sources: [{
+          id: 'highlightPoints',
+          type: 'geojson',
+          data: highlightPointFeatureCollection
+        }],
+        mapLayers: [{
+          id: 'highlightPoints',
+          type: 'circle',
+          source: 'highlightPoints',
+          paint: {
+            'circle-color': 'rgba(255, 255, 255, 1)',
+            'circle-opacity': 0,
+            'circle-radius': 10,
+            'circle-stroke-width': 3,
+            'circle-pitch-scale': 'map',
+            'circle-stroke-color': 'rgba(217, 107, 39, 1)',
+            'circle-stroke-opacity': 0.8
+          }
+        }]
+      });
+
       var leftOffset = 36;
       if (this.state.layerListExpanded) leftOffset += 164;
       if (this.state.layerContentVisible) leftOffset += 320;
@@ -333,70 +399,65 @@
       var selectedLayer = this.state.mapConfig.selectedLayer;
 
       return _react2.default.createElement(
-        _MuiThemeProvider2.default,
-        null,
+        'div',
+        { className: 'jane-container', style: this.props.style },
         _react2.default.createElement(
           'div',
-          { className: 'jane-container', style: this.props.style },
-          _react2.default.createElement(
+          {
+            className: 'jane-map-container', style: {
+              left: leftOffset
+            }
+          },
+          this.props.search && _react2.default.createElement(_Search2.default, _extends({}, this.props.searchConfig, {
+            onGeocoderSelection: this.showPoiMarker,
+            onClear: this.hidePoiMarker,
+            selectionActive: this.state.poiFeature
+          })),
+          legendItems.length > 0 && _react2.default.createElement(
             'div',
-            {
-              className: 'jane-map-container', style: {
-                left: leftOffset
-              }
-            },
-            this.props.search && _react2.default.createElement(_Search2.default, _extends({}, this.props.searchConfig, {
-              onGeocoderSelection: this.showPoiMarker,
-              onClear: this.hidePoiMarker,
-              selectionActive: this.state.poiFeature
-            })),
-            legendItems.length > 0 && _react2.default.createElement(
-              'div',
-              { className: 'jane-legend' },
-              legendItems
-            ),
-            _react2.default.createElement(_GLMap2.default, _extends({}, this.props.mapInit, {
-              ref: function ref(map) {
-                _this3.map = map;
-              },
-              onLoad: this.onMapLoad
-            }))
+            { className: 'jane-legend' },
+            legendItems
           ),
-          this.state.poiFeature && this.map && _react2.default.createElement(_PoiMarker2.default, {
-            feature: this.state.poiFeature,
-            label: this.state.poiLabel,
-            map: this.map
-          }),
-          _react2.default.createElement(_LayerList2.default, {
-            expanded: this.state.layerListExpanded,
-            layers: this.state.mapConfig.layers,
-            selectedLayer: selectedLayer,
-            onLayerReorder: this.handleLayerReorder,
-            onLayerClick: this.handleLayerClick,
-            onToggleExpanded: this.handleToggleExpanded,
-            onLayerToggle: this.handleLayerToggle
-          }),
-          _react2.default.createElement(_LayerContent2.default, {
-            offset: this.state.layerListExpanded,
-            visible: this.state.layerContentVisible,
-            layers: this.state.mapConfig.layers,
-            selectedLayer: selectedLayer,
-            onLayerUpdate: this.handleLayerUpdate,
-            onLayerToggle: this.handleLayerToggle,
-            onClose: this.toggleLayerContent,
-            context: this.props.context
-          }),
-          _react2.default.createElement(
-            _SelectedFeaturesPane2.default,
-            {
-              style: {
-                right: selectedFeatureItems.length > 0 ? 0 : -250
-              }
+          _react2.default.createElement(_GLMap2.default, _extends({}, this.props.mapInit, {
+            ref: function ref(map) {
+              _this3.map = map;
             },
-            selectedFeatureItems
-          ),
-          this.state.mapLoaded && _react2.default.createElement(_MapHandler2.default, { map: this.map, mapConfig: mapConfig })
-        )
+            onLoad: this.onMapLoad
+          }))
+        ),
+        this.state.poiFeature && this.map && _react2.default.createElement(_PoiMarker2.default, {
+          feature: this.state.poiFeature,
+          label: this.state.poiLabel,
+          map: this.map
+        }),
+        _react2.default.createElement(_LayerList2.default, {
+          expanded: this.state.layerListExpanded,
+          layers: this.state.mapConfig.layers,
+          selectedLayer: selectedLayer,
+          onLayerReorder: this.handleLayerReorder,
+          onLayerClick: this.handleLayerClick,
+          onToggleExpanded: this.handleToggleExpanded,
+          onLayerToggle: this.handleLayerToggle
+        }),
+        _react2.default.createElement(_LayerContent2.default, {
+          offset: this.state.layerListExpanded,
+          visible: this.state.layerContentVisible,
+          layers: this.state.mapConfig.layers,
+          selectedLayer: selectedLayer,
+          onLayerUpdate: this.handleLayerUpdate,
+          onLayerToggle: this.handleLayerToggle,
+          onClose: this.toggleLayerContent
+        }),
+        _react2.default.createElement(
+          _SelectedFeaturesPane2.default,
+          {
+            style: {
+              right: selectedFeatureItems.length > 0 ? 0 : -250
+            }
+          },
+          selectedFeatureItems
+        ),
+        this.state.mapLoaded && _react2.default.createElement(_MapHandler2.default, { map: this.map, mapConfig: mapConfig })
       );
     }
   });

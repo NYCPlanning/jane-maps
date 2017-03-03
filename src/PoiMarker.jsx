@@ -1,5 +1,4 @@
 import React from 'react';
-import mapboxgl from 'mapbox-gl/dist/mapbox-gl';
 
 const PoiMarker = React.createClass({
   propTypes: {
@@ -11,17 +10,20 @@ const PoiMarker = React.createClass({
   componentDidMount() {
     const el = document.createElement('div');
     el.className = 'marker';
-    el.style.backgroundImage = 'url(/img/orange-marker.png)';
+    // TODO entire marker should be config-driven
+    // url reference breaks depending on how the site is hosted
+    // so for now just reference the marker image on the production domain
+    el.style.backgroundImage = 'url(//capitalplanning.nyc.gov/img/orange-marker.png)';
     el.style.width = '32px';
     el.style.height = '32px';
     el.style.zIndex = 10;
 
-    this.marker = new mapboxgl.Marker(el, {
+    this.marker = new mapboxgl.Marker(el, { // eslint-disable-line no-undef
       offset: [-16, -32],
     });
 
 
-    this.label = new mapboxgl.Popup({
+    this.label = new mapboxgl.Popup({ // eslint-disable-line no-undef
       offset: [6, 0],
       anchor: 'left',
       closeButton: false,

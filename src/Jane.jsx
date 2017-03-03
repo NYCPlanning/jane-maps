@@ -1,7 +1,5 @@
 import React from 'react';
 import update from 'react/lib/update';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import injectTapEventPlugin from 'react-tap-event-plugin';
 
 
 import GLMap from './GLMap';
@@ -12,6 +10,7 @@ import Search from './Search';
 import SelectedFeaturesPane from './SelectedFeaturesPane';
 import MapHandler from './MapHandler';
 
+
 // styles should be manually imported from whatever is using Jane for now
 // import './styles.scss'
 
@@ -19,13 +18,12 @@ const Jane = React.createClass({
   propTypes: {
     poiFeature: React.PropTypes.object,
     poiLabel: React.PropTypes.string,
-    mapConfig: React.PropTypes.object.isRequired,
     layerContentVisible: React.PropTypes.bool,
     mapInit: React.PropTypes.object.isRequired,
     style: React.PropTypes.object,
-    context: React.PropTypes.object,
     search: React.PropTypes.bool,
     searchConfig: React.PropTypes.object,
+    fitBounds: React.PropTypes.array,
   },
 
   getDefaultProps() {
@@ -41,25 +39,52 @@ const Jane = React.createClass({
         left: 0,
         overflow: 'hidden',
       },
-      context: null,
       search: false,
       searchConfig: null,
+      fitBounds: null,
     };
   },
 
   getInitialState() {
-    const defaultMapConfig = {
-      layers: [],
-    };
-
     return ({
       poiFeature: this.props.poiFeature ? this.props.poiFeature : null,
       poiLabel: this.props.poiLabel ? this.props.poiLabel : null,
       mapLoaded: false,
-      mapConfig: this.props.mapConfig ? this.props.mapConfig : defaultMapConfig,
       layerListExpanded: false,
       layerContentVisible: this.props.layerContentVisible,
       selectedFeatures: [],
+    });
+  },
+
+  componentWillMount() {
+    const mapConfig = {
+      layers: [],
+    };
+
+    React.Children.forEach(this.props.children, (child) => {
+      if (child !== null && child.type.displayName === 'JaneLayer') {
+        if (child.props.selected) {
+          mapConfig.selectedLayer = child.props.id;
+        }
+
+        mapConfig.layers.push({
+          id: child.props.id,
+          name: child.props.name,
+          icon: child.props.icon,
+          visible: child.props.visible,
+          component: child.props.component,
+          listItem: child.props.listItem,
+          interactivityMapLayers: child.props.interactivityMapLayers,
+          highlightPointLayers: child.props.highlightPointLayers,
+          sources: child.props.sources,
+          mapLayers: child.props.mapLayers,
+          initialState: child.props.initialState,
+        });
+      }
+    });
+
+    this.setState({
+      mapConfig,
     });
   },
 
@@ -71,6 +96,13 @@ const Jane = React.createClass({
 
     this.map.mapObject.on('click', this.handleMapLayerClick);
     this.map.mapObject.on('mousemove', this.handleMapMousemove);
+  },
+
+  componentDidUpdate(prevProps) {
+    // fit map to fitBounds property if it is different from previous props
+    if (JSON.stringify(prevProps.fitBounds) !== JSON.stringify(this.props.fitBounds)) {
+      this.map.mapObject.fitBounds(this.props.fitBounds);
+    }
   },
 
   onMapLoad() {
@@ -152,7 +184,13 @@ const Jane = React.createClass({
     if (this.state.mapConfig.selectedLayer === layerid) {
       this.state.mapConfig.selectedLayer = '';
       if (this.state.layerContentVisible) this.toggleLayerContent();
+    } else {
+      // if layer being turned on is not selected, select it
+      this.state.mapConfig.selectedLayer = layerid;
     }
+
+    // if a layer is being turned on, open the second drawer if it is not already open
+    if (theLayer.visible && !this.state.layerContentVisible) this.toggleLayerContent();
 
     this.setState({
       mapConfig: this.state.mapConfig,
@@ -179,32 +217,6 @@ const Jane = React.createClass({
   resetSelectedFeatures() {
     this.setState({
       selectedFeatures: [],
-    });
-  },
-
-  highlightFeature(feature) {
-    const map = this.map.mapObject;
-    try {
-      map.removeLayer('highlighted');
-      map.removeSource('highlighted');
-    } catch (err) {
-      // ignore
-    }
-
-    map.addSource('highlighted', {
-      type: 'geojson',
-      data: feature,
-    });
-
-    map.addLayer({
-      id: 'highlighted',
-      type: 'circle',
-      source: 'highlighted',
-      paint: {
-        'circle-radius': 14,
-        'circle-color': 'steelblue',
-        'circle-opacity': 0.5,
-      },
     });
   },
 
@@ -244,8 +256,15 @@ const Jane = React.createClass({
   render() {
     const mapConfig = this.state.mapConfig;
 
+    // remove highlightPoints layer if it exists
+    mapConfig.layers.forEach((layer, i) => {
+      if (layer.id === 'highlightPoints') mapConfig.layers.splice(i, 1);
+    });
+
     // add legendItems for each layer
     const legendItems = [];
+
+    // TODO combine all these forEach() into one big one
 
     mapConfig.layers.forEach((layer) => {
       if (layer.visible && layer.legend) {
@@ -267,6 +286,56 @@ const Jane = React.createClass({
       }
     });
 
+    // add highlighted points for each layer
+
+    const highlightPointFeatures = [];
+
+    mapConfig.layers.forEach((layer) => {
+      if (layer.visible && layer.highlightPointLayers) {
+        // get selected features
+        const layerSelectedFeatures = this.state.selectedFeatures.filter(feature => layer.interactivityMapLayers.indexOf(feature.layer.id) > -1);
+
+
+        layerSelectedFeatures.forEach((layerSelectedFeature) => {
+          highlightPointFeatures.push({
+            type: 'Feature',
+            geometry: layerSelectedFeature.geometry,
+            properties: {},
+          });
+        });
+      }
+    });
+
+    const highlightPointFeatureCollection = {
+      type: 'FeatureCollection',
+      features: highlightPointFeatures,
+    };
+
+    mapConfig.layers.push({
+      id: 'highlightPoints',
+      visible: 'true',
+      showInLayerList: false,
+      sources: [{
+        id: 'highlightPoints',
+        type: 'geojson',
+        data: highlightPointFeatureCollection,
+      }],
+      mapLayers: [{
+        id: 'highlightPoints',
+        type: 'circle',
+        source: 'highlightPoints',
+        paint: {
+          'circle-color': 'rgba(255, 255, 255, 1)',
+          'circle-opacity': 0,
+          'circle-radius': 10,
+          'circle-stroke-width': 3,
+          'circle-pitch-scale': 'map',
+          'circle-stroke-color': 'rgba(217, 107, 39, 1)',
+          'circle-stroke-opacity': 0.8,
+        },
+      }],
+    });
+
 
     let leftOffset = 36;
     if (this.state.layerListExpanded) leftOffset += 164;
@@ -276,82 +345,79 @@ const Jane = React.createClass({
 
     return (
 
-      <MuiThemeProvider>
-        <div className="jane-container" style={this.props.style}>
-          <div
-            className="jane-map-container" style={{
-              left: leftOffset,
-            }}
-          >
-            {
-              this.props.search && (
-                <Search
-                  {...this.props.searchConfig}
-                  onGeocoderSelection={this.showPoiMarker}
-                  onClear={this.hidePoiMarker}
-                  selectionActive={this.state.poiFeature}
-                />
-              )
-            }
-
-            {
-              legendItems.length > 0 && (
-                <div className="jane-legend">
-                  {legendItems}
-                </div>
-              )
-            }
-
-            <GLMap
-              {...this.props.mapInit}
-              ref={(map) => { this.map = map; }}
-              onLoad={this.onMapLoad}
-            />
-
-          </div>
-
+      <div className="jane-container" style={this.props.style}>
+        <div
+          className="jane-map-container" style={{
+            left: leftOffset,
+          }}
+        >
           {
-            (this.state.poiFeature && this.map) && (
-              <PoiMarker
-                feature={this.state.poiFeature}
-                label={this.state.poiLabel}
-                map={this.map}
+            this.props.search && (
+              <Search
+                {...this.props.searchConfig}
+                onGeocoderSelection={this.showPoiMarker}
+                onClear={this.hidePoiMarker}
+                selectionActive={this.state.poiFeature}
               />
             )
           }
 
-          <LayerList
-            expanded={this.state.layerListExpanded}
-            layers={this.state.mapConfig.layers}
-            selectedLayer={selectedLayer}
-            onLayerReorder={this.handleLayerReorder}
-            onLayerClick={this.handleLayerClick}
-            onToggleExpanded={this.handleToggleExpanded}
-            onLayerToggle={this.handleLayerToggle}
+          {
+            legendItems.length > 0 && (
+              <div className="jane-legend">
+                {legendItems}
+              </div>
+            )
+          }
+
+          <GLMap
+            {...this.props.mapInit}
+            ref={(map) => { this.map = map; }}
+            onLoad={this.onMapLoad}
           />
 
-          <LayerContent
-            offset={this.state.layerListExpanded}
-            visible={this.state.layerContentVisible}
-            layers={this.state.mapConfig.layers}
-            selectedLayer={selectedLayer}
-            onLayerUpdate={this.handleLayerUpdate}
-            onLayerToggle={this.handleLayerToggle}
-            onClose={this.toggleLayerContent}
-            context={this.props.context}
-          />
-
-          <SelectedFeaturesPane
-            style={{
-              right: (selectedFeatureItems.length > 0) ? 0 : -250,
-            }}
-          >
-            {selectedFeatureItems}
-          </SelectedFeaturesPane>
-
-          { this.state.mapLoaded && <MapHandler map={this.map} mapConfig={mapConfig} /> }
         </div>
-      </MuiThemeProvider>
+
+        {
+          (this.state.poiFeature && this.map) && (
+            <PoiMarker
+              feature={this.state.poiFeature}
+              label={this.state.poiLabel}
+              map={this.map}
+            />
+          )
+        }
+
+        <LayerList
+          expanded={this.state.layerListExpanded}
+          layers={this.state.mapConfig.layers}
+          selectedLayer={selectedLayer}
+          onLayerReorder={this.handleLayerReorder}
+          onLayerClick={this.handleLayerClick}
+          onToggleExpanded={this.handleToggleExpanded}
+          onLayerToggle={this.handleLayerToggle}
+        />
+
+        <LayerContent
+          offset={this.state.layerListExpanded}
+          visible={this.state.layerContentVisible}
+          layers={this.state.mapConfig.layers}
+          selectedLayer={selectedLayer}
+          onLayerUpdate={this.handleLayerUpdate}
+          onLayerToggle={this.handleLayerToggle}
+          onClose={this.toggleLayerContent}
+        />
+
+        <SelectedFeaturesPane
+          style={{
+            right: (selectedFeatureItems.length > 0) ? 0 : -250,
+          }}
+        >
+          {selectedFeatureItems}
+        </SelectedFeaturesPane>
+
+        { this.state.mapLoaded && <MapHandler map={this.map} mapConfig={mapConfig} /> }
+      </div>
 
     );
   },

@@ -38,15 +38,12 @@
       selectedLayer: _react2.default.PropTypes.string,
       onClose: _react2.default.PropTypes.func.isRequired,
       onLayerUpdate: _react2.default.PropTypes.func.isRequired,
-      context: _react2.default.PropTypes.object,
       offset: _react2.default.PropTypes.bool.isRequired,
       visible: _react2.default.PropTypes.bool.isRequired
     },
 
     getDefaultProps: function getDefaultProps() {
-      console.log(this.props);
       return {
-        context: null,
         selectedLayer: null
       };
     },
@@ -56,7 +53,6 @@
     render: function render() {
       var _this = this;
 
-      console.log(this.props);
       var _props = this.props,
           layers = _props.layers,
           selectedLayer = _props.selectedLayer;
@@ -120,21 +116,15 @@
           ),
           layer.component && _react2.default.createElement(LayerComponent, {
             layer: layer,
-            onUpdate: _this.props.onLayerUpdate,
-            context: _this.props.context
+            onUpdate: _this.props.onLayerUpdate
           }),
           !layer.component && _react2.default.createElement(
             'div',
-            { className: 'sidebar-tab-content' },
+            { className: 'second-drawer-content' },
             _react2.default.createElement(
               'h4',
               null,
-              layer.name
-            ),
-            _react2.default.createElement(
-              'p',
-              null,
-              'You can show and hide this layer using the toggle above '
+              'This layer has no content'
             )
           )
         );
