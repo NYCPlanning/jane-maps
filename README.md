@@ -1,6 +1,6 @@
 #Jane Maps
 
-A framework for rich, composable web maps React and MapboxGL.  
+A framework for rich, composable web maps using React and MapboxGL  
 
 ![facilities_explorer_and_developer_tools_-_http___localhost_8080__and_developer_tools_-_https___staging_capitalplanning_nyc_facilities_explorer](https://cloud.githubusercontent.com/assets/1833820/23576517/c9619900-0075-11e7-8836-ab6d7515cd16.png)
 
