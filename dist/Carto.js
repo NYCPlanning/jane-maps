@@ -33,7 +33,7 @@
             data = JSON.parse(data);
             var layergroupid = data.layergroupid;
 
-            var template = 'https://' + options.carto_domain + '/user/' + options.carto_user + '/api/v1/map/' + layergroupid + '/0/{z}/{x}/{y}.mvt';
+            var template = 'https://' + options.carto_domain + '/user/' + options.carto_user + '/api/v1/map/' + layergroupid + '/{z}/{x}/{y}.mvt';
 
             resolve(template);
           }
