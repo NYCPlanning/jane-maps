@@ -1,8 +1,24 @@
 {
   "name": "jane-maps",
   "version": "0.0.1",
+  "author": "NYC Department of City Planning",
   "description": "a modular web mapping framework for react and mapboxGL",
   "main": "dist/index.js",
+  "keywords": [
+    "react",
+    "react-component",
+    "web mapping",
+    "web maps",
+    "mapboxgl"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NYCPlanning/jane-maps.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NYCPlanning/jane-maps/issues"
+  },
   "dependencies": {
     "jquery": "^3.1.1",
     "mapbox-gl": "^0.31.0",

@@ -6,7 +6,13 @@ A web mapping framework for React and MapboxGL.
 
 Jane Maps is the frontend mapping framework used in [DCP's Capital Planning Platform](http://capitalplanning.nyc.gov).  It's more than just a React wrapper for mapboxgl.js, and includes several UI components that complement the map, allowing for modular layer configurations that include map data, styling, and their associated UI.
 
-We only recently extracted Jane Maps from its original home within the Capital Planning Platform, as we see great potential in its reusability in other parts of NYC government and beyond.  Making it more generic and extensible is going to take a community effort, and we would love for you to be a part of that community.  
+We only recently extracted Jane Maps from its original home within the Capital Planning Platform, as we see great potential in its reusability in other parts of NYC government and beyond. 
+
+Making Jane Maps more generic and extensible is going to take a community effort, and we hope you will be a part of that community.  Please create issues and communicate with us if you have ideas to improve the package or are having trouble getting it to work in your project. 
+
+##Who is Jane?
+Jane Maps is named for [Jane Jacobs](https://en.wikipedia.org/wiki/Jane_Jacobs), and we hope it helps to provide a new way of looking at cities and neighborhoods, just as she did.
+
 
 ##Simple Usage
 
@@ -224,6 +230,31 @@ Source types include:
 
 
 ##`mapLayers`
+
+MapLayers define styling in mapboxGL, and are identical to those defined in the mapboxGL api.
+
+```
+{
+  id: 'facilities-points-outline',
+  source: 'facilities',
+  'source-layer': 'layer0',
+  type: 'circle',
+  paint: {
+    'circle-radius': {
+      stops: [
+        [10, 3],
+        [15, 7],
+      ],
+    },
+    'circle-color': '#012700',
+    'circle-opacity': 0.7,
+  },
+},
+```
+
+## A Dream
+
+Someday in the not too distant future, JaneLayers could be packaged with data, styles, and UI, and exist in an open registry.  Adding a complex layer to your project could be as simple as running `jane install nyc-admin-boundaries`.  A dev can dream...
 
 ##Development
 `npm watch` will transpile from `/src` into `/dist`, and will also convert the `styles.scss` to `css`.  
