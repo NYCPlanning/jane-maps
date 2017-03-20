@@ -1,10 +1,10 @@
-#Jane Maps
+# Jane Maps
 
 A framework for rich, composable web maps using React and MapboxGL  
 
 ![facilities_explorer_and_developer_tools_-_http___localhost_8080__and_developer_tools_-_https___staging_capitalplanning_nyc_facilities_explorer](https://cloud.githubusercontent.com/assets/1833820/23576517/c9619900-0075-11e7-8836-ab6d7515cd16.png)
 
-##What's it all about?
+## What's it all about?
 
 Jane Maps is the frontend mapping framework used in [DCP's Capital Planning Platform](http://capitalplanning.nyc.gov).  It's more than just a React wrapper for mapboxgl.js, and includes several UI components that complement the map, allowing for modular layer configurations that include map data, styling, and their associated UI.
 
@@ -12,11 +12,11 @@ We only recently extracted Jane Maps from its original home within the Capital P
 
 Making Jane Maps more generic and extensible is going to take a community effort, and we hope you will be a part of that community.  Please create issues and communicate with us if you have ideas to improve the package or are having trouble getting it to work in your project. 
 
-##Who is Jane?
+## Who is Jane?
 Jane Maps is named for [Jane Jacobs](https://en.wikipedia.org/wiki/Jane_Jacobs), and we hope it helps to provide a new way of looking at cities and neighborhoods, just as she did.
 
 
-##Simple Usage
+## Simple Usage
 
 Install via npm:
 `npm install jane-maps`
@@ -101,17 +101,17 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 ```
 
-###MUI Theme
+### MUI Theme
 
 All components using Material UI must be wrapped in a `<MuiThemeProvider>` component which provides sitewide styles for Material UI components.  
 
-#Jane Components
+# Jane Components
 
-##`Jane`
+## `Jane`
 
 `Jane` is the top-level component, and is used to create a MapboxGL map with optional UI components
 
-###Props
+### Props
 
 `mapInit` - object - configuration options used to instantiate the map 
 
@@ -144,11 +144,11 @@ All components using Material UI must be wrapped in a `<MuiThemeProvider>` compo
 }
 ```
 
-##`JaneLayer`
+## `JaneLayer`
 
 A JaneLayer is a discrete set of related map sources, symbologies and UIs.  Each JaneLayer gets a spot in Jane's built-in layer selector, and can be composed in several different ways. JaneLayers can act as controllers for many separate layers on the map, and can have no UI (meaning Jane can toggle visibility only) or custom UI (a custom component passed in as a prop)
 
-###Props
+### Props
 
 `id` - string - every JaneLayer must have a unique id
 
@@ -174,7 +174,7 @@ A JaneLayer is a discrete set of related map sources, symbologies and UIs.  Each
 
 `listItem` - react component - a component that will be rendered in the selectedFeaturesPane for each selectedFeature after the user clicks.
 
-##`sources`
+## `sources`
 
 Sources in Jane are configuration objects that eventually become mapboxGL sources.
 
@@ -231,7 +231,7 @@ Source types include:
 ```
 
 
-##`mapLayers`
+## `mapLayers`
 
 MapLayers define styling in mapboxGL, and are identical to those defined in the mapboxGL api.
 
@@ -258,7 +258,7 @@ MapLayers define styling in mapboxGL, and are identical to those defined in the 
 
 Someday in the not too distant future, JaneLayers could be packaged with data, styles, and UI, and exist in an open registry.  Adding a complex layer to your project could be as simple as running `jane install nyc-admin-boundaries`.  A dev can dream...
 
-##Development
+## Development
 `npm watch` will transpile from `/src` into `/dist`, and will also convert the `styles.scss` to `css`.  
 
 To use a local development repo of jane-maps in another project, use `npm link`.  From this directory, run `npm link jane-maps`.  Navigate to the directory for the project that is using jane-maps, and run `npm link jane-maps`.  Run `npm watch` in this directory, and if you have webpack dev server listening in your other project directory it should pick up the changes and rebuild.
