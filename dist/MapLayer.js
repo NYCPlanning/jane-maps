@@ -37,6 +37,12 @@
       this.map = this.props.map.mapObject;
       this.map.addLayer(this.props.config);
     },
+    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+      if (JSON.stringify(this.props.config) !== JSON.stringify(nextProps.config)) {
+        this.map.removeLayer(this.props.config.id);
+        this.map.addLayer(nextProps.config);
+      }
+    },
     componentWillUnmount: function componentWillUnmount() {
       this.map.removeLayer(this.props.config.id);
     },

@@ -11,6 +11,13 @@ const MapLayer = React.createClass({
     this.map.addLayer(this.props.config);
   },
 
+  componentWillReceiveProps(nextProps) {
+    if (JSON.stringify(this.props.config) !== JSON.stringify(nextProps.config)) {
+      this.map.removeLayer(this.props.config.id);
+      this.map.addLayer(nextProps.config);
+    }
+  },
+
   componentWillUnmount() {
     this.map.removeLayer(this.props.config.id);
   },

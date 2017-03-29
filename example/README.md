@@ -2,7 +2,7 @@
 
 This directory contains example implementations of the jane-maps framework.  
 
-## How to use 
+## How to use
 
   * Install dependencies: `npm install`
   * Transpile JSX and serve with webpack-dev-server: `npm start`
@@ -10,4 +10,4 @@ This directory contains example implementations of the jane-maps framework.
 
 ## Help us out
 
-We need your help privding more examples.  Pull requests with improvements to these examples and additional examples are welcomed and encouraged.
+We need your help providing more examples.  Pull requests with improvements to these examples and additional examples are welcomed and encouraged.
