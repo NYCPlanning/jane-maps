@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; // eslint-disable-line
 
 const PoiMarker = React.createClass({
   propTypes: {
@@ -30,12 +30,14 @@ const PoiMarker = React.createClass({
       closeOnClick: false,
     });
 
-    this.updateMarker(this.props.feature);
+    const { feature, label } = this.props;
+
+    this.updateMarker(feature, label);
   },
 
   componentWillUpdate(nextProps) {
     if (JSON.stringify(nextProps.feature) !== JSON.stringify(this.props.feature)) {
-      this.updateMarker(nextProps.feature);
+      this.updateMarker(nextProps.feature, nextProps.label);
     }
   },
 
@@ -44,16 +46,19 @@ const PoiMarker = React.createClass({
     this.label.remove();
   },
 
-  updateMarker(feature) {
+  updateMarker(feature, label) {
+    const { map } = this.props;
+
     this.marker
       .setLngLat(feature.geometry.coordinates)
-      .addTo(this.props.map.mapObject);
+      .addTo(map.mapObject);
+
     this.label
       .setLngLat(feature.geometry.coordinates)
-      .setHTML(`<p>${this.props.label}</p>`)
-      .addTo(this.props.map.mapObject);
+      .setHTML(`<p>${label}</p>`)
+      .addTo(map.mapObject);
 
-    this.props.map.flyMap(feature);
+    map.flyMap(feature);
   },
 
   render() {

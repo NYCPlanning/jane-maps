@@ -25,6 +25,8 @@
     };
   }
 
+  // eslint-disable-line
+
   var PoiMarker = _react2.default.createClass({
     displayName: 'PoiMarker',
 
@@ -56,22 +58,31 @@
         closeOnClick: false
       });
 
-      this.updateMarker(this.props.feature);
+      var _props = this.props,
+          feature = _props.feature,
+          label = _props.label;
+
+
+      this.updateMarker(feature, label);
     },
     componentWillUpdate: function componentWillUpdate(nextProps) {
       if (JSON.stringify(nextProps.feature) !== JSON.stringify(this.props.feature)) {
-        this.updateMarker(nextProps.feature);
+        this.updateMarker(nextProps.feature, nextProps.label);
       }
     },
     componentWillUnmount: function componentWillUnmount() {
       this.marker.remove();
       this.label.remove();
     },
-    updateMarker: function updateMarker(feature) {
-      this.marker.setLngLat(feature.geometry.coordinates).addTo(this.props.map.mapObject);
-      this.label.setLngLat(feature.geometry.coordinates).setHTML('<p>' + this.props.label + '</p>').addTo(this.props.map.mapObject);
+    updateMarker: function updateMarker(feature, label) {
+      var map = this.props.map;
 
-      this.props.map.flyMap(feature);
+
+      this.marker.setLngLat(feature.geometry.coordinates).addTo(map.mapObject);
+
+      this.label.setLngLat(feature.geometry.coordinates).setHTML('<p>' + label + '</p>').addTo(map.mapObject);
+
+      map.flyMap(feature);
     },
     render: function render() {
       return _react2.default.createElement('div', null);
