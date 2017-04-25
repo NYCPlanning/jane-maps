@@ -1,29 +1,27 @@
-import React from 'react';
-import update from 'react/lib/update';
-
+import React, { PropTypes } from 'react'; // eslint-disable-line
+import update from 'react/lib/update'; // eslint-disable-line
+import _ from 'underscore';
 
 import GLMap from './GLMap';
 import LayerContent from './LayerContent';
 import LayerList from './LayerList';
 import PoiMarker from './PoiMarker';
 import Search from './Search';
-import SelectedFeaturesPane from './SelectedFeaturesPane';
 import MapHandler from './MapHandler';
-
-
-// styles should be manually imported from whatever is using Jane for now
-// import './styles.scss'
 
 const Jane = React.createClass({
   propTypes: {
-    poiFeature: React.PropTypes.object,
-    poiLabel: React.PropTypes.string,
-    layerContentVisible: React.PropTypes.bool,
-    mapInit: React.PropTypes.object.isRequired,
-    style: React.PropTypes.object,
-    search: React.PropTypes.bool,
-    searchConfig: React.PropTypes.object,
-    fitBounds: React.PropTypes.array,
+    poiFeature: PropTypes.object,
+    poiLabel: PropTypes.string,
+    layerContentVisible: PropTypes.bool,
+    mapInit: PropTypes.object.isRequired,
+    style: PropTypes.object,
+    search: PropTypes.bool,
+    searchConfig: PropTypes.object,
+    fitBounds: PropTypes.array,
+    children: PropTypes.array,
+    onZoomEnd: PropTypes.func,
+    onDragEnd: PropTypes.func,
   },
 
   getDefaultProps() {
@@ -42,6 +40,9 @@ const Jane = React.createClass({
       search: false,
       searchConfig: null,
       fitBounds: null,
+      children: null,
+      onZoomEnd: null,
+      onDragEnd: null,
     };
   },
 
@@ -61,6 +62,7 @@ const Jane = React.createClass({
       layers: [],
     };
 
+    // parse all children component props, each becomes a layer object in mapConfig
     React.Children.forEach(this.props.children, (child) => {
       if (child !== null && child.type.displayName === 'JaneLayer') {
         if (child.props.selected) {
@@ -74,6 +76,7 @@ const Jane = React.createClass({
           visible: child.props.visible,
           component: child.props.component,
           listItem: child.props.listItem,
+          onMapLayerClick: child.props.onMapLayerClick,
           interactivityMapLayers: child.props.interactivityMapLayers,
           highlightPointLayers: child.props.highlightPointLayers,
           sources: child.props.sources,
@@ -89,10 +92,10 @@ const Jane = React.createClass({
   },
 
   componentDidMount() {
+    // pass dragend and zoomend up, handle click and mousemove
     // this.map is the GLMap Component, not the map object itself
-
-    this.map.mapObject.on('zoomend', this.resetSelectedFeatures);
-    this.map.mapObject.on('dragend', this.resetSelectedFeatures);
+    this.map.mapObject.on('zoomend', this.props.onZoomEnd);
+    this.map.mapObject.on('dragend', this.props.onDragEnd);
 
     this.map.mapObject.on('click', this.handleMapLayerClick);
     this.map.mapObject.on('mousemove', this.handleMapMousemove);
@@ -109,37 +112,18 @@ const Jane = React.createClass({
     this.setState({ mapLoaded: true });
   },
 
-  // return an array of all loaded mapLayers
-  getLoadedMapLayers() {
-    const mapLayers = [];
-
-    this.state.mapConfig.layers.forEach((layer) => {
-      layer.mapLayers.forEach((mapLayer) => {
-        if (layer.visible && this.map.mapObject.getLayer(mapLayer.id)) {
-          mapLayers.push(mapLayer.id);
-        }
-      });
-    });
-
-    return mapLayers;
-  },
-
   handleLayerReorder(layers) {
     this.state.mapConfig.layers = layers;
-
     this.setState({ mapConfig: this.state.mapConfig });
   },
 
   handleLayerClick(layerid) {
     const visible = this.isLayerVisible(layerid);
 
-    // open second drawer if closed
     if (!this.state.layerContentVisible && visible) this.toggleLayerContent();
 
     // if selected layer was clicked, toggle second drawer, else make clicked layer selected
-    if (this.state.mapConfig.selectedLayer === layerid) {
-      // this.toggleLayerContent();
-    } else {
+    if (this.state.mapConfig.selectedLayer !== layerid) {
       // if clicked layer is enabled (visible), make it active
       if (visible) {
         this.state.mapConfig.selectedLayer = layerid;
@@ -159,21 +143,22 @@ const Jane = React.createClass({
   },
 
   handleMapLayerClick(e) {
-    const mapLayers = this.getLoadedMapLayers();
+    this.state.mapConfig.layers.forEach((layer) => {
+      if (layer.visible && layer.onMapLayerClick) {
+        const mapLayerIds = layer.mapLayers.map(mapLayer => mapLayer.id);
 
-    const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayers });
-
-    this.setState({
-      selectedFeatures: features,
+        const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
+        // de-dup
+        const uniqueFeatures = _.uniq(features, feature => feature.id);
+        if (uniqueFeatures.length > 0) layer.onMapLayerClick(uniqueFeatures);
+      }
     });
   },
 
   handleMapMousemove(e) {
-    const mapLayers = this.getLoadedMapLayers();
-
-    const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayers });
-
-    this.map.mapObject.getCanvas().style.cursor = (features.length > 0) ? 'pointer' : '';
+    // const mapLayers = this.getLoadedMapLayers();
+    // const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayers });
+    // this.map.mapObject.getCanvas().style.cursor = (features.length > 0) ? 'pointer' : '';
   },
 
   handleLayerToggle(layerid) {
@@ -211,12 +196,6 @@ const Jane = React.createClass({
     this.setState({
       poiFeature: feature,
       poiLabel: label,
-    });
-  },
-
-  resetSelectedFeatures() {
-    this.setState({
-      selectedFeatures: [],
     });
   },
 
@@ -269,20 +248,6 @@ const Jane = React.createClass({
     mapConfig.layers.forEach((layer) => {
       if (layer.visible && layer.legend) {
         legendItems.push(<div key={layer.id}>{layer.legend}</div>);
-      }
-    });
-
-    // add selected feature items for each layer
-    const selectedFeatureItems = [];
-
-    mapConfig.layers.forEach((layer, i) => {
-      if (layer.listItem && layer.visible && layer.interactivityMapLayers) {
-        const SelectedFeatureItem = layer.listItem ? layer.listItem : null;
-        const layerSelectedFeatures = this.state.selectedFeatures.filter(feature => layer.interactivityMapLayers.indexOf(feature.layer.id) > -1);
-
-        layerSelectedFeatures.forEach((layerSelectedFeature, j) => {
-          selectedFeatureItems.push(<SelectedFeatureItem feature={layerSelectedFeature} key={i.toString() + j.toString()} />);
-        });
       }
     });
 
@@ -407,14 +372,6 @@ const Jane = React.createClass({
           onLayerToggle={this.handleLayerToggle}
           onClose={this.toggleLayerContent}
         />
-
-        <SelectedFeaturesPane
-          style={{
-            right: (selectedFeatureItems.length > 0) ? 0 : -250,
-          }}
-        >
-          {selectedFeatureItems}
-        </SelectedFeaturesPane>
 
         { this.state.mapLoaded && <MapHandler map={this.map} mapConfig={mapConfig} /> }
       </div>

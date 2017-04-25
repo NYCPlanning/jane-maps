@@ -1,16 +1,16 @@
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', 'react', 'react/lib/update', './GLMap', './LayerContent', './LayerList', './PoiMarker', './Search', './SelectedFeaturesPane', './MapHandler'], factory);
+    define(['exports', 'react', 'react/lib/update', 'underscore', './GLMap', './LayerContent', './LayerList', './PoiMarker', './Search', './MapHandler'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('react'), require('react/lib/update'), require('./GLMap'), require('./LayerContent'), require('./LayerList'), require('./PoiMarker'), require('./Search'), require('./SelectedFeaturesPane'), require('./MapHandler'));
+    factory(exports, require('react'), require('react/lib/update'), require('underscore'), require('./GLMap'), require('./LayerContent'), require('./LayerList'), require('./PoiMarker'), require('./Search'), require('./MapHandler'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.react, global.update, global.GLMap, global.LayerContent, global.LayerList, global.PoiMarker, global.Search, global.SelectedFeaturesPane, global.MapHandler);
+    factory(mod.exports, global.react, global.update, global.underscore, global.GLMap, global.LayerContent, global.LayerList, global.PoiMarker, global.Search, global.MapHandler);
     global.Jane = mod.exports;
   }
-})(this, function (exports, _react, _update, _GLMap, _LayerContent, _LayerList, _PoiMarker, _Search, _SelectedFeaturesPane, _MapHandler) {
+})(this, function (exports, _react, _update, _underscore, _GLMap, _LayerContent, _LayerList, _PoiMarker, _Search, _MapHandler) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
@@ -21,6 +21,8 @@
 
   var _update2 = _interopRequireDefault(_update);
 
+  var _underscore2 = _interopRequireDefault(_underscore);
+
   var _GLMap2 = _interopRequireDefault(_GLMap);
 
   var _LayerContent2 = _interopRequireDefault(_LayerContent);
@@ -30,8 +32,6 @@
   var _PoiMarker2 = _interopRequireDefault(_PoiMarker);
 
   var _Search2 = _interopRequireDefault(_Search);
-
-  var _SelectedFeaturesPane2 = _interopRequireDefault(_SelectedFeaturesPane);
 
   var _MapHandler2 = _interopRequireDefault(_MapHandler);
 
@@ -70,21 +70,21 @@
     return obj;
   }
 
-  // styles should be manually imported from whatever is using Jane for now
-  // import './styles.scss'
-
   var Jane = _react2.default.createClass({
     displayName: 'Jane',
 
     propTypes: {
-      poiFeature: _react2.default.PropTypes.object,
-      poiLabel: _react2.default.PropTypes.string,
-      layerContentVisible: _react2.default.PropTypes.bool,
-      mapInit: _react2.default.PropTypes.object.isRequired,
-      style: _react2.default.PropTypes.object,
-      search: _react2.default.PropTypes.bool,
-      searchConfig: _react2.default.PropTypes.object,
-      fitBounds: _react2.default.PropTypes.array
+      poiFeature: _react.PropTypes.object,
+      poiLabel: _react.PropTypes.string,
+      layerContentVisible: _react.PropTypes.bool,
+      mapInit: _react.PropTypes.object.isRequired,
+      style: _react.PropTypes.object,
+      search: _react.PropTypes.bool,
+      searchConfig: _react.PropTypes.object,
+      fitBounds: _react.PropTypes.array,
+      children: _react.PropTypes.array,
+      onZoomEnd: _react.PropTypes.func,
+      onDragEnd: _react.PropTypes.func
     },
 
     getDefaultProps: function getDefaultProps() {
@@ -102,7 +102,10 @@
         },
         search: false,
         searchConfig: null,
-        fitBounds: null
+        fitBounds: null,
+        children: null,
+        onZoomEnd: null,
+        onDragEnd: null
       };
     },
     getInitialState: function getInitialState() {
@@ -120,6 +123,7 @@
         layers: []
       };
 
+      // parse all children component props, each becomes a layer object in mapConfig
       _react2.default.Children.forEach(this.props.children, function (child) {
         if (child !== null && child.type.displayName === 'JaneLayer') {
           if (child.props.selected) {
@@ -133,6 +137,7 @@
             visible: child.props.visible,
             component: child.props.component,
             listItem: child.props.listItem,
+            onMapLayerClick: child.props.onMapLayerClick,
             interactivityMapLayers: child.props.interactivityMapLayers,
             highlightPointLayers: child.props.highlightPointLayers,
             sources: child.props.sources,
@@ -147,10 +152,10 @@
       });
     },
     componentDidMount: function componentDidMount() {
+      // pass dragend and zoomend up, handle click and mousemove
       // this.map is the GLMap Component, not the map object itself
-
-      this.map.mapObject.on('zoomend', this.resetSelectedFeatures);
-      this.map.mapObject.on('dragend', this.resetSelectedFeatures);
+      this.map.mapObject.on('zoomend', this.props.onZoomEnd);
+      this.map.mapObject.on('dragend', this.props.onDragEnd);
 
       this.map.mapObject.on('click', this.handleMapLayerClick);
       this.map.mapObject.on('mousemove', this.handleMapMousemove);
@@ -164,36 +169,17 @@
     onMapLoad: function onMapLoad() {
       this.setState({ mapLoaded: true });
     },
-    getLoadedMapLayers: function getLoadedMapLayers() {
-      var _this = this;
-
-      var mapLayers = [];
-
-      this.state.mapConfig.layers.forEach(function (layer) {
-        layer.mapLayers.forEach(function (mapLayer) {
-          if (layer.visible && _this.map.mapObject.getLayer(mapLayer.id)) {
-            mapLayers.push(mapLayer.id);
-          }
-        });
-      });
-
-      return mapLayers;
-    },
     handleLayerReorder: function handleLayerReorder(layers) {
       this.state.mapConfig.layers = layers;
-
       this.setState({ mapConfig: this.state.mapConfig });
     },
     handleLayerClick: function handleLayerClick(layerid) {
       var visible = this.isLayerVisible(layerid);
 
-      // open second drawer if closed
       if (!this.state.layerContentVisible && visible) this.toggleLayerContent();
 
       // if selected layer was clicked, toggle second drawer, else make clicked layer selected
-      if (this.state.mapConfig.selectedLayer === layerid) {
-        // this.toggleLayerContent();
-      } else {
+      if (this.state.mapConfig.selectedLayer !== layerid) {
         // if clicked layer is enabled (visible), make it active
         if (visible) {
           this.state.mapConfig.selectedLayer = layerid;
@@ -213,20 +199,27 @@
       return thisLayer.visible;
     },
     handleMapLayerClick: function handleMapLayerClick(e) {
-      var mapLayers = this.getLoadedMapLayers();
+      var _this = this;
 
-      var features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayers });
+      this.state.mapConfig.layers.forEach(function (layer) {
+        if (layer.visible && layer.onMapLayerClick) {
+          var mapLayerIds = layer.mapLayers.map(function (mapLayer) {
+            return mapLayer.id;
+          });
 
-      this.setState({
-        selectedFeatures: features
+          var features = _this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
+          // de-dup
+          var uniqueFeatures = _underscore2.default.uniq(features, function (feature) {
+            return feature.id;
+          });
+          if (uniqueFeatures.length > 0) layer.onMapLayerClick(uniqueFeatures);
+        }
       });
     },
     handleMapMousemove: function handleMapMousemove(e) {
-      var mapLayers = this.getLoadedMapLayers();
-
-      var features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayers });
-
-      this.map.mapObject.getCanvas().style.cursor = features.length > 0 ? 'pointer' : '';
+      // const mapLayers = this.getLoadedMapLayers();
+      // const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayers });
+      // this.map.mapObject.getCanvas().style.cursor = (features.length > 0) ? 'pointer' : '';
     },
     handleLayerToggle: function handleLayerToggle(layerid) {
       var theLayer = this.state.mapConfig.layers.find(function (layer) {
@@ -260,11 +253,6 @@
       this.setState({
         poiFeature: feature,
         poiLabel: label
-      });
-    },
-    resetSelectedFeatures: function resetSelectedFeatures() {
-      this.setState({
-        selectedFeatures: []
       });
     },
     toggleLayerContent: function toggleLayerContent() {
@@ -322,22 +310,6 @@
             { key: layer.id },
             layer.legend
           ));
-        }
-      });
-
-      // add selected feature items for each layer
-      var selectedFeatureItems = [];
-
-      mapConfig.layers.forEach(function (layer, i) {
-        if (layer.listItem && layer.visible && layer.interactivityMapLayers) {
-          var SelectedFeatureItem = layer.listItem ? layer.listItem : null;
-          var layerSelectedFeatures = _this3.state.selectedFeatures.filter(function (feature) {
-            return layer.interactivityMapLayers.indexOf(feature.layer.id) > -1;
-          });
-
-          layerSelectedFeatures.forEach(function (layerSelectedFeature, j) {
-            selectedFeatureItems.push(_react2.default.createElement(SelectedFeatureItem, { feature: layerSelectedFeature, key: i.toString() + j.toString() }));
-          });
         }
       });
 
@@ -448,15 +420,6 @@
           onLayerToggle: this.handleLayerToggle,
           onClose: this.toggleLayerContent
         }),
-        _react2.default.createElement(
-          _SelectedFeaturesPane2.default,
-          {
-            style: {
-              right: selectedFeatureItems.length > 0 ? 0 : -250
-            }
-          },
-          selectedFeatureItems
-        ),
         this.state.mapLoaded && _react2.default.createElement(_MapHandler2.default, { map: this.map, mapConfig: mapConfig })
       );
     }

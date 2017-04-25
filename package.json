@@ -45,9 +45,16 @@
     "react": "~0.14.8 || ^15.0.0",
     "react-dom": "~0.14.8 || ^15.0.0"
   },
+  "watch": {
+    "build": {
+      "patterns": ["src"],
+      "extensions": "jsx"
+    }
+  },
   "scripts": {
     "scss": "./node_modules/.bin/node-sass --output-style compressed -o dist src",
     "prepublish": "babel --plugins transform-es2015-modules-umd src --out-dir ./dist && npm run scss",
-    "watch": "watch 'babel --plugins transform-es2015-modules-umd src --out-dir ./dist && npm run scss' --ignoreDirectoryPattern=/dist/"
+    "build": "babel --plugins transform-es2015-modules-umd src --out-dir ./dist && npm run scss",
+    "watch": "npm-watch"
   }
 }
