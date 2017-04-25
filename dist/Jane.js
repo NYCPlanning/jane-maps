@@ -217,6 +217,18 @@
       });
     },
     handleMapMousemove: function handleMapMousemove(e) {
+      var _this2 = this;
+
+      this.state.mapConfig.layers.forEach(function (layer) {
+        if (layer.visible && layer.onMapLayerClick) {
+          var mapLayerIds = layer.mapLayers.map(function (mapLayer) {
+            return mapLayer.id;
+          });
+
+          var features = _this2.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
+          _this2.map.mapObject.getCanvas().style.cursor = features.length > 0 ? 'pointer' : '';
+        }
+      });
       // const mapLayers = this.getLoadedMapLayers();
       // const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayers });
       // this.map.mapObject.getCanvas().style.cursor = (features.length > 0) ? 'pointer' : '';
@@ -256,15 +268,15 @@
       });
     },
     toggleLayerContent: function toggleLayerContent() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.setState({
         layerContentVisible: !this.state.layerContentVisible
       }, function () {
-        if (!_this2.state.layerContentVisible) {
-          var mapConfig = _this2.state.mapConfig;
+        if (!_this3.state.layerContentVisible) {
+          var mapConfig = _this3.state.mapConfig;
           mapConfig.selectedLayer = '';
-          _this2.setState({ mapConfig: mapConfig });
+          _this3.setState({ mapConfig: mapConfig });
         }
       });
     },
@@ -289,7 +301,7 @@
       this.setState({ layerListExpanded: !this.state.layerListExpanded });
     },
     render: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
       var mapConfig = this.state.mapConfig;
 
@@ -320,7 +332,7 @@
       mapConfig.layers.forEach(function (layer) {
         if (layer.visible && layer.highlightPointLayers) {
           // get selected features
-          var layerSelectedFeatures = _this3.state.selectedFeatures.filter(function (feature) {
+          var layerSelectedFeatures = _this4.state.selectedFeatures.filter(function (feature) {
             return layer.interactivityMapLayers.indexOf(feature.layer.id) > -1;
           });
 
@@ -392,7 +404,7 @@
           ),
           _react2.default.createElement(_GLMap2.default, _extends({}, this.props.mapInit, {
             ref: function ref(map) {
-              _this3.map = map;
+              _this4.map = map;
             },
             onLoad: this.onMapLoad
           }))

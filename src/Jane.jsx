@@ -156,6 +156,14 @@ const Jane = React.createClass({
   },
 
   handleMapMousemove(e) {
+    this.state.mapConfig.layers.forEach((layer) => {
+      if (layer.visible && layer.onMapLayerClick) {
+        const mapLayerIds = layer.mapLayers.map(mapLayer => mapLayer.id);
+
+        const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
+        this.map.mapObject.getCanvas().style.cursor = (features.length > 0) ? 'pointer' : '';
+      }
+    });
     // const mapLayers = this.getLoadedMapLayers();
     // const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayers });
     // this.map.mapObject.getCanvas().style.cursor = (features.length > 0) ? 'pointer' : '';
