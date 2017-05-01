@@ -1,6 +1,5 @@
 import React from 'react';
-import Jane from '../dist';
-import JaneLayer from '../dist/JaneLayer.js';
+import { Jane, JaneLayer } from '../dist';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
@@ -53,7 +52,7 @@ const JaneExample = React.createClass({
         },
       },
     ];
-    
+
     const mapLayers = [
       {
         id: 'feature',
@@ -80,11 +79,11 @@ const JaneExample = React.createClass({
             search
             searchConfig={searchConfig}
           >
-            <JaneLayer 
+            <JaneLayer
               id="feature"
               name="Feature"
               icon="university"
-              visible="true"
+              visible
               sources={sources}
               mapLayers={mapLayers}
             />
