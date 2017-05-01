@@ -8,13 +8,12 @@ A framework for rich, composable web maps using React and MapboxGL
 
 Jane Maps is the frontend mapping framework used in [DCP's Capital Planning Platform](http://capitalplanning.nyc.gov).  It's more than just a React wrapper for mapboxgl.js, and includes several UI components that complement the map, allowing for modular layer configurations that include map data, styling, and their associated UI.
 
-We only recently extracted Jane Maps from its original home within the Capital Planning Platform, as we see great potential in its reusability in other parts of NYC government and beyond. 
+We only recently extracted Jane Maps from its original home within the Capital Planning Platform, as we see great potential in its reusability in other parts of NYC government and beyond.
 
-Making Jane Maps more generic and extensible is going to take a community effort, and we hope you will be a part of that community.  Please create issues and communicate with us if you have ideas to improve the package or are having trouble getting it to work in your project. 
+Making Jane Maps more generic and extensible is going to take a community effort, and we hope you will be a part of that community.  Please create issues and communicate with us if you have ideas to improve the package or are having trouble getting it to work in your project.
 
 ## Who is Jane?
 Jane Maps is named for [Jane Jacobs](https://en.wikipedia.org/wiki/Jane_Jacobs), and we hope it helps to provide a new way of looking at cities and neighborhoods, just as she did.
-
 
 ## Simple Usage
 
@@ -24,8 +23,7 @@ Install via npm:
 
 Include the top-level component `Jane` and `JaneLayer`, and include the css
 ```
-import Jane from 'jane-maps';
-import JaneLayer from 'jane-maps/dist/jane-layer';
+import { Jane, JaneLayer } from 'jane-maps';
 
 import 'jane-maps/dist/styles.css'
 ```
@@ -79,7 +77,7 @@ const mapLayers = [
         zoom: 13.62,
       }}
     />
-      <JaneLayer 
+      <JaneLayer
         id="feature"
         name="Feature"
         icon="university"
@@ -113,7 +111,7 @@ All components using Material UI must be wrapped in a `<MuiThemeProvider>` compo
 
 ### Props
 
-`mapInit` - object - configuration options used to instantiate the map 
+`mapInit` - object - configuration options used to instantiate the map
 
 ```
 {
@@ -154,7 +152,7 @@ A JaneLayer is a discrete set of related map sources, symbologies and UIs.  Each
 
 `name` - string - this is the name used for display purposes in the UI
 
-`icon` - string - the font-awesome icon for the JaneLayer.  This should be the part of the font-awesome class after the hypen, so use `'university'` for the icon `fa-university` 
+`icon` - string - the font-awesome icon for the JaneLayer.  This should be the part of the font-awesome class after the hypen, so use `'university'` for the icon `fa-university`
 
 `visible` - boolean - if true, the JaneLayer will be visible on the map (and toggled on in the UI) by default
 
@@ -164,15 +162,27 @@ A JaneLayer is a discrete set of related map sources, symbologies and UIs.  Each
 
 `mapLayers` - array - An array of mapboxGL layer objects.  These are no different that those used in mapboxGL's api.  See `mapLayers` below.
 
-`component` - react component - This is the primary UI for the JaneLayer.  The result of its `render` function will be placed in Jane's drawer when the JaneLayer is selected and visible. This component is also passed an `onUpdate` prop when it is instantiated, allowing for dynamic updating of the JaneLayer's `sources` and `mapLayers`
+`onMapLayerClick(features)` - function - A function to handle click events on the JaneLayer's rendered features.  `features` is a de-duped array of features that were under the click.
 
-`initialState` - object - Initial state object passed into the JaneLayer's `component`. This is useful for configuring filters elsewhere in a project, and composing the JaneLayer with a custom state
+### Children
 
-`interactivityMapLayers` - array (string) - An array of `mapLayer` ids eligible for actions on click.  If a mapLayer's id is in this array, on click that mapLayer's associated feature will be added to Jane's `selectedFeatures` state and can trigger interactivity.
+The content rendered in Jane's sidebar is defined by the Child of each `JaneLayer`.  This child should be a React Component that will present the UI associated with that JaneLayer, and handle all user interactions.
 
-`highlightPointMapLayers` - array (string) - An array of point-based mapLayers that will be highlighted using Jane's default point highlighting when one of their elements is clicked.
+The Child component will be cloned and an additional `onUpdate` prop will be passed in, for use in programmatically updating the JaneLayer's layerConfig (sources, mapLayers, legends)
 
-`listItem` - react component - a component that will be rendered in the selectedFeaturesPane for each selectedFeature after the user clicks.
+```
+<JaneLayer
+  id="facilities"
+  name="Facilities and Program Sites"
+  icon="university"
+  onMapLayerClick={this.handleMapLayerClick}
+  selected
+  visible
+>
+  <FacilitiesComponent />
+</JaneLayer>
+```
+
 
 ## `sources`
 

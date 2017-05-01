@@ -19,7 +19,6 @@ const Jane = React.createClass({
     search: PropTypes.bool,
     searchConfig: PropTypes.object,
     fitBounds: PropTypes.array,
-    children: PropTypes.array,
     onZoomEnd: PropTypes.func,
     onDragEnd: PropTypes.func,
   },
@@ -41,8 +40,8 @@ const Jane = React.createClass({
       searchConfig: null,
       fitBounds: null,
       children: null,
-      onZoomEnd: null,
-      onDragEnd: null,
+      onZoomEnd: () => {},
+      onDragEnd: () => {},
     };
   },
 
