@@ -23,11 +23,6 @@
     };
   }
 
-  // MapzenGeocoder.jsx - Autocomplete geocoder component
-  // Props:
-  //   onSelection - function to be called when the user chooses an autocomplete selection
-  //   The geocoder will pass a geojson feature to onSelection(), which can be used to zoom a map into that location and create a marker
-
   function getSuggestionValue(suggestion) {
     return suggestion.properties.label;
   }

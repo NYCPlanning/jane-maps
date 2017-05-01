@@ -1,3 +1,4 @@
 import Jane from './Jane';
+import JaneLayer from './JaneLayer';
 
-export default Jane;
+export { Jane, JaneLayer };

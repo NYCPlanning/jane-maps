@@ -235,9 +235,6 @@
           _this3.map.mapObject.getCanvas().style.cursor = features && features.length > 0 ? 'pointer' : '';
         }
       });
-      // const mapLayers = this.getLoadedMapLayers();
-      // const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayers });
-      // this.map.mapObject.getCanvas().style.cursor = (features.length > 0) ? 'pointer' : '';
     },
     handleLayerToggle: function handleLayerToggle(layerid) {
       var theLayer = this.state.mapConfig.layers.find(function (layer) {
@@ -318,9 +315,6 @@
 
       // add legendItems for each layer
       var legendItems = [];
-
-      // TODO combine all these forEach() into one big one
-
       mapConfig.layers.forEach(function (layer) {
         if (layer.visible && layer.legend) {
           legendItems.push(_react2.default.createElement(
@@ -329,57 +323,6 @@
             layer.legend
           ));
         }
-      });
-
-      // add highlighted points for each layer
-
-      var highlightPointFeatures = [];
-
-      mapConfig.layers.forEach(function (layer) {
-        if (layer.visible && layer.highlightPointLayers) {
-          // get selected features
-          var layerSelectedFeatures = _this5.state.selectedFeatures.filter(function (feature) {
-            return layer.interactivityMapLayers.indexOf(feature.layer.id) > -1;
-          });
-
-          layerSelectedFeatures.forEach(function (layerSelectedFeature) {
-            highlightPointFeatures.push({
-              type: 'Feature',
-              geometry: layerSelectedFeature.geometry,
-              properties: {}
-            });
-          });
-        }
-      });
-
-      var highlightPointFeatureCollection = {
-        type: 'FeatureCollection',
-        features: highlightPointFeatures
-      };
-
-      mapConfig.layers.push({
-        id: 'highlightPoints',
-        visible: 'true',
-        showInLayerList: false,
-        sources: [{
-          id: 'highlightPoints',
-          type: 'geojson',
-          data: highlightPointFeatureCollection
-        }],
-        mapLayers: [{
-          id: 'highlightPoints',
-          type: 'circle',
-          source: 'highlightPoints',
-          paint: {
-            'circle-color': 'rgba(255, 255, 255, 1)',
-            'circle-opacity': 0,
-            'circle-radius': 10,
-            'circle-stroke-width': 3,
-            'circle-pitch-scale': 'map',
-            'circle-stroke-color': 'rgba(217, 107, 39, 1)',
-            'circle-stroke-opacity': 0.8
-          }
-        }]
       });
 
       var leftOffset = 0;

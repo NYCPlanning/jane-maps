@@ -166,9 +166,6 @@ const Jane = React.createClass({
         this.map.mapObject.getCanvas().style.cursor = (features && features.length > 0) ? 'pointer' : '';
       }
     });
-    // const mapLayers = this.getLoadedMapLayers();
-    // const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayers });
-    // this.map.mapObject.getCanvas().style.cursor = (features.length > 0) ? 'pointer' : '';
   },
 
   handleLayerToggle(layerid) {
@@ -191,9 +188,6 @@ const Jane = React.createClass({
       mapConfig: this.state.mapConfig,
     });
   },
-
-  // keeps track of loaded sources in state,
-  // used to figure out whether layers are ready to be added in render()
 
   hidePoiMarker() {
     this.setState({
@@ -252,65 +246,11 @@ const Jane = React.createClass({
 
     // add legendItems for each layer
     const legendItems = [];
-
-    // TODO combine all these forEach() into one big one
-
     mapConfig.layers.forEach((layer) => {
       if (layer.visible && layer.legend) {
         legendItems.push(<div key={layer.id}>{layer.legend}</div>);
       }
     });
-
-    // add highlighted points for each layer
-
-    const highlightPointFeatures = [];
-
-    mapConfig.layers.forEach((layer) => {
-      if (layer.visible && layer.highlightPointLayers) {
-        // get selected features
-        const layerSelectedFeatures = this.state.selectedFeatures.filter(feature => layer.interactivityMapLayers.indexOf(feature.layer.id) > -1);
-
-
-        layerSelectedFeatures.forEach((layerSelectedFeature) => {
-          highlightPointFeatures.push({
-            type: 'Feature',
-            geometry: layerSelectedFeature.geometry,
-            properties: {},
-          });
-        });
-      }
-    });
-
-    const highlightPointFeatureCollection = {
-      type: 'FeatureCollection',
-      features: highlightPointFeatures,
-    };
-
-    mapConfig.layers.push({
-      id: 'highlightPoints',
-      visible: 'true',
-      showInLayerList: false,
-      sources: [{
-        id: 'highlightPoints',
-        type: 'geojson',
-        data: highlightPointFeatureCollection,
-      }],
-      mapLayers: [{
-        id: 'highlightPoints',
-        type: 'circle',
-        source: 'highlightPoints',
-        paint: {
-          'circle-color': 'rgba(255, 255, 255, 1)',
-          'circle-opacity': 0,
-          'circle-radius': 10,
-          'circle-stroke-width': 3,
-          'circle-pitch-scale': 'map',
-          'circle-stroke-color': 'rgba(217, 107, 39, 1)',
-          'circle-stroke-opacity': 0.8,
-        },
-      }],
-    });
-
 
     let leftOffset = 0;
     if (this.state.layerListExpanded) leftOffset += 164;
