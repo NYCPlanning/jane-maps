@@ -127,7 +127,6 @@
 
       // parse all children component props, each becomes a layer object in mapConfig
       _react2.default.Children.forEach(this.props.children, function (child) {
-        console.log('CHILD', child);
         if (child !== null && child.type.displayName === 'JaneLayer') {
           if (child.props.selected) {
             mapConfig.selectedLayer = child.props.id;
@@ -233,7 +232,7 @@
           });
 
           var features = _this3.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
-          _this3.map.mapObject.getCanvas().style.cursor = features.length > 0 ? 'pointer' : '';
+          _this3.map.mapObject.getCanvas().style.cursor = features && features.length > 0 ? 'pointer' : '';
         }
       });
       // const mapLayers = this.getLoadedMapLayers();

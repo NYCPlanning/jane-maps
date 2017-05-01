@@ -8,7 +8,6 @@ const LayerContent = React.createClass({
     layers: React.PropTypes.array.isRequired,
     selectedLayer: React.PropTypes.string,
     onClose: React.PropTypes.func.isRequired,
-    onLayerUpdate: React.PropTypes.func.isRequired,
     offset: React.PropTypes.bool.isRequired,
     visible: React.PropTypes.bool.isRequired,
   },
@@ -44,53 +43,47 @@ const LayerContent = React.createClass({
       },
     };
 
-    console.log('Layers', layers);
-
     // if the layer has a component, mount it
-    const components = layers.map((layer) => {
-      const children = layer.children;
-
-      return (
-        <div
-          style={{
-            display: layer.id === selectedLayer ? 'inline' : 'none',
-          }}
-          key={layer.id}
-        >
-          <div className="drawer-header" >
-            <FontIcon className={`fa fa-${layer.icon}`} style={style.fontIcon} />
-            {layer.name}
-            <IconButton
-              iconClassName={'fa fa-times'}
-              style={{
-                width: 36,
-                height: 36,
-                padding: 0,
-                position: 'absolute',
-                right: 0,
-                top: 0,
-              }}
-              iconStyle={{
-                fontSize: '15px',
-                margin: '8px',
-                height: '15px',
-                width: '15px',
-                float: 'right',
-                color: '#5F5F5F',
-              }}
-              onTouchTap={this.props.onClose}
-            />
-          </div>
-
-          { layer.children }
-          { !layer.children && (
-            <div className="second-drawer-content">
-              <h4>This layer has no content</h4>
-            </div>
-          )}
+    const components = layers.map(layer => (
+      <div
+        style={{
+          display: layer.id === selectedLayer ? 'inline' : 'none',
+        }}
+        key={layer.id}
+      >
+        <div className="drawer-header" >
+          <FontIcon className={`fa fa-${layer.icon}`} style={style.fontIcon} />
+          {layer.name}
+          <IconButton
+            iconClassName={'fa fa-times'}
+            style={{
+              width: 36,
+              height: 36,
+              padding: 0,
+              position: 'absolute',
+              right: 0,
+              top: 0,
+            }}
+            iconStyle={{
+              fontSize: '15px',
+              margin: '8px',
+              height: '15px',
+              width: '15px',
+              float: 'right',
+              color: '#5F5F5F',
+            }}
+            onTouchTap={this.props.onClose}
+          />
         </div>
-      );
-    });
+
+        { layer.children }
+        { !layer.children && (
+          <div className="second-drawer-content">
+            <h4>This layer has no content</h4>
+          </div>
+        )}
+      </div>
+    ));
 
     return ( // render() return
       <div

@@ -64,7 +64,6 @@ const Jane = React.createClass({
 
     // parse all children component props, each becomes a layer object in mapConfig
     React.Children.forEach(this.props.children, (child) => {
-      console.log('CHILD', child);
       if (child !== null && child.type.displayName === 'JaneLayer') {
         if (child.props.selected) {
           mapConfig.selectedLayer = child.props.id;
@@ -164,7 +163,7 @@ const Jane = React.createClass({
         const mapLayerIds = layer.mapLayers.map(mapLayer => mapLayer.id);
 
         const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
-        this.map.mapObject.getCanvas().style.cursor = (features.length > 0) ? 'pointer' : '';
+        this.map.mapObject.getCanvas().style.cursor = (features && features.length > 0) ? 'pointer' : '';
       }
     });
     // const mapLayers = this.getLoadedMapLayers();

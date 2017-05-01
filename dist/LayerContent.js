@@ -38,7 +38,6 @@
       layers: _react2.default.PropTypes.array.isRequired,
       selectedLayer: _react2.default.PropTypes.string,
       onClose: _react2.default.PropTypes.func.isRequired,
-      onLayerUpdate: _react2.default.PropTypes.func.isRequired,
       offset: _react2.default.PropTypes.bool.isRequired,
       visible: _react2.default.PropTypes.bool.isRequired
     },
@@ -77,12 +76,8 @@
         }
       };
 
-      console.log('Layers', layers);
-
       // if the layer has a component, mount it
       var components = layers.map(function (layer) {
-        var children = layer.children;
-
         return _react2.default.createElement(
           'div',
           {
