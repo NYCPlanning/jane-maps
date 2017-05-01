@@ -145,6 +145,8 @@
             name: child.props.name,
             icon: child.props.icon,
             visible: child.props.visible,
+            sources: child.props.sources,
+            mapLayers: child.props.mapLayers,
             onMapLayerClick: child.props.onMapLayerClick,
             initialState: child.props.initialState,
             children: clonedChildren
@@ -381,7 +383,7 @@
         }]
       });
 
-      var leftOffset = 36;
+      var leftOffset = 0;
       if (this.state.layerListExpanded) leftOffset += 164;
       if (this.state.layerContentVisible) leftOffset += 320;
 
@@ -393,18 +395,20 @@
         _react2.default.createElement(
           'div',
           {
-            className: 'jane-map-container', style: {
-              left: leftOffset
-            }
+            className: 'jane-map-container'
           },
           this.props.search && _react2.default.createElement(_Search2.default, _extends({}, this.props.searchConfig, {
             onGeocoderSelection: this.showPoiMarker,
             onClear: this.hidePoiMarker,
-            selectionActive: this.state.poiFeature
+            selectionActive: this.state.poiFeature,
+            leftOffset: leftOffset
           })),
           legendItems.length > 0 && _react2.default.createElement(
             'div',
-            { className: 'jane-legend' },
+            {
+              className: 'jane-legend',
+              style: { left: leftOffset }
+            },
             legendItems
           ),
           _react2.default.createElement(_GLMap2.default, _extends({}, this.props.mapInit, {

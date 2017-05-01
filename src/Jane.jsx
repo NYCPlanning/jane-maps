@@ -80,6 +80,8 @@ const Jane = React.createClass({
           name: child.props.name,
           icon: child.props.icon,
           visible: child.props.visible,
+          sources: child.props.sources,
+          mapLayers: child.props.mapLayers,
           onMapLayerClick: child.props.onMapLayerClick,
           initialState: child.props.initialState,
           children: clonedChildren,
@@ -311,7 +313,7 @@ const Jane = React.createClass({
     });
 
 
-    let leftOffset = 36;
+    let leftOffset = 0;
     if (this.state.layerListExpanded) leftOffset += 164;
     if (this.state.layerContentVisible) leftOffset += 320;
 
@@ -321,9 +323,7 @@ const Jane = React.createClass({
 
       <div className="jane-container" style={this.props.style}>
         <div
-          className="jane-map-container" style={{
-            left: leftOffset,
-          }}
+          className="jane-map-container"
         >
           {
             this.props.search && (
@@ -332,13 +332,17 @@ const Jane = React.createClass({
                 onGeocoderSelection={this.showPoiMarker}
                 onClear={this.hidePoiMarker}
                 selectionActive={this.state.poiFeature}
+                leftOffset={leftOffset}
               />
             )
           }
 
           {
             legendItems.length > 0 && (
-              <div className="jane-legend">
+              <div
+                className="jane-legend"
+                style={{ left: leftOffset }}
+              >
                 {legendItems}
               </div>
             )

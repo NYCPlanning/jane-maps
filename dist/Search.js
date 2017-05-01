@@ -56,7 +56,8 @@
       mapzen_api_key: _react2.default.PropTypes.string,
       onGeocoderSelection: _react2.default.PropTypes.func,
       onClear: _react2.default.PropTypes.func,
-      selectionActive: _react2.default.PropTypes.bool
+      selectionActive: _react2.default.PropTypes.bool,
+      leftOffset: _react2.default.PropTypes.number
     },
 
     getInitialState: function getInitialState() {
@@ -122,7 +123,8 @@
       return _react2.default.createElement(
         'div',
         {
-          className: 'mui-toolbar-container search-filter-toolbar'
+          className: 'mui-toolbar-container search-filter-toolbar',
+          style: { left: this.props.leftOffset }
         },
         _react2.default.createElement(
           _Toolbar.Toolbar,

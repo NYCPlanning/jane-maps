@@ -25,6 +25,7 @@ const Search = React.createClass({
     onGeocoderSelection: React.PropTypes.func,
     onClear: React.PropTypes.func,
     selectionActive: React.PropTypes.bool,
+    leftOffset: React.PropTypes.number,
   },
 
   getInitialState() {
@@ -42,7 +43,7 @@ const Search = React.createClass({
     if (this.props.bounds) {
       apiCall += `&boundary.rect.min_lon=${this.props.bounds.minLon}&boundary.rect.max_lon=${this.props.bounds.maxLon}&boundary.rect.min_lat=${this.props.bounds.minLat}&boundary.rect.max_lat=${this.props.bounds.maxLat}`;
     }
-    
+
     apiCall += `&api_key=${this.props.mapzen_api_key}`;
 
     $.getJSON(apiCall, (data) => { // eslint-disable-line no-undef
@@ -93,6 +94,7 @@ const Search = React.createClass({
     return (
       <div
         className={'mui-toolbar-container search-filter-toolbar'}
+        style={{ left: this.props.leftOffset }}
       >
         <Toolbar
           className="mui-toolbar"
