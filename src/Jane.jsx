@@ -64,24 +64,25 @@ const Jane = React.createClass({
 
     // parse all children component props, each becomes a layer object in mapConfig
     React.Children.forEach(this.props.children, (child) => {
+      console.log('CHILD', child);
       if (child !== null && child.type.displayName === 'JaneLayer') {
         if (child.props.selected) {
           mapConfig.selectedLayer = child.props.id;
         }
+
+        // inject onUpdate prop into layer content, used to dynamically update the map styles
+        const clonedChildren = React.Children.map(child.props.children, (grandchild => React.cloneElement(grandchild, {
+          onUpdate: this.handleLayerUpdate,
+        })));
 
         mapConfig.layers.push({
           id: child.props.id,
           name: child.props.name,
           icon: child.props.icon,
           visible: child.props.visible,
-          component: child.props.component,
-          listItem: child.props.listItem,
           onMapLayerClick: child.props.onMapLayerClick,
-          interactivityMapLayers: child.props.interactivityMapLayers,
-          highlightPointLayers: child.props.highlightPointLayers,
-          sources: child.props.sources,
-          mapLayers: child.props.mapLayers,
           initialState: child.props.initialState,
+          children: clonedChildren,
         });
       }
     });

@@ -119,30 +119,35 @@
       };
     },
     componentWillMount: function componentWillMount() {
+      var _this = this;
+
       var mapConfig = {
         layers: []
       };
 
       // parse all children component props, each becomes a layer object in mapConfig
       _react2.default.Children.forEach(this.props.children, function (child) {
+        console.log('CHILD', child);
         if (child !== null && child.type.displayName === 'JaneLayer') {
           if (child.props.selected) {
             mapConfig.selectedLayer = child.props.id;
           }
+
+          // inject onUpdate prop into layer content, used to dynamically update the map styles
+          var clonedChildren = _react2.default.Children.map(child.props.children, function (grandchild) {
+            return _react2.default.cloneElement(grandchild, {
+              onUpdate: _this.handleLayerUpdate
+            });
+          });
 
           mapConfig.layers.push({
             id: child.props.id,
             name: child.props.name,
             icon: child.props.icon,
             visible: child.props.visible,
-            component: child.props.component,
-            listItem: child.props.listItem,
             onMapLayerClick: child.props.onMapLayerClick,
-            interactivityMapLayers: child.props.interactivityMapLayers,
-            highlightPointLayers: child.props.highlightPointLayers,
-            sources: child.props.sources,
-            mapLayers: child.props.mapLayers,
-            initialState: child.props.initialState
+            initialState: child.props.initialState,
+            children: clonedChildren
           });
         }
       });
@@ -199,24 +204,6 @@
       return thisLayer.visible;
     },
     handleMapLayerClick: function handleMapLayerClick(e) {
-      var _this = this;
-
-      this.state.mapConfig.layers.forEach(function (layer) {
-        if (layer.visible && layer.onMapLayerClick) {
-          var mapLayerIds = layer.mapLayers.map(function (mapLayer) {
-            return mapLayer.id;
-          });
-
-          var features = _this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
-          // de-dup
-          var uniqueFeatures = _underscore2.default.uniq(features, function (feature) {
-            return feature.id;
-          });
-          if (uniqueFeatures.length > 0) layer.onMapLayerClick(uniqueFeatures);
-        }
-      });
-    },
-    handleMapMousemove: function handleMapMousemove(e) {
       var _this2 = this;
 
       this.state.mapConfig.layers.forEach(function (layer) {
@@ -226,7 +213,25 @@
           });
 
           var features = _this2.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
-          _this2.map.mapObject.getCanvas().style.cursor = features.length > 0 ? 'pointer' : '';
+          // de-dup
+          var uniqueFeatures = _underscore2.default.uniq(features, function (feature) {
+            return feature.id;
+          });
+          if (uniqueFeatures.length > 0) layer.onMapLayerClick(uniqueFeatures);
+        }
+      });
+    },
+    handleMapMousemove: function handleMapMousemove(e) {
+      var _this3 = this;
+
+      this.state.mapConfig.layers.forEach(function (layer) {
+        if (layer.visible && layer.onMapLayerClick) {
+          var mapLayerIds = layer.mapLayers.map(function (mapLayer) {
+            return mapLayer.id;
+          });
+
+          var features = _this3.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
+          _this3.map.mapObject.getCanvas().style.cursor = features.length > 0 ? 'pointer' : '';
         }
       });
       // const mapLayers = this.getLoadedMapLayers();
@@ -268,15 +273,15 @@
       });
     },
     toggleLayerContent: function toggleLayerContent() {
-      var _this3 = this;
+      var _this4 = this;
 
       this.setState({
         layerContentVisible: !this.state.layerContentVisible
       }, function () {
-        if (!_this3.state.layerContentVisible) {
-          var mapConfig = _this3.state.mapConfig;
+        if (!_this4.state.layerContentVisible) {
+          var mapConfig = _this4.state.mapConfig;
           mapConfig.selectedLayer = '';
-          _this3.setState({ mapConfig: mapConfig });
+          _this4.setState({ mapConfig: mapConfig });
         }
       });
     },
@@ -301,7 +306,7 @@
       this.setState({ layerListExpanded: !this.state.layerListExpanded });
     },
     render: function render() {
-      var _this4 = this;
+      var _this5 = this;
 
       var mapConfig = this.state.mapConfig;
 
@@ -332,7 +337,7 @@
       mapConfig.layers.forEach(function (layer) {
         if (layer.visible && layer.highlightPointLayers) {
           // get selected features
-          var layerSelectedFeatures = _this4.state.selectedFeatures.filter(function (feature) {
+          var layerSelectedFeatures = _this5.state.selectedFeatures.filter(function (feature) {
             return layer.interactivityMapLayers.indexOf(feature.layer.id) > -1;
           });
 
@@ -404,7 +409,7 @@
           ),
           _react2.default.createElement(_GLMap2.default, _extends({}, this.props.mapInit, {
             ref: function ref(map) {
-              _this4.map = map;
+              _this5.map = map;
             },
             onLoad: this.onMapLoad
           }))

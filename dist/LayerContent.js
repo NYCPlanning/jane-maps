@@ -29,6 +29,7 @@
     };
   }
 
+  // eslint-disable-line
   var LayerContent = _react2.default.createClass({
     displayName: 'LayerContent',
 
@@ -76,9 +77,11 @@
         }
       };
 
+      console.log('Layers', layers);
+
       // if the layer has a component, mount it
       var components = layers.map(function (layer) {
-        var LayerComponent = layer.component;
+        var children = layer.children;
 
         return _react2.default.createElement(
           'div',
@@ -114,11 +117,8 @@
               onTouchTap: _this.props.onClose
             })
           ),
-          layer.component && _react2.default.createElement(LayerComponent, {
-            layer: layer,
-            onUpdate: _this.props.onLayerUpdate
-          }),
-          !layer.component && _react2.default.createElement(
+          layer.children,
+          !layer.children && _react2.default.createElement(
             'div',
             { className: 'second-drawer-content' },
             _react2.default.createElement(
@@ -130,15 +130,17 @@
         );
       });
 
-      return _react2.default.createElement(
-        'div',
-        {
-          className: 'second-drawer ' + (this.props.offset ? 'offset' : ''),
-          style: {
-            transform: this.props.visible ? 'translate(0px, 0px)' : 'translate(-320px, 0px)'
-          }
-        },
-        components
+      return (// render() return
+        _react2.default.createElement(
+          'div',
+          {
+            className: 'second-drawer ' + (this.props.offset ? 'offset' : ''),
+            style: {
+              transform: this.props.visible ? 'translate(0px, 0px)' : 'translate(-320px, 0px)'
+            }
+          },
+          components
+        )
       );
     }
   });

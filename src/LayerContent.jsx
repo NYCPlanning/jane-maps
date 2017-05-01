@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; // eslint-disable-line
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 
@@ -44,10 +44,11 @@ const LayerContent = React.createClass({
       },
     };
 
+    console.log('Layers', layers);
+
     // if the layer has a component, mount it
     const components = layers.map((layer) => {
-      const LayerComponent = layer.component;
-
+      const children = layer.children;
 
       return (
         <div
@@ -81,26 +82,17 @@ const LayerContent = React.createClass({
             />
           </div>
 
-          {
-            layer.component && (
-              <LayerComponent
-                layer={layer}
-                onUpdate={this.props.onLayerUpdate}
-              />
-            )
-          }
-          {
-              !layer.component && (
-                <div className="second-drawer-content">
-                  <h4>This layer has no content</h4>
-                </div>
-              )
-            }
+          { layer.children }
+          { !layer.children && (
+            <div className="second-drawer-content">
+              <h4>This layer has no content</h4>
+            </div>
+          )}
         </div>
       );
     });
 
-    return (
+    return ( // render() return
       <div
         className={`second-drawer ${this.props.offset ? 'offset' : ''}`}
         style={{
