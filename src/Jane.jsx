@@ -62,7 +62,7 @@ const Jane = React.createClass({
     };
 
     // parse all children component props, each becomes a layer object in mapConfig
-    React.Children.forEach(this.props.children, (child) => {
+    React.Children.forEach(this.props.children, (child) => { // eslint-disable-line
       if (child !== null && child.type.displayName === 'JaneLayer') {
         if (child.props.selected) {
           mapConfig.selectedLayer = child.props.id;
@@ -159,7 +159,9 @@ const Jane = React.createClass({
   handleMapMousemove(e) {
     this.state.mapConfig.layers.forEach((layer) => {
       if (layer.visible && layer.onMapLayerClick) {
-        const mapLayerIds = layer.mapLayers.map(mapLayer => mapLayer.id);
+        const mapLayerIds = layer.mapLayers
+          .map(mapLayer => mapLayer.id)
+          .filter(mapLayerId => (this.map.mapObject.getLayer(mapLayerId) !== undefined));
 
         const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
         this.map.mapObject.getCanvas().style.cursor = (features && features.length > 0) ? 'pointer' : '';
