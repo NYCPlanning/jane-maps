@@ -157,33 +157,39 @@ const Jane = React.createClass({
   },
 
   handleMapMousemove(e) {
+    const features = [];
+
     this.state.mapConfig.layers.forEach((layer) => {
       if (layer.visible && layer.onMapLayerClick) {
         const mapLayerIds = layer.mapLayers
           .map(mapLayer => mapLayer.id)
           .filter(mapLayerId => (this.map.mapObject.getLayer(mapLayerId) !== undefined));
 
-        const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
-        this.map.mapObject.getCanvas().style.cursor = (features && features.length > 0) ? 'pointer' : '';
+        const layerFeatures = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
+        layerFeatures.forEach((layerFeature) => {
+          features.push(layerFeature);
+        });
       }
     });
+
+    this.map.mapObject.getCanvas().style.cursor = (features && features.length > 0) ? 'pointer' : '';
   },
 
   handleLayerToggle(layerid) {
     const theLayer = this.state.mapConfig.layers.find((layer => layer.id === layerid));
     theLayer.visible = !theLayer.visible;
 
-    // clear selectedlayer
-    if (this.state.mapConfig.selectedLayer === layerid) {
-      this.state.mapConfig.selectedLayer = '';
-      if (this.state.layerContentVisible) this.toggleLayerContent();
-    } else {
-      // if layer being turned on is not selected, select it
-      this.state.mapConfig.selectedLayer = layerid;
-    }
+    if (theLayer.visible) { // if this action is turning a layer ON
+      if (this.state.mapConfig.selectedLayer !== layerid) {
+        // if layer being turned on is not selected, select it
+        this.state.mapConfig.selectedLayer = layerid;
+      } 
 
-    // if a layer is being turned on, open the second drawer if it is not already open
-    if (theLayer.visible && !this.state.layerContentVisible) this.toggleLayerContent();
+      if (!this.state.layerContentVisible) this.toggleLayerContent();
+    } else if (this.state.mapConfig.selectedLayer === layerid && this.state.layerContentVisible) { // if this action is turning a layer OFF
+      // only close the drawer if this is the selected layer
+      this.toggleLayerContent();
+    }
 
     this.setState({
       mapConfig: this.state.mapConfig,
