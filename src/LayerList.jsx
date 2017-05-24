@@ -59,6 +59,8 @@ const LayerList = React.createClass({
   },
 
   render() {
+    const { disabledLayers } = this.props;
+
     const style = {
       fontIcon: {
         fontSize: '15px',
@@ -71,14 +73,18 @@ const LayerList = React.createClass({
     };
 
     let layers = this.state.layers.map((layer, i) => {
+      const disabled = disabledLayers.indexOf(layer.id) > -1 ? true : false;
+      console.log(layer.name, disabled)
+
       let className = this.props.selectedLayer === layer.id ? 'list-item selected' : 'list-item';
-      if (!layer.visible) className += ' disabled';
+      if (disabled) className += ' disabled';
 
       if (layer.showInLayerList !== false) {
         return (
           <ListItem
             className={className}
             expanded={this.props.expanded}
+            disabled={disabled}
             layer={layer}
             moveListItem={this.moveListItem}
             index={i}

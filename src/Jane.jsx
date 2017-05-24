@@ -52,54 +52,56 @@ const Jane = React.createClass({
       mapLoaded: false,
       layerListExpanded: false,
       layerContentVisible: this.props.layerContentVisible,
-      selectedFeatures: [],
+      disabledLayers: [],
+      selectedLayer: this.props.initialSelectedJaneLayer,
     });
   },
 
   componentWillMount() {
-    const mapConfig = {
-      layers: [],
-    };
+    // const mapConfig = {
+    //   layers: [],
+    // };
 
-    // parse all children component props, each becomes a layer object in mapConfig
-    React.Children.forEach(this.props.children, (child) => { // eslint-disable-line
-      if (child !== null && child.type.displayName === 'JaneLayer') {
-        if (child.props.selected) {
-          mapConfig.selectedLayer = child.props.id;
-        }
-
-        // inject onUpdate prop into layer content, used to dynamically update the map styles
-        const clonedChildren = React.Children.map(child.props.children, (grandchild => React.cloneElement(grandchild, {
-          onUpdate: this.handleLayerUpdate,
-        })));
-
-        mapConfig.layers.push({
-          id: child.props.id,
-          name: child.props.name,
-          icon: child.props.icon,
-          visible: child.props.visible,
-          sources: child.props.sources,
-          mapLayers: child.props.mapLayers,
-          onMapLayerClick: child.props.onMapLayerClick,
-          initialState: child.props.initialState,
-          children: clonedChildren,
-        });
-      }
-    });
-
-    this.setState({
-      mapConfig,
-    });
+    // // parse all children component props, each becomes a layer object in mapConfig
+    // React.Children.forEach(this.props.children, (child) => { // eslint-disable-line
+    //   console.log('child', child);
+    //   if (child !== null && child.type.displayName === 'JaneLayer') {
+    //     if (child.props.selected) {
+    //       mapConfig.selectedLayer = child.props.id;
+    //     }
+    //
+    //     // inject onUpdate prop into layer content, used to dynamically update the map styles
+    //     const clonedChildren = React.Children.map(child.props.children, (grandchild => React.cloneElement(grandchild, {
+    //       onUpdate: this.handleLayerUpdate,
+    //     })));
+    //
+    //     mapConfig.layers.push({
+    //       id: child.props.id,
+    //       name: child.props.name,
+    //       icon: child.props.icon,
+    //       visible: child.props.visible,
+    //       sources: child.props.sources,
+    //       mapLayers: child.props.mapLayers,
+    //       onMapLayerClick: child.props.onMapLayerClick,
+    //       initialState: child.props.initialState,
+    //       children: clonedChildren,
+    //     });
+    //   }
+    // });
+    //
+    // this.setState({
+    //   mapConfig,
+    // });
   },
 
   componentDidMount() {
-    // pass dragend and zoomend up, handle click and mousemove
-    // this.map is the GLMap Component, not the map object itself
-    this.map.mapObject.on('zoomend', this.props.onZoomEnd);
-    this.map.mapObject.on('dragend', this.props.onDragEnd);
-
-    this.map.mapObject.on('click', this.handleMapLayerClick);
-    this.map.mapObject.on('mousemove', this.handleMapMousemove);
+    // // pass dragend and zoomend up, handle click and mousemove
+    // // this.map is the GLMap Component, not the map object itself
+    // this.map.mapObject.on('zoomend', this.props.onZoomEnd);
+    // this.map.mapObject.on('dragend', this.props.onDragEnd);
+    //
+    // this.map.mapObject.on('click', this.handleMapLayerClick);
+    // this.map.mapObject.on('mousemove', this.handleMapMousemove);
   },
 
   componentDidUpdate(prevProps) {
@@ -119,28 +121,23 @@ const Jane = React.createClass({
   },
 
   handleLayerClick(layerid) {
-    const visible = this.isLayerVisible(layerid);
+    const { disabledLayers, layerContentVisible, selectedLayer } = this.state;
+    const disabled = disabledLayers.indexOf(layerid) > -1;
 
-    if (!this.state.layerContentVisible && visible) this.toggleLayerContent();
+    if (!layerContentVisible && !disabled) this.toggleLayerContent();
 
     // if selected layer was clicked, toggle second drawer, else make clicked layer selected
-    if (this.state.mapConfig.selectedLayer !== layerid) {
+    if (selectedLayer !== layerid) {
       // if clicked layer is enabled (visible), make it active
-      if (visible) {
-        this.state.mapConfig.selectedLayer = layerid;
-        this.setState({ mapConfig: this.state.mapConfig });
+      if (!disabled) {
+        const newSelectedLayer = layerid;
+        this.setState({ selectedLayer: newSelectedLayer });
         return;
       }
 
       // otherwise expand the layerlist
       if (!this.state.layerListExpanded) this.setState({ layerListExpanded: true });
     }
-  },
-
-  isLayerVisible(layerid) {
-    // checks if layer with id of layerid is visible, returns boolean
-    const thisLayer = this.state.mapConfig.layers.filter(layer => layer.id === layerid)[0];
-    return thisLayer.visible;
   },
 
   handleMapLayerClick(e) {
@@ -169,25 +166,17 @@ const Jane = React.createClass({
     });
   },
 
-  handleLayerToggle(layerid) {
-    const theLayer = this.state.mapConfig.layers.find((layer => layer.id === layerid));
-    theLayer.visible = !theLayer.visible;
+  handleLayerToggle(id) {
+    const { disabledLayers } = this.state;
+    const i = disabledLayers.indexOf(id);
 
-    // clear selectedlayer
-    if (this.state.mapConfig.selectedLayer === layerid) {
-      this.state.mapConfig.selectedLayer = '';
-      if (this.state.layerContentVisible) this.toggleLayerContent();
+    if (i > -1) {
+      disabledLayers.splice(i, 1);
     } else {
-      // if layer being turned on is not selected, select it
-      this.state.mapConfig.selectedLayer = layerid;
+      disabledLayers.push(id);
     }
 
-    // if a layer is being turned on, open the second drawer if it is not already open
-    if (theLayer.visible && !this.state.layerContentVisible) this.toggleLayerContent();
-
-    this.setState({
-      mapConfig: this.state.mapConfig,
-    });
+    this.setState({ disabledLayers });
   },
 
   hidePoiMarker() {
@@ -209,9 +198,8 @@ const Jane = React.createClass({
       layerContentVisible: !this.state.layerContentVisible,
     }, () => {
       if (!this.state.layerContentVisible) {
-        const mapConfig = this.state.mapConfig;
-        mapConfig.selectedLayer = '';
-        this.setState({ mapConfig });
+        const selectedLayer = '';
+        this.setState({ selectedLayer });
       }
     });
   },
@@ -240,24 +228,34 @@ const Jane = React.createClass({
   render() {
     const mapConfig = this.state.mapConfig;
 
-    // remove highlightPoints layer if it exists
-    mapConfig.layers.forEach((layer, i) => {
-      if (layer.id === 'highlightPoints') mapConfig.layers.splice(i, 1);
+    const { disabledLayers } = this.state;
+
+    const layerListObjects = React.Children.map(this.props.children, (child) => {
+      return child.props
     });
 
-    // add legendItems for each layer
-    const legendItems = [];
-    mapConfig.layers.forEach((layer) => {
-      if (layer.visible && layer.legend) {
-        legendItems.push(<div key={layer.id}>{layer.legend}</div>);
-      }
-    });
+    // const components = React.Children.map(this.props.children, (child) => { // eslint-disable-line
+    //   return child.component;
+    // });
+
+    // // remove highlightPoints layer if it exists
+    // mapConfig.layers.forEach((layer, i) => {
+    //   if (layer.id === 'highlightPoints') mapConfig.layers.splice(i, 1);
+    // });
+    //
+    // // add legendItems for each layer
+    // const legendItems = [];
+    // mapConfig.layers.forEach((layer) => {
+    //   if (layer.visible && layer.legend) {
+    //     legendItems.push(<div key={layer.id}>{layer.legend}</div>);
+    //   }
+    // });
 
     let leftOffset = 0;
     if (this.state.layerListExpanded) leftOffset += 164;
     if (this.state.layerContentVisible) leftOffset += 320;
 
-    const selectedLayer = this.state.mapConfig.selectedLayer;
+    const { selectedLayer } = this.state;
 
     return (
 
@@ -277,7 +275,7 @@ const Jane = React.createClass({
             )
           }
 
-          {
+          { /*
             legendItems.length > 0 && (
               <div
                 className="jane-legend"
@@ -285,7 +283,7 @@ const Jane = React.createClass({
               >
                 {legendItems}
               </div>
-            )
+            ) */
           }
 
           <GLMap
@@ -308,7 +306,8 @@ const Jane = React.createClass({
 
         <LayerList
           expanded={this.state.layerListExpanded}
-          layers={this.state.mapConfig.layers}
+          layers={layerListObjects}
+          disabledLayers={disabledLayers}
           selectedLayer={selectedLayer}
           onLayerReorder={this.handleLayerReorder}
           onLayerClick={this.handleLayerClick}
@@ -319,14 +318,15 @@ const Jane = React.createClass({
         <LayerContent
           offset={this.state.layerListExpanded}
           visible={this.state.layerContentVisible}
-          layers={this.state.mapConfig.layers}
+          layers={this.props.children}
+          disabledLayers={disabledLayers}
           selectedLayer={selectedLayer}
           onLayerUpdate={this.handleLayerUpdate}
           onLayerToggle={this.handleLayerToggle}
           onClose={this.toggleLayerContent}
         />
 
-        { this.state.mapLoaded && <MapHandler map={this.map} mapConfig={mapConfig} /> }
+        { /* this.state.mapLoaded && <MapHandler map={this.map} mapConfig={mapConfig} /> */}
       </div>
 
     );

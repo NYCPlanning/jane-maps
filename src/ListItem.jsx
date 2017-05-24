@@ -107,7 +107,7 @@ let ListItem = React.createClass({
       },
     };
 
-    const { connectDragSource, connectDropTarget, layer } = this.props;
+    const { connectDragSource, connectDropTarget, layer, disabled } = this.props;
 
     return connectDragSource(connectDropTarget(
       <div className={this.props.className} onClick={this.handleClick.bind(this, layer)}>
@@ -117,7 +117,7 @@ let ListItem = React.createClass({
             trackStyle={style.track}
             thumbSwitchedStyle={style.thumbSwitched}
             trackSwitchedStyle={style.trackSwitched}
-            toggled={layer.visible}
+            toggled={!disabled}
             onToggle={this.handleToggle.bind(this, layer.id)}
           />
         </div>

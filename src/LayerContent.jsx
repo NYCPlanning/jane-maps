@@ -43,17 +43,21 @@ const LayerContent = React.createClass({
       },
     };
 
+    const content1 = layers.map(layer => {
+      console.log(layer);
+    })
+
     // if the layer has a component, mount it
-    const components = layers.map(layer => (
+    const content = layers.map(layer => (
       <div
         style={{
-          display: layer.id === selectedLayer ? 'inline' : 'none',
+          display: layer.props.id === selectedLayer ? 'inline' : 'none',
         }}
-        key={layer.id}
+        key={layer.props.id}
       >
         <div className="drawer-header" >
-          <FontIcon className={`fa fa-${layer.icon}`} style={style.fontIcon} />
-          {layer.name}
+          <FontIcon className={`fa fa-${layer.props.icon}`} style={style.fontIcon} />
+          {layer.props.name}
           <IconButton
             iconClassName={'fa fa-times'}
             style={{
@@ -76,12 +80,7 @@ const LayerContent = React.createClass({
           />
         </div>
 
-        { layer.children }
-        { !layer.children && (
-          <div className="second-drawer-content">
-            <h4>This layer has no content</h4>
-          </div>
-        )}
+        {layer.props.component}
       </div>
     ));
 
@@ -92,7 +91,7 @@ const LayerContent = React.createClass({
           transform: this.props.visible ? 'translate(0px, 0px)' : 'translate(-320px, 0px)',
         }}
       >
-        {components}
+        {content}
       </div>
     );
   },

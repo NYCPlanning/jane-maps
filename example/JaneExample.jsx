@@ -2,10 +2,12 @@ import React from 'react';
 import { Jane, JaneLayer } from '../dist';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import TransportationJaneLayer from './transportation/JaneLayer.jsx';
 
 import './node_modules/jane-maps/dist/styles.css';
 
 injectTapEventPlugin();
+
 
 const JaneExample = React.createClass({
   render() {
@@ -78,20 +80,21 @@ const JaneExample = React.createClass({
             mapInit={mapInit}
             search
             searchConfig={searchConfig}
+            layerContentVisible
+            initialSelectedJaneLayer={'transportation'}
           >
             <JaneLayer
               id="feature"
               name="Feature"
               icon="university"
-              visible
-              sources={sources}
-              mapLayers={mapLayers}
+              component={<div><h4>Hello, World!</h4></div>}
             />
+          {TransportationJaneLayer()}
           </Jane>
         </div>
       </MuiThemeProvider>
-    )
-  }
-})
+    );
+  },
+});
 
 export default JaneExample;
