@@ -44,7 +44,7 @@ class UIComponent extends React.Component {
     });
 
     const mapConfig = { sources, mapLayers };
-    this.props.onMapConfigUpdate()
+    this.props.onUpdate();
   }
 
   render() {
