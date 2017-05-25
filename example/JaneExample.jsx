@@ -1,8 +1,10 @@
 import React from 'react';
-import { Jane, JaneLayer } from '../dist';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
-import TransportationJaneLayer from './transportation/JaneLayer.jsx';
+import { Jane, JaneLayer } from '../dist';
+
+import TransportationJaneLayer from './transportation/JaneLayer';
+import DummyComponent from './DummyComponent';
 
 import './node_modules/jane-maps/dist/styles.css';
 
@@ -32,43 +34,6 @@ const JaneExample = React.createClass({
       }
     }
 
-    const sources = [
-      {
-        id: 'feature',
-        type: 'geojson',
-        data: {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "type": "Point",
-                "coordinates": [
-                  -74.00836944580078,
-                  40.71213418976525
-                ]
-              }
-            }
-          ]
-        },
-      },
-    ];
-
-    const mapLayers = [
-      {
-        id: 'feature',
-        source: 'feature',
-        type: 'circle',
-        paint: {
-          'circle-radius': 10,
-          'circle-color': 'steelblue',
-          'circle-opacity': 0.7,
-        },
-      },
-    ];
-
-
     return (
       <MuiThemeProvider>
         <div style={{
@@ -87,9 +52,9 @@ const JaneExample = React.createClass({
               id="feature"
               name="Feature"
               icon="university"
-              component={<div><h4>Hello, World!</h4></div>}
+              component={<DummyComponent />}
             />
-          {TransportationJaneLayer()}
+            {TransportationJaneLayer()}
           </Jane>
         </div>
       </MuiThemeProvider>
