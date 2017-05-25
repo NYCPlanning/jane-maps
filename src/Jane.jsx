@@ -54,44 +54,8 @@ const Jane = React.createClass({
       layerContentVisible: this.props.layerContentVisible,
       disabledLayers: [],
       selectedLayer: this.props.initialSelectedJaneLayer,
+      mapConfig: {},
     });
-  },
-
-  componentWillMount() {
-    // const mapConfig = {
-    //   layers: [],
-    // };
-
-    // // parse all children component props, each becomes a layer object in mapConfig
-    // React.Children.forEach(this.props.children, (child) => { // eslint-disable-line
-    //   console.log('child', child);
-    //   if (child !== null && child.type.displayName === 'JaneLayer') {
-    //     if (child.props.selected) {
-    //       mapConfig.selectedLayer = child.props.id;
-    //     }
-    //
-    //     // inject onUpdate prop into layer content, used to dynamically update the map styles
-    //     const clonedChildren = React.Children.map(child.props.children, (grandchild => React.cloneElement(grandchild, {
-    //       onUpdate: this.handleLayerUpdate,
-    //     })));
-    //
-    //     mapConfig.layers.push({
-    //       id: child.props.id,
-    //       name: child.props.name,
-    //       icon: child.props.icon,
-    //       visible: child.props.visible,
-    //       sources: child.props.sources,
-    //       mapLayers: child.props.mapLayers,
-    //       onMapLayerClick: child.props.onMapLayerClick,
-    //       initialState: child.props.initialState,
-    //       children: clonedChildren,
-    //     });
-    //   }
-    // });
-    //
-    // this.setState({
-    //   mapConfig,
-    // });
   },
 
   componentDidMount() {
@@ -205,20 +169,14 @@ const Jane = React.createClass({
   },
 
   // handles updates to a layer's configuration
-  handleLayerUpdate(layerid, updates) {
-    // get the index in mapConfig.layers of the layer to be updated
-    const layerIndex = this.state.mapConfig.layers.findIndex(layer => layer.id === layerid);
+  handleLayerUpdate(layerid, config) {
+    const { mapConfig } = this.state;
+    const oldConfig = mapConfig[layerid];
 
-    // use setState with callback because multiple <Layer>s may want to update in the same render cycle
-    this.setState(prevState => ({
-      mapConfig: update(prevState.mapConfig, {
-        layers: {
-          [layerIndex]: {
-            $merge: updates,
-          },
-        },
-      }),
-    }));
+    if (JSON.stringify(oldConfig) !== JSON.stringify(config)) {
+      mapConfig[layerid] = config;
+      this.setState({ mapConfig });
+    }
   },
 
   handleToggleExpanded() {
@@ -226,23 +184,23 @@ const Jane = React.createClass({
   },
 
   render() {
-    const mapConfig = this.state.mapConfig;
-
-    const { disabledLayers } = this.state;
+    const { disabledLayers, mapConfig, mapLoaded } = this.state;
 
     const layerListObjects = React.Children.map(this.props.children, (child) => {
-      return child.props
+      return child.props;
     });
 
-    // const components = React.Children.map(this.props.children, (child) => { // eslint-disable-line
-    //   return child.component;
-    // });
 
-    // // remove highlightPoints layer if it exists
-    // mapConfig.layers.forEach((layer, i) => {
-    //   if (layer.id === 'highlightPoints') mapConfig.layers.splice(i, 1);
-    // });
-    //
+    const mapConfigArray = React.Children.map(this.props.children, (child) => {
+      const thisMapConfig = mapConfig[child.props.id];
+
+      return {
+        id: child.props.id,
+        sources: thisMapConfig ? thisMapConfig.sources : [],
+        mapLayers: thisMapConfig ? thisMapConfig.mapLayers : [],
+      };
+    });
+
     // // add legendItems for each layer
     // const legendItems = [];
     // mapConfig.layers.forEach((layer) => {
@@ -326,7 +284,7 @@ const Jane = React.createClass({
           onClose={this.toggleLayerContent}
         />
 
-        { /* this.state.mapLoaded && <MapHandler map={this.map} mapConfig={mapConfig} /> */}
+      { mapLoaded && <MapHandler map={this.map} mapConfig={mapConfigArray} /> }
       </div>
 
     );

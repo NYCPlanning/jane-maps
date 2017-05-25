@@ -2,12 +2,14 @@
 // and renders appropriate components
 import React, { PropTypes } from 'react';
 
+
+
 import MapLayer from './MapLayer';
 import Source from './source/Source';
 
 const MapHandler = React.createClass({
   propTypes: {
-    mapConfig: PropTypes.object.isRequired,
+    mapConfig: PropTypes.array.isRequired,
     map: PropTypes.object.isRequired,
   },
 
@@ -26,8 +28,8 @@ const MapHandler = React.createClass({
     const sources = [];
     const { mapConfig, map } = this.props;
 
-    mapConfig.layers.forEach((layer) => {
-      if (layer.sources && layer.visible) {
+    mapConfig.forEach((layer) => {
+      if (layer.sources) {
         layer.sources.forEach((source) => {
           sources.push(
             <Source map={map} source={source} onLoaded={this.handleSourceLoaded} key={source.id} />,
@@ -39,8 +41,8 @@ const MapHandler = React.createClass({
     // check to see if all sources for visible layers are loaded
     let allSourcesLoaded = true;
 
-    mapConfig.layers.forEach((layer) => {
-      if (layer.visible && layer.sources && layer.mapLayers) {
+    mapConfig.forEach((layer) => {
+      if (layer.sources && layer.mapLayers) {
         layer.mapLayers.forEach((mapLayer) => {
           if (!Object.prototype.hasOwnProperty.call(this.state.loadedSources, mapLayer.source)) { allSourcesLoaded = false; }
         });
@@ -52,9 +54,9 @@ const MapHandler = React.createClass({
 
     if (allSourcesLoaded) {
       this.order = 0;
-      mapConfig.layers.forEach((layer) => {
+      mapConfig.forEach((layer) => {
         // render layers in order
-        if (layer.visible && layer.sources && layer.mapLayers) {
+        if (layer.sources && layer.mapLayers) {
           layer.mapLayers.forEach((mapLayer) => {
             mapLayers.push(<MapLayer map={map} config={mapLayer} key={mapLayer.id + this.order} />);
           });

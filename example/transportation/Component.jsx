@@ -14,6 +14,10 @@ class UIComponent extends React.Component {
     };
   }
 
+  componentDidUpdate() {
+    this.updateMapConfig();
+  }
+
   handleCheck(id) {
     const { activeCheckboxes } = this.state
     const i = activeCheckboxes.indexOf(id);
@@ -44,11 +48,10 @@ class UIComponent extends React.Component {
     });
 
     const mapConfig = { sources, mapLayers };
-    this.props.onUpdate();
+    this.props.onUpdate(mapConfig);
   }
 
   render() {
-    this.updateMapConfig();
 
     const listItemStyle = {
       marginTop: '14px',

@@ -74,7 +74,6 @@ const LayerList = React.createClass({
 
     let layers = this.state.layers.map((layer, i) => {
       const disabled = disabledLayers.indexOf(layer.id) > -1 ? true : false;
-      console.log(layer.name, disabled)
 
       let className = this.props.selectedLayer === layer.id ? 'list-item selected' : 'list-item';
       if (disabled) className += ' disabled';

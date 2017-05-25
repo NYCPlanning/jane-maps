@@ -43,10 +43,6 @@ const LayerContent = React.createClass({
       },
     };
 
-    const content1 = layers.map(layer => {
-      console.log(layer);
-    })
-
     // if the layer has a component, mount it
     const content = layers.map(layer => (
       <div
@@ -80,7 +76,11 @@ const LayerContent = React.createClass({
           />
         </div>
 
-        {layer.props.component}
+        {
+          React.cloneElement(layer.props.component, {
+            onUpdate: this.props.onLayerUpdate.bind(null, layer.props.id),
+          })
+        }
       </div>
     ));
 
