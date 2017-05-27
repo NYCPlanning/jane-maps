@@ -10,56 +10,54 @@ import './node_modules/jane-maps/dist/styles.css';
 
 injectTapEventPlugin();
 
+const JaneExample = () => {
+  const mapInit = {
+    mapbox_accessToken: 'pk.eyJ1IjoiY3dob25nbnljIiwiYSI6ImNpczF1MXdrdjA4MXcycXA4ZGtyN2x5YXIifQ.3HGyME8tBs6BnljzUVIt4Q',
+    center: [-74.0084, 40.7121],
+    zoom: 13.62,
+    minZoom: 9,
+    maxZoom: null,
+    pitch: 0,
+    hash: false,
+    navigationControlPosition: 'bottom-right',
+  };
 
-const JaneExample = React.createClass({
-  render() {
-    const mapInit = {
-      mapbox_accessToken: 'pk.eyJ1IjoiY3dob25nbnljIiwiYSI6ImNpczF1MXdrdjA4MXcycXA4ZGtyN2x5YXIifQ.3HGyME8tBs6BnljzUVIt4Q',
-      center: [-74.0084, 40.7121],
-      zoom: 13.62,
-      minZoom: 9,
-      maxZoom: null,
-      pitch: 0,
-      hash: false,
-      navigationControlPosition: 'bottom-right',
-    };
+  const searchConfig = {
+    mapzen_api_key: 'mapzen-ZyMEp5H',
+    bounds: {
+      minLon: -74.292297,
+      maxLon: -73.618011,
+      minLat: 40.477248,
+      maxLat: 40.958123,
+    },
+  };
 
-    const searchConfig = {
-      mapzen_api_key: 'mapzen-ZyMEp5H',
-      bounds: {
-        minLon: -74.292297,
-        maxLon: -73.618011,
-        minLat: 40.477248,
-        maxLat: 40.958123,
-      }
-    }
-
-    return (
-      <MuiThemeProvider>
-        <div style={{
+  return (
+    <MuiThemeProvider>
+      <div
+        style={{
           height: '500px',
           width: '500px',
         }}
+      >
+        <Jane
+          mapInit={mapInit}
+          search
+          searchConfig={searchConfig}
+          layerContentVisible
+          initialSelectedJaneLayer={'transportation'}
         >
-          <Jane
-            mapInit={mapInit}
-            search
-            searchConfig={searchConfig}
-            layerContentVisible
-            initialSelectedJaneLayer={'transportation'}
-          >
-            <JaneLayer
-              id="feature"
-              name="Feature"
-              icon="university"
-              component={<DummyComponent />}
-            />
-            {TransportationJaneLayer()}
-          </Jane>
-        </div>
-      </MuiThemeProvider>
-    );
-  },
-});
+          <JaneLayer
+            id="feature"
+            name="Feature"
+            icon="university"
+            component={<DummyComponent />}
+          />
+          {TransportationJaneLayer()}
+        </Jane>
+      </div>
+    </MuiThemeProvider>
+  );
+};
 
 export default JaneExample;
