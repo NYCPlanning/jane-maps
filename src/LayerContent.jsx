@@ -1,26 +1,13 @@
 import React from 'react'; // eslint-disable-line
+import PropTypes from 'prop-types';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 
-const LayerContent = React.createClass({
-  propTypes: {
-    onLayerToggle: React.PropTypes.func.isRequired,
-    layers: React.PropTypes.array.isRequired,
-    selectedLayer: React.PropTypes.string,
-    onClose: React.PropTypes.func.isRequired,
-    offset: React.PropTypes.bool.isRequired,
-    visible: React.PropTypes.bool.isRequired,
-  },
-
-  getDefaultProps() {
-    return {
-      selectedLayer: null,
-    };
-  },
+class LayerContent extends React.Component {
 
   handleToggle(layerid) {
     this.props.onLayerToggle(layerid);
-  },
+  }
 
   render() {
     const { layers, selectedLayer } = this.props;
@@ -94,7 +81,21 @@ const LayerContent = React.createClass({
         {content}
       </div>
     );
-  },
-});
+  }
+}
+
+LayerContent.propTypes = {
+  onLayerToggle: PropTypes.func.isRequired,
+  onLayerUpdate: PropTypes.func.isRequired,
+  layers: PropTypes.array.isRequired,
+  selectedLayer: PropTypes.string,
+  onClose: PropTypes.func.isRequired,
+  offset: PropTypes.bool.isRequired,
+  visible: PropTypes.bool.isRequired,
+};
+
+LayerContent.defaultProps = {
+  selectedLayer: null,
+};
 
 export default LayerContent;

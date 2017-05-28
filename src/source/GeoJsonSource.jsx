@@ -1,13 +1,9 @@
 // source prop should have 'data' property with geoJSON, or 'source' property with URL to geojson
 
 import React from 'react';
+import PropTypes from 'prop-types';
 
-const GeoJsonSource = React.createClass({
-  propTypes: {
-    map: React.PropTypes.object.isRequired,
-    source: React.PropTypes.object.isRequired,
-    onLoaded: React.PropTypes.func.isRequired,
-  },
+class GeoJsonSource extends React.Component {
 
   componentWillMount() {
     this.map = this.props.map.mapObject;
@@ -18,7 +14,7 @@ const GeoJsonSource = React.createClass({
       this.data = this.props.source.data;
       this.addSource();
     }
-  },
+  }
 
   componentWillReceiveProps(nextProps) {
     // compare sql
@@ -26,7 +22,7 @@ const GeoJsonSource = React.createClass({
       this.data = nextProps.source.data;
       this.map.getSource(this.props.source.id).setData(this.data);
     }
-  },
+  }
 
   fetchData() {
     const self = this;
@@ -36,7 +32,7 @@ const GeoJsonSource = React.createClass({
         self.data = data;
         self.addSource();
       });
-  },
+  }
 
   addSource() {
     this.map.addSource(this.props.source.id, {
@@ -45,11 +41,17 @@ const GeoJsonSource = React.createClass({
     });
 
     this.props.onLoaded(this.map.getStyle().sources);
-  },
+  }
 
   render() {
     return null;
-  },
-});
+  }
+}
+
+GeoJsonSource.propTypes = {
+  map: PropTypes.object.isRequired,
+  source: PropTypes.object.isRequired,
+  onLoaded: PropTypes.func.isRequired,
+};
 
 export default GeoJsonSource;

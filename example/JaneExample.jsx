@@ -52,6 +52,7 @@ const JaneExample = () => {
             name="Feature"
             icon="university"
             component={<DummyComponent />}
+            onMapLayerClick={() => { console.log('click'); }}
           />
           {TransportationJaneLayer()}
         </Jane>

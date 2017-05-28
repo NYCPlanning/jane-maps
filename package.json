@@ -21,10 +21,11 @@
   },
   "dependencies": {
     "jquery": "^3.1.1",
-    "mapbox-gl": "^0.31.0",
-    "material-ui": "^0.16.6",
-    "react-autosuggest": "^8.0.1",
-    "react-bootstrap": "^0.30.7",
+    "mapbox-gl": "^0.37.0",
+    "material-ui": "^0.18.1",
+    "prop-types": "^15.5.10",
+    "react-autosuggest": "^9.0.1",
+    "react-bootstrap": "^0.31.0",
     "react-dnd": "^2.2.3",
     "react-dnd-html5-backend": "^2.2.3",
     "underscore": "^1.8.3"
@@ -36,11 +37,12 @@
     "babel-preset-react": "^6.22.0",
     "babel-preset-stage-2": "^6.22.0",
     "eslint": "^3.18.0",
-    "eslint-config-airbnb": "^14.1.0",
+    "eslint-config-airbnb": "^15.0.1",
     "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^4.0.0",
-    "eslint-plugin-react": "^6.10.3",
-    "node-sass": "^4.5.0"
+    "eslint-plugin-jsx-a11y": "^5.0.1",
+    "eslint-plugin-react": "^7.0.1",
+    "node-sass": "^4.5.0",
+    "npm-watch": "^0.1.9"
   },
   "peerDependencies": {
     "react": "~0.14.8 || ^15.0.0",

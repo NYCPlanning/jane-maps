@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import GeoJsonSource from './GeoJsonSource';
 import RasterSource from './RasterSource';
@@ -6,22 +7,16 @@ import CartoVectorSource from './CartoVectorSource';
 import CartoRasterSource from './CartoRasterSource';
 
 
-const Source = React.createClass({
-  propTypes: {
-    map: React.PropTypes.object.isRequired,
-    source: React.PropTypes.object.isRequired,
-    onLoaded: React.PropTypes.func.isRequired,
-  },
-
+class Source extends React.Component {
   componentWillUnmount() {
     this.removeSource();
-  },
+  }
 
   removeSource() {
     this.props.map.mapObject.removeSource(this.props.source.id);
     // let jane know what sources are still loaded
     this.props.onLoaded(this.props.map.mapObject.getStyle().sources);
-  },
+  }
 
   render() {
     const source = this.props.source;
@@ -32,7 +27,13 @@ const Source = React.createClass({
     if (source.type === 'cartoraster') return <CartoRasterSource {...this.props} />;
 
     return null;
-  },
-});
+  }
+}
+
+Source.propTypes = {
+  map: PropTypes.object.isRequired,
+  source: PropTypes.object.isRequired,
+  onLoaded: PropTypes.func.isRequired,
+};
 
 export default Source;

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Autosuggest from 'react-autosuggest';
 
 function getSuggestionValue(suggestion) {
@@ -15,19 +16,13 @@ function shouldRenderSuggestions(value) {
   return value.trim().length > 2;
 }
 
-const MapzenGeocoder = React.createClass({
-  propTypes: {
-    bounds: React.PropTypes.object,
-    mapzen_api_key: React.PropTypes.string,
-    onSelection: React.PropTypes.func,
-  },
-
+class MapzenGeocoder extends React.Component {
   getInitialState() {
     return {
       value: '',
       suggestions: [],
     };
-  },
+  }
 
   onSuggestionsFetchRequested({ value }) {
     const self = this;
@@ -39,20 +34,20 @@ const MapzenGeocoder = React.createClass({
         suggestions: data.features,
       });
     });
-  },
+  }
 
   // Autosuggest will call this function every time you need to clear suggestions.
   onSuggestionsClearRequested() {
     this.setState({
       suggestions: [],
     });
-  },
+  }
 
   onChange(e, obj) {
     this.setState({
       value: obj.newValue,
     });
-  },
+  }
 
   onSuggestionSelected(e, o) {
     this.setState({
@@ -60,7 +55,7 @@ const MapzenGeocoder = React.createClass({
     });
 
     this.props.onSelection(o.suggestion);
-  },
+  }
 
   render() {
     const inputProps = {
@@ -81,7 +76,13 @@ const MapzenGeocoder = React.createClass({
         onSuggestionSelected={this.onSuggestionSelected}
       />
     );
-  },
-});
+  }
+}
+
+MapzenGeocoder.propTypes = {
+  bounds: PropTypes.object,
+  mapzen_api_key: PropTypes.string,
+  onSelection: PropTypes.func,
+};
 
 module.exports = MapzenGeocoder;

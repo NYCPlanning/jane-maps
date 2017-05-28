@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import update from 'react/lib/update';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
@@ -10,39 +11,26 @@ import ListItem from './ListItem';
 // This component keeps track of its own state for the order of the layers to implement drag and drop functionality
 // Once an item is dropped, we then pass the new layer order up to Jane to update the main state
 
-const LayerList = React.createClass({
-  propTypes: {
-    layers: PropTypes.array.isRequired,
-    onLayerReorder: PropTypes.func.isRequired,
-    expanded: PropTypes.bool.isRequired,
-    onLayerClick: PropTypes.func.isRequired,
-    selectedLayer: PropTypes.string,
-    onToggleExpanded: PropTypes.func.isRequired,
-    onLayerToggle: PropTypes.func.isRequired,
-  },
+class LayerList extends React.Component {
 
-  getDefaultProps() {
-    return {
-      selectedLayer: null,
-    };
-  },
+  constructor(props) {
+    super(props);
 
-  getInitialState() {
-    return ({
+    this.state = {
       layers: this.props.layers,
-    });
-  },
+    };
+  }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
       layers: nextProps.layers,
     });
-  },
+  }
 
   handleDrop() {
     // on drop pass the current state up to Jane
     this.props.onLayerReorder(this.state.layers);
-  },
+  }
 
   moveListItem(dragIndex, hoverIndex) {
     const { layers } = this.state;
@@ -56,7 +44,7 @@ const LayerList = React.createClass({
         ],
       },
     }));
-  },
+  }
 
   render() {
     const { disabledLayers } = this.props;
@@ -73,7 +61,7 @@ const LayerList = React.createClass({
     };
 
     let layers = this.state.layers.map((layer, i) => {
-      const disabled = disabledLayers.indexOf(layer.id) > -1 ? true : false;
+      const disabled = disabledLayers.indexOf(layer.id) > -1;
 
       let className = this.props.selectedLayer === layer.id ? 'list-item selected' : 'list-item';
       if (disabled) className += ' disabled';
@@ -121,7 +109,22 @@ const LayerList = React.createClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
+
+LayerList.propTypes = {
+  layers: PropTypes.array.isRequired,
+  onLayerReorder: PropTypes.func.isRequired,
+  expanded: PropTypes.bool.isRequired,
+  onLayerClick: PropTypes.func.isRequired,
+  selectedLayer: PropTypes.string,
+  onToggleExpanded: PropTypes.func.isRequired,
+  onLayerToggle: PropTypes.func.isRequired,
+  disabledLayers: PropTypes.array.isRequired,
+};
+
+LayerList.defaultProps = {
+  selectedLayer: null,
+};
 
 export default DragDropContext(HTML5Backend)(LayerList);

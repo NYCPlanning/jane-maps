@@ -1,27 +1,23 @@
 // MapHandler - a component that figures out which sources and mapLayers should exist on the map,
 // and renders appropriate components
-import React, { PropTypes } from 'react';
-
-
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import MapLayer from './MapLayer';
 import Source from './source/Source';
 
-const MapHandler = React.createClass({
-  propTypes: {
-    mapConfig: PropTypes.array.isRequired,
-    map: PropTypes.object.isRequired,
-  },
+class MapHandler extends React.Component {
+  constructor(props) {
+    super(props);
 
-  getInitialState() {
-    return {
+    this.state = {
       loadedSources: {},
     };
-  },
+  }
 
-  handleSourceLoaded(loadedSources) {
+  handleSourceLoaded = (loadedSources) => {
     this.setState({ loadedSources });
-  },
+  }
 
   render() {
     // load all sources for visible layers
@@ -72,7 +68,12 @@ const MapHandler = React.createClass({
         {mapLayers}
       </div>
     );
-  },
-});
+  }
+}
+
+MapHandler.propTypes = {
+  mapConfig: PropTypes.array.isRequired,
+  map: PropTypes.object.isRequired,
+};
 
 export default MapHandler;

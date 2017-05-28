@@ -1,5 +1,6 @@
-import React, { PropTypes } from 'react'; // eslint-disable-line
+import React from 'react'; // eslint-disable-line
 import update from 'react/lib/update'; // eslint-disable-line
+import PropTypes from 'prop-types';
 import _ from 'underscore';
 
 import GLMap from './GLMap';
@@ -9,44 +10,12 @@ import PoiMarker from './PoiMarker';
 import Search from './Search';
 import MapHandler from './MapHandler';
 
-const Jane = React.createClass({
-  propTypes: {
-    poiFeature: PropTypes.object,
-    poiLabel: PropTypes.string,
-    layerContentVisible: PropTypes.bool,
-    mapInit: PropTypes.object.isRequired,
-    style: PropTypes.object,
-    search: PropTypes.bool,
-    searchConfig: PropTypes.object,
-    fitBounds: PropTypes.array,
-    onZoomEnd: PropTypes.func,
-    onDragEnd: PropTypes.func,
-  },
+class Jane extends React.Component {
 
-  getDefaultProps() {
-    return {
-      poiFeature: null,
-      poiLabel: null,
-      layerContentVisible: false,
-      style: {
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0,
-        overflow: 'hidden',
-      },
-      search: false,
-      searchConfig: null,
-      fitBounds: null,
-      children: null,
-      onZoomEnd: () => {},
-      onDragEnd: () => {},
-    };
-  },
+  constructor(props) {
+    super(props);
 
-  getInitialState() {
-    return ({
+    this.state = {
       poiFeature: this.props.poiFeature ? this.props.poiFeature : null,
       poiLabel: this.props.poiLabel ? this.props.poiLabel : null,
       mapLoaded: false,
@@ -55,36 +24,38 @@ const Jane = React.createClass({
       disabledLayers: [],
       selectedLayer: this.props.initialSelectedJaneLayer,
       mapConfig: {},
-    });
-  },
+      layerOrder: [],
+    };
+  }
 
   componentDidMount() {
     // // pass dragend and zoomend up, handle click and mousemove
     // // this.map is the GLMap Component, not the map object itself
-    // this.map.mapObject.on('zoomend', this.props.onZoomEnd);
-    // this.map.mapObject.on('dragend', this.props.onDragEnd);
-    //
-    // this.map.mapObject.on('click', this.handleMapLayerClick);
-    // this.map.mapObject.on('mousemove', this.handleMapMousemove);
-  },
+    this.map.mapObject.on('zoomend', this.props.onZoomEnd);
+    this.map.mapObject.on('dragend', this.props.onDragEnd);
+
+    this.map.mapObject.on('click', this.handleMapLayerClick);
+    this.map.mapObject.on('mousemove', this.handleMapMousemove);
+  }
 
   componentDidUpdate(prevProps) {
     // fit map to fitBounds property if it is different from previous props
     if (JSON.stringify(prevProps.fitBounds) !== JSON.stringify(this.props.fitBounds)) {
       this.map.mapObject.fitBounds(this.props.fitBounds);
     }
-  },
+  }
 
-  onMapLoad() {
+  onMapLoad = () => {
+    console.log('onMapLoad', this)
     this.setState({ mapLoaded: true });
-  },
+  }
 
-  handleLayerReorder(layers) {
-    this.state.mapConfig.layers = layers;
-    this.setState({ mapConfig: this.state.mapConfig });
-  },
+  handleLayerReorder = (layers) => {
+    const layerOrder = layers.map(layer => layer.id);
+    this.setState({ layerOrder });
+  }
 
-  handleLayerClick(layerid) {
+  handleLayerClick = (layerid) => {
     const { disabledLayers, layerContentVisible, selectedLayer } = this.state;
     const disabled = disabledLayers.indexOf(layerid) > -1;
 
@@ -102,9 +73,9 @@ const Jane = React.createClass({
       // otherwise expand the layerlist
       if (!this.state.layerListExpanded) this.setState({ layerListExpanded: true });
     }
-  },
+  }
 
-  handleMapLayerClick(e) {
+  handleMapLayerClick = (e) => {
     this.state.mapConfig.layers.forEach((layer) => {
       if (layer.visible && layer.onMapLayerClick) {
         const mapLayerIds = layer.mapLayers.map(mapLayer => mapLayer.id);
@@ -115,12 +86,19 @@ const Jane = React.createClass({
         if (uniqueFeatures.length > 0) layer.onMapLayerClick(uniqueFeatures);
       }
     });
-  },
+  }
 
-  handleMapMousemove(e) {
-    this.state.mapConfig.layers.forEach((layer) => {
-      if (layer.visible && layer.onMapLayerClick) {
-        const mapLayerIds = layer.mapLayers
+  handleMapMousemove = (e) => {
+    const { mapConfig, disabledLayers } = this.state;
+    console.log(mapConfig);
+
+    React.Children.map(this.props.children, (janeLayer) => {
+      const { id, onMapLayerClick } = janeLayer.props;
+
+      const disabled = disabledLayers.indexOf(id) > -1;
+
+      if (!disabled && onMapLayerClick) {
+        const mapLayerIds = mapConfig[id].mapLayers
           .map(mapLayer => mapLayer.id)
           .filter(mapLayerId => (this.map.mapObject.getLayer(mapLayerId) !== undefined));
 
@@ -128,9 +106,9 @@ const Jane = React.createClass({
         this.map.mapObject.getCanvas().style.cursor = (features && features.length > 0) ? 'pointer' : '';
       }
     });
-  },
+  }
 
-  handleLayerToggle(id) {
+  handleLayerToggle = (id) => {
     const { disabledLayers } = this.state;
     const i = disabledLayers.indexOf(id);
 
@@ -141,23 +119,23 @@ const Jane = React.createClass({
     }
 
     this.setState({ disabledLayers });
-  },
+  }
 
-  hidePoiMarker() {
+  hidePoiMarker = () => {
     this.setState({
       poiFeature: null,
       poiLabel: null,
     });
-  },
+  }
 
-  showPoiMarker(feature, label) {
+  showPoiMarker = (feature, label) => {
     this.setState({
       poiFeature: feature,
       poiLabel: label,
     });
-  },
+  }
 
-  toggleLayerContent() {
+  toggleLayerContent = () => {
     this.setState({
       layerContentVisible: !this.state.layerContentVisible,
     }, () => {
@@ -166,10 +144,10 @@ const Jane = React.createClass({
         this.setState({ selectedLayer });
       }
     });
-  },
+  }
 
   // handles updates to a layer's configuration
-  handleLayerUpdate(layerid, config) {
+  handleLayerUpdate = (layerid, config) => {
     const { mapConfig } = this.state;
     const oldConfig = mapConfig[layerid];
 
@@ -177,18 +155,24 @@ const Jane = React.createClass({
       mapConfig[layerid] = config;
       this.setState({ mapConfig });
     }
-  },
+  }
 
-  handleToggleExpanded() {
+  handleToggleExpanded = () => {
     this.setState({ layerListExpanded: !this.state.layerListExpanded });
-  },
+  }
+
+  sort = (a, b) => {
+    console.log(this);
+    const { layerOrder } = this.state;
+    return layerOrder.indexOf(a.id) > layerOrder.indexOf(b.id) ? 1 : -1;
+  }
 
   render() {
     const { disabledLayers, mapConfig, mapLoaded } = this.state;
 
-    const layerListObjects = React.Children.map(this.props.children, (child) => {
-      return child.props;
-    });
+    const layerListObjects = React.Children
+      .map(this.props.children, child => child.props)
+      .sort(this.sort);
 
 
     const mapConfigArray = React.Children.map(this.props.children, (child) => {
@@ -199,7 +183,7 @@ const Jane = React.createClass({
         sources: thisMapConfig ? thisMapConfig.sources : [],
         mapLayers: thisMapConfig ? thisMapConfig.mapLayers : [],
       };
-    });
+    }).sort(this.sort);
 
     // // add legendItems for each layer
     // const legendItems = [];
@@ -284,11 +268,47 @@ const Jane = React.createClass({
           onClose={this.toggleLayerContent}
         />
 
-      { mapLoaded && <MapHandler map={this.map} mapConfig={mapConfigArray} /> }
+        { mapLoaded && <MapHandler map={this.map} mapConfig={mapConfigArray} /> }
       </div>
 
     );
+  }
+}
+
+Jane.propTypes = {
+  poiFeature: PropTypes.object,
+  poiLabel: PropTypes.string,
+  layerContentVisible: PropTypes.bool,
+  mapInit: PropTypes.object.isRequired,
+  style: PropTypes.object,
+  search: PropTypes.bool,
+  searchConfig: PropTypes.object,
+  fitBounds: PropTypes.array,
+  onZoomEnd: PropTypes.func,
+  onDragEnd: PropTypes.func,
+  children: PropTypes.array,
+  initialSelectedJaneLayer: PropTypes.string,
+};
+
+Jane.defaultProps = {
+  poiFeature: null,
+  poiLabel: null,
+  layerContentVisible: false,
+  style: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    overflow: 'hidden',
   },
-});
+  search: false,
+  searchConfig: null,
+  fitBounds: null,
+  children: null,
+  initialSelectedJaneLayer: null,
+  onZoomEnd: () => {},
+  onDragEnd: () => {},
+};
 
 export default Jane;

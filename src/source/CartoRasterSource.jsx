@@ -1,18 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-const CartoRasterSource = React.createClass({
-  propTypes: {
-    map: React.PropTypes.shape({
-      mapObject: React.PropTypes.object,
-    }).isRequired,
-    source: React.PropTypes.shape({
-      options: React.PropTypes.object,
-      tiles: React.PropTypes.array,
-      id: React.PropTypes.string,
-      sql: React.PropTypes.string,
-    }).isRequired,
-    onLoaded: React.PropTypes.func.isRequired,
-  },
+class CartoRasterSource extends React.Component {
 
   componentWillMount() {
     this.map = this.props.map.mapObject;
@@ -20,7 +9,7 @@ const CartoRasterSource = React.createClass({
     if (!this.props.source.tiles) {
       this.fetchData(this.props.source.sql);
     }
-  },
+  }
 
   componentWillReceiveProps(nextProps) {
     // compare sql
@@ -28,7 +17,7 @@ const CartoRasterSource = React.createClass({
     if (!(nextProps.source.sql === this.props.source.sql)) {
       this.fetchData(nextProps.source.sql);
     }
-  },
+  }
 
   fetchData() {
     const { carto_domain, carto_user } = this.props.source.options;
@@ -58,7 +47,7 @@ const CartoRasterSource = React.createClass({
         this.addSource(template);
       },
     });
-  },
+  }
 
   addSource(template) {
     if (this.map.getSource(this.props.source.id)) {
@@ -71,12 +60,25 @@ const CartoRasterSource = React.createClass({
     });
 
     this.props.onLoaded(this.map.getStyle().sources);
-  },
+  }
 
 
   render() {
     return null;
-  },
-});
+  }
+}
+
+CartoRasterSource.propTypes = {
+  map: PropTypes.shape({
+    mapObject: PropTypes.object,
+  }).isRequired,
+  source: PropTypes.shape({
+    options: PropTypes.object,
+    tiles: PropTypes.array,
+    id: PropTypes.string,
+    sql: PropTypes.string,
+  }).isRequired,
+  onLoaded: PropTypes.func.isRequired,
+};
 
 export default CartoRasterSource;

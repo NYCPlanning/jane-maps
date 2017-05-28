@@ -1,11 +1,7 @@
 import React from 'react'; // eslint-disable-line
+import PropTypes from 'prop-types';
 
-const PoiMarker = React.createClass({
-  propTypes: {
-    feature: React.PropTypes.object.isRequired,
-    map: React.PropTypes.object.isRequired,
-    label: React.PropTypes.string.isRequired,
-  },
+class PoiMarker extends React.Component {
 
   componentDidMount() {
     const el = document.createElement('div');
@@ -33,18 +29,18 @@ const PoiMarker = React.createClass({
     const { feature, label } = this.props;
 
     this.updateMarker(feature, label);
-  },
+  }
 
   componentWillUpdate(nextProps) {
     if (JSON.stringify(nextProps.feature) !== JSON.stringify(this.props.feature)) {
       this.updateMarker(nextProps.feature, nextProps.label);
     }
-  },
+  }
 
   componentWillUnmount() {
     this.marker.remove();
     this.label.remove();
-  },
+  }
 
   updateMarker(feature, label) {
     const { map } = this.props;
@@ -59,11 +55,18 @@ const PoiMarker = React.createClass({
       .addTo(map.mapObject);
 
     map.flyMap(feature);
-  },
+  }
 
   render() {
     return (<div />);
-  },
-});
+  }
+}
+
+PoiMarker.propTypes = {
+  feature: PropTypes.object.isRequired,
+  map: PropTypes.object.isRequired,
+  label: PropTypes.string.isRequired,
+};
+
 
 export default PoiMarker;
