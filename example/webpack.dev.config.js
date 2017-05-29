@@ -11,6 +11,7 @@ module.exports = {
     publicPath: '/',
   },
   resolve: {
+    extensions: ['.js', '.jsx'],
     modules: [
       'node_modules',
       path.join(__dirname, 'node_modules'),

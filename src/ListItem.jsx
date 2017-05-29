@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { findDOMNode } from 'react-dom';
 import { DragSource, DropTarget } from 'react-dnd';
 import FontIcon from 'material-ui/FontIcon';
@@ -65,25 +66,15 @@ const listItemTarget = {
   },
 };
 
-let ListItem = React.createClass({
-
-  propTypes: {
-    connectDragSource: PropTypes.func.isRequired,
-    connectDropTarget: PropTypes.func.isRequired,
-    layer: PropTypes.object.isRequired,
-    onClick: PropTypes.func.isRequired,
-    className: PropTypes.string.isRequired,
-    expanded: PropTypes.bool.isRequired,
-    onLayerToggle: PropTypes.func.isRequired,
-  },
+class ListItemClass extends React.Component {
 
   handleClick(layer, e) {
     if (e.target.type !== 'checkbox') this.props.onClick(layer.id);
-  },
+  }
 
   handleToggle(layerid) {
     this.props.onLayerToggle(layerid);
-  },
+  }
 
   render() {
     const style = {
@@ -107,7 +98,7 @@ let ListItem = React.createClass({
       },
     };
 
-    const { connectDragSource, connectDropTarget, layer } = this.props;
+    const { connectDragSource, connectDropTarget, layer, disabled } = this.props;
 
     return connectDragSource(connectDropTarget(
       <div className={this.props.className} onClick={this.handleClick.bind(this, layer)}>
@@ -117,7 +108,7 @@ let ListItem = React.createClass({
             trackStyle={style.track}
             thumbSwitchedStyle={style.thumbSwitched}
             trackSwitchedStyle={style.trackSwitched}
-            toggled={layer.visible}
+            toggled={!disabled}
             onToggle={this.handleToggle.bind(this, layer.id)}
           />
         </div>
@@ -140,9 +131,25 @@ let ListItem = React.createClass({
 
       </div>,
     ));
-  },
-});
+  }
+}
 
+ListItemClass.propTypes = {
+  connectDragSource: PropTypes.func.isRequired,
+  connectDropTarget: PropTypes.func.isRequired,
+  layer: PropTypes.object.isRequired,
+  onClick: PropTypes.func.isRequired,
+  className: PropTypes.string.isRequired,
+  expanded: PropTypes.bool.isRequired,
+  onLayerToggle: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
+};
+
+ListItemClass.defaultProps = {
+  disabled: false,
+};
+
+let ListItem = ListItemClass;
 
 ListItem = DragSource('listItem', listItemSource, (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
@@ -152,7 +159,6 @@ ListItem = DragSource('listItem', listItemSource, (connect, monitor) => ({
 ListItem = DropTarget('listItem', listItemTarget, connect => ({
   connectDropTarget: connect.dropTarget(),
 }))(ListItem);
-
 
 const exportListItem = ListItem;
 export default exportListItem;

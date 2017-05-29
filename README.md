@@ -4,9 +4,13 @@ A framework for rich, composable web maps using React and MapboxGL
 
 ![facilities_explorer_and_developer_tools_-_http___localhost_8080__and_developer_tools_-_https___staging_capitalplanning_nyc_facilities_explorer](https://cloud.githubusercontent.com/assets/1833820/23576517/c9619900-0075-11e7-8836-ab6d7515cd16.png)
 
-## What's it all about?
+## What is Jane?
 
-Jane Maps is the frontend mapping framework used in [DCP's Capital Planning Platform](http://capitalplanning.nyc.gov).  It's more than just a React wrapper for mapboxgl.js, and includes several UI components that complement the map, allowing for modular layer configurations that include map data, styling, and their associated UI.
+Jane Maps is a react component for building modular, multi-layer web maps with complex UIs
+
+It is the frontend mapping framework used in [DCP's Capital Planning Platform](http://capitalplanning.nyc.gov).  It's more than just a React wrapper for mapboxgl.js, and includes several UI components that complement the map, allowing for modular layer configurations that include map data, styling, and their associated UI.
+
+## Jane is Young
 
 We only recently extracted Jane Maps from its original home within the Capital Planning Platform, as we see great potential in its reusability in other parts of NYC government and beyond.
 
@@ -20,7 +24,6 @@ Jane Maps is named for [Jane Jacobs](https://en.wikipedia.org/wiki/Jane_Jacobs),
 Install via npm:
 `npm install jane-maps`
 
-
 Include the top-level component `Jane` and `JaneLayer`, and include the css
 ```
 import { Jane, JaneLayer } from 'jane-maps';
@@ -30,45 +33,9 @@ import 'jane-maps/dist/styles.css'
 
 Use Jane and JaneLayer to compose a map
 ```
-// define arrays of mapboxgl sources and layers to be passed in to `<JaneLayer/>` as props
 
-const sources = [
-  {
-    id: 'feature',
-    type: 'geojson',
-    data: {
-      "type": "FeatureCollection",
-      "features": [
-        {
-          "type": "Feature",
-          "properties": {},
-          "geometry": {
-            "type": "Point",
-            "coordinates": [
-              -74.00836944580078,
-              40.71213418976525
-            ]
-          }
-        }
-      ]
-    },
-  },
-];
 
-const mapLayers = [
-  {
-    id: 'feature',
-    source: 'feature',
-    type: 'circle',
-    paint: {
-      'circle-radius': 10,
-      'circle-color': 'steelblue',
-      'circle-opacity': 0.7,
-    },
-  },
-];
-
-// Use `<Jane/>` to instantiate a map, and `<JaneLayer/>` as a child of `<Jane/>` to define a simple layer
+// Use `<Jane/>` to instantiate a map, and `<JaneLayer/>` as a child of `<Jane/>` to define a layer.  `JaneLayer` must include as props a unique `id`, a display `name`, an `icon` (fontawesome icon name), and a `component`.  The component renders the UI for the JaneLayer, and also manages the internal state and current map configuration for the layer.
 
     <Jane
       mapInit={{
@@ -81,14 +48,61 @@ const mapLayers = [
         id="feature"
         name="Feature"
         icon="university"
-        visible="true"
-        sources={sources}
-        mapLayers={mapLayers}
+        component={<MyJaneLayerComponent />}
       />
     </Jane>
 ```
 
-## Material UI Extra Steps
+`JaneLayer`'s component prop is cloned by `Jane` and given an `onUpdate` prop.  When `JaneLayer` updates, it should call `onUpdate` with the latest mapConfig. mapConfig is an object that includes mapboxGL sources and layers, and legend content.
+
+class MyJaneLayerComponent extends React.Component {
+  componentDidUpdate() {
+    this.props.onUpdate({
+      sources: [
+        {
+          id: 'feature',
+          type: 'geojson',
+          data: {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                  "type": "Point",
+                  "coordinates": [
+                    -74.00836944580078,
+                    40.71213418976525
+                  ]
+                }
+              }
+            ]
+          },
+        },
+      ],
+      mapLayers = [
+        {
+          id: 'feature',
+          source: 'feature',
+          type: 'circle',
+          paint: {
+            'circle-radius': 10,
+            'circle-color': 'steelblue',
+            'circle-opacity': 0.7,
+          },
+        },
+      ],
+    })
+  }
+
+  render() {
+    return (
+        <div>About this JaneLayer</div>
+    )
+  }
+}
+
+## Material UI
 
 Jane Maps makes use of Material UI.  If you don't have Material UI in your project, you'll need to take some additional steps to make sure it's set up properly for Jane Maps.  See the examples for more information on these requirements.
 
@@ -107,7 +121,7 @@ All components using Material UI must be wrapped in a `<MuiThemeProvider>` compo
 
 ## `Jane`
 
-`Jane` is the top-level component, and is used to create a MapboxGL map with optional UI components
+`Jane` is the top-level component, and is used to create a MapboxGL map and manage JaneLayers.  Jane's built-in drawer allows the user to select which JaneLayer to interact with, toggle visibility of JaneLayers, etc.
 
 ### Props
 
@@ -142,9 +156,23 @@ All components using Material UI must be wrapped in a `<MuiThemeProvider>` compo
 }
 ```
 
+`poiFeature` - geoJson object with geometry of type point - Point of Interest Feature, Jane will show a marker icon at this location.
+
+`poiLabel` - string - This string will be displayed to the right of the `poiFeature` marker
+
+`layerContentVisible` - boolean - if true, the JaneLayer content drawer will be initially open
+
+`onZoomEnd` - function - Handler for the mapboxGL map's `zoomend` event
+`onDragEnd` - function - Handler for the mapboxGL map's `dragend` event
+
+`initialSelectedJaneLayer` - string - the id of the JaneLayer that should be initially selected.
+
+`initialDisabledJaneLayers` - array of strings - ids of the JaneLayers that should be disabled (switched off) initially
+
+
 ## `JaneLayer`
 
-A JaneLayer is a discrete set of related map sources, symbologies and UIs.  Each JaneLayer gets a spot in Jane's built-in layer selector, and can be composed in several different ways. JaneLayers can act as controllers for many separate layers on the map, and can have no UI (meaning Jane can toggle visibility only) or custom UI (a custom component passed in as a prop)
+JaneLayers are passed in to Jane as children, and include a Component prop that handles local state, map updates, and UI.  JaneLayers are where updates to the
 
 ### Props
 
@@ -152,39 +180,29 @@ A JaneLayer is a discrete set of related map sources, symbologies and UIs.  Each
 
 `name` - string - this is the name used for display purposes in the UI
 
-`icon` - string - the font-awesome icon for the JaneLayer.  This should be the part of the font-awesome class after the hypen, so use `'university'` for the icon `fa-university`
+`icon` - string - the font-awesome icon for the JaneLayer.  This should be the part of the font-awesome class after the hyphen, so use `'university'` for the icon `fa-university`
 
-`visible` - boolean - if true, the JaneLayer will be visible on the map (and toggled on in the UI) by default
-
-`selected` - boolean - Jane's layer selector allows for only a single JaneLayer's UI to be visible at a time.  If true, this JaneLayer will be selected by default.  Only one JaneLayer should have `selected=true` when instantiating a new Jane map.
-
-`sources` - array - An array of Jane Sources.  These translate directly into mapboxGL sources, but Jane includes some custom source types that provide extra handling of data before adding the source to the map. (such as a Carto maps API handshake) See `sources` below.
-
-`mapLayers` - array - An array of mapboxGL layer objects.  These are no different that those used in mapboxGL's api.  See `mapLayers` below.
+`component` - React Component - the Component which will render in Jane's drawer.  The component also calls `onUpdate` to pass new map configurations up to Jane
 
 `onMapLayerClick(features)` - function - A function to handle click events on the JaneLayer's rendered features.  `features` is a de-duped array of features that were under the click.
 
-### Children
+## mapConfig objects
 
-The content rendered in Jane's sidebar is defined by the Child of each `JaneLayer`.  This child should be a React Component that will present the UI associated with that JaneLayer, and handle all user interactions.
+Jane-maps doesn't allow you to explicitly define mapboxGL sources and layers to render on the map. Instead, it expects the Component associated with each JaneLayer to pass a mapConfig object whenever there is a change to what should be displayed.
 
-The Child component will be cloned and an additional `onUpdate` prop will be passed in, for use in programmatically updating the JaneLayer's layerConfig (sources, mapLayers, legends)
+Behind the scenes, Jane keeps track of the mapConfigs for each of the JaneLayers, including what order they should be rendered in, whether they should be visible, etc.
 
-```
-<JaneLayer
-  id="facilities"
-  name="Facilities and Program Sites"
-  icon="university"
-  onMapLayerClick={this.handleMapLayerClick}
-  selected
-  visible
->
-  <FacilitiesComponent />
-</JaneLayer>
-```
+A mapConfig object includes three main properties:  `sources`, `mapLayers`, and `legend`
 
+const mapConfig = {
+  sources: [],
+  mapLayers: [],
+  legend: <SomeContent />
+}
 
-## `sources`
+### `sources`
+
+`sources` is an array of `source` objects, see below for the various source types and what other properties they require.
 
 Sources in Jane are configuration objects that eventually become mapboxGL sources.
 
@@ -241,7 +259,9 @@ Source types include:
 ```
 
 
-## `mapLayers`
+### `mapLayers`
+
+`mapLayers` is an array of mapboxGL `layer` objects.  Each should use a source that is defined in `sources` for this JaneLayer.
 
 MapLayers define styling in mapboxGL, and are identical to those defined in the mapboxGL api.
 
@@ -266,7 +286,7 @@ MapLayers define styling in mapboxGL, and are identical to those defined in the 
 
 ## A Dream
 
-Someday in the not too distant future, JaneLayers could be packaged with data, styles, and UI, and exist in an open registry.  Adding a complex layer to your project could be as simple as running `jane install nyc-admin-boundaries`.  A dev can dream...
+Someday in the not too distant future, JaneLayers could be packaged with data, styles, and UI, and exist as npm packages.  Adding a complex janeLayer to your project could be as simple as running `npm install jane-nyc-admin-boundaries`.  A dev can dream...
 
 ## Development
 `npm watch` will transpile from `/src` into `/dist`, and will also convert the `styles.scss` to `css`.  

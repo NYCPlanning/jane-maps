@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
@@ -18,24 +19,18 @@ function shouldRenderSuggestions(value) {
   return value.trim().length > 2;
 }
 
-const Search = React.createClass({
-  propTypes: {
-    bounds: React.PropTypes.object,
-    mapzen_api_key: React.PropTypes.string,
-    onGeocoderSelection: React.PropTypes.func,
-    onClear: React.PropTypes.func,
-    selectionActive: React.PropTypes.bool,
-    leftOffset: React.PropTypes.number,
-  },
+class Search extends React.Component {
 
-  getInitialState() {
-    return {
+  constructor(props) {
+    super(props);
+
+    this.state = {
       value: '',
       suggestions: [],
     };
-  },
+  }
 
-  onSuggestionsFetchRequested({ value }) {
+  onSuggestionsFetchRequested = ({ value }) => {
     const self = this;
 
     let apiCall = `https://search.mapzen.com/v1/autocomplete?text=${value}`;
@@ -51,30 +46,30 @@ const Search = React.createClass({
         suggestions: data.features,
       });
     });
-  },
+  }
 
-  onSuggestionsClearRequested() {
+  onSuggestionsClearRequested = () => {
     this.setState({
       suggestions: [],
     });
-  },
+  }
 
-  onChange(e, obj) {
+  onChange = (e, obj) =>  {
     this.setState({
       value: obj.newValue,
     });
-  },
+  }
 
-  onSuggestionSelected(e, o) {
+  onSuggestionSelected = (e, o) => {
     this.setState({
       value: o.suggestionValue,
     });
 
     // pass up to Jane to create/update PoiMarker
     this.props.onGeocoderSelection(o.suggestion, o.suggestion.properties.name);
-  },
+  }
 
-  clearInput() {
+  clearInput= () => {
     // tell Jane to hide PoiMarker
     this.props.onClear();
 
@@ -82,7 +77,7 @@ const Search = React.createClass({
     this.setState({
       value: '',
     });
-  },
+  }
 
   render() {
     const inputProps = {
@@ -127,7 +122,16 @@ const Search = React.createClass({
         </Toolbar>
       </div>
     );
-  },
-});
+  }
+}
+
+Search.propTypes = {
+  bounds: PropTypes.object,
+  mapzen_api_key: PropTypes.string,
+  onGeocoderSelection: PropTypes.func,
+  onClear: PropTypes.func,
+  selectionActive: PropTypes.bool,
+  leftOffset: PropTypes.number,
+};
 
 module.exports = Search;

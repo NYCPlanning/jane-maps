@@ -1,18 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-const RasterSource = React.createClass({
-
-  propTypes: {
-    map: React.PropTypes.object.isRequired,
-    source: React.PropTypes.object.isRequired,
-    onLoaded: React.PropTypes.func.isRequired,
-  },
+class RasterSource extends React.Component {
 
   componentWillMount() {
     this.map = this.props.map.mapObject;
     // fetch data if necessary, add layer to map
     this.addSource();
-  },
+  }
 
   addSource() {
     if (this.map.getSource(this.props.source.id)) {
@@ -26,11 +21,17 @@ const RasterSource = React.createClass({
     });
 
     this.props.onLoaded(this.map.getStyle().sources);
-  },
+  }
 
   render() {
     return null;
-  },
-});
+  }
+}
+
+RasterSource.propTypes = {
+  map: PropTypes.object.isRequired,
+  source: PropTypes.object.isRequired,
+  onLoaded: PropTypes.func.isRequired,
+};
 
 export default RasterSource;
