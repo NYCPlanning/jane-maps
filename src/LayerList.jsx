@@ -27,12 +27,12 @@ class LayerList extends React.Component {
     });
   }
 
-  handleDrop() {
+  handleDrop = () => {
     // on drop pass the current state up to Jane
     this.props.onLayerReorder(this.state.layers);
   }
 
-  moveListItem(dragIndex, hoverIndex) {
+  moveListItem = (dragIndex, hoverIndex) => {
     const { layers } = this.state;
     const dragLayer = layers[dragIndex];
 

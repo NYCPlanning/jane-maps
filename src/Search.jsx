@@ -30,7 +30,7 @@ class Search extends React.Component {
     };
   }
 
-  onSuggestionsFetchRequested({ value }) {
+  onSuggestionsFetchRequested = ({ value }) => {
     const self = this;
 
     let apiCall = `https://search.mapzen.com/v1/autocomplete?text=${value}`;
@@ -48,19 +48,19 @@ class Search extends React.Component {
     });
   }
 
-  onSuggestionsClearRequested() {
+  onSuggestionsClearRequested = () => {
     this.setState({
       suggestions: [],
     });
   }
 
-  onChange(e, obj) {
+  onChange = (e, obj) =>  {
     this.setState({
       value: obj.newValue,
     });
   }
 
-  onSuggestionSelected(e, o) {
+  onSuggestionSelected = (e, o) => {
     this.setState({
       value: o.suggestionValue,
     });
@@ -69,7 +69,7 @@ class Search extends React.Component {
     this.props.onGeocoderSelection(o.suggestion, o.suggestion.properties.name);
   }
 
-  clearInput() {
+  clearInput= () => {
     // tell Jane to hide PoiMarker
     this.props.onClear();
 

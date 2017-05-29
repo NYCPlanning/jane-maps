@@ -19,7 +19,7 @@ class CartoVectorSource extends React.Component {
     }
   }
 
-  fetchData(sqlArray, cb) {
+  fetchData = (sqlArray, cb) => {
     const mapConfig = {
       version: '1.3.0',
       layers: [],
@@ -43,7 +43,7 @@ class CartoVectorSource extends React.Component {
       });
   }
 
-  addSource(template) {
+  addSource = (template) => {
     if (this.map.getSource(this.props.source.id)) {
       this.map.removeSource(this.props.source.id);
     }
@@ -56,7 +56,7 @@ class CartoVectorSource extends React.Component {
     this.props.onLoaded(this.map.getStyle().sources);
   }
 
-  updateSource(template) {
+  updateSource = (template) => {
     const newStyle = this.map.getStyle();
     newStyle.sources[this.props.source.id].tiles = [template];
     this.map.setStyle(newStyle);

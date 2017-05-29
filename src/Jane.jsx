@@ -21,7 +21,7 @@ class Jane extends React.Component {
       mapLoaded: false,
       layerListExpanded: false,
       layerContentVisible: this.props.layerContentVisible,
-      disabledLayers: [],
+      disabledLayers: this.props.initialDisabledJaneLayers,
       selectedLayer: this.props.initialSelectedJaneLayer,
       mapConfig: {},
       layerOrder: [],
@@ -46,7 +46,6 @@ class Jane extends React.Component {
   }
 
   onMapLoad = () => {
-    console.log('onMapLoad', this)
     this.setState({ mapLoaded: true });
   }
 
@@ -76,21 +75,29 @@ class Jane extends React.Component {
   }
 
   handleMapLayerClick = (e) => {
-    this.state.mapConfig.layers.forEach((layer) => {
-      if (layer.visible && layer.onMapLayerClick) {
-        const mapLayerIds = layer.mapLayers.map(mapLayer => mapLayer.id);
+    const { mapConfig, disabledLayers } = this.state;
+
+    React.Children.map(this.props.children, (janeLayer) => {
+      const { id, onMapLayerClick } = janeLayer.props;
+
+      const disabled = disabledLayers.indexOf(id) > -1;
+
+      if (!disabled && onMapLayerClick) {
+        const mapLayerIds = mapConfig[id].mapLayers
+          .map(mapLayer => mapLayer.id)
+          .filter(mapLayerId => (this.map.mapObject.getLayer(mapLayerId) !== undefined));
 
         const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
         // de-dup
         const uniqueFeatures = _.uniq(features, feature => feature.id);
-        if (uniqueFeatures.length > 0) layer.onMapLayerClick(uniqueFeatures);
+        if (uniqueFeatures.length > 0) onMapLayerClick(uniqueFeatures);
       }
     });
   }
 
   handleMapMousemove = (e) => {
-    const { mapConfig, disabledLayers } = this.state;
-    console.log(mapConfig);
+    const { mapConfig, disabledLayers, mapLoaded } = this.state;
+    if (!mapLoaded) return;
 
     React.Children.map(this.props.children, (janeLayer) => {
       const { id, onMapLayerClick } = janeLayer.props;
@@ -109,16 +116,23 @@ class Jane extends React.Component {
   }
 
   handleLayerToggle = (id) => {
-    const { disabledLayers } = this.state;
+    const { disabledLayers, layerContentVisible } = this.state;
+    let { selectedLayer } = this.state;
     const i = disabledLayers.indexOf(id);
 
-    if (i > -1) {
+    if (i > -1) { // enable
+      if (!layerContentVisible) this.toggleLayerContent();
+      selectedLayer = id;
       disabledLayers.splice(i, 1);
-    } else {
+    } else { // disable
+      if (layerContentVisible && selectedLayer === id) this.toggleLayerContent();
       disabledLayers.push(id);
     }
 
-    this.setState({ disabledLayers });
+    this.setState({
+      disabledLayers,
+      selectedLayer,
+    });
   }
 
   hidePoiMarker = () => {
@@ -162,42 +176,58 @@ class Jane extends React.Component {
   }
 
   sort = (a, b) => {
-    console.log(this);
     const { layerOrder } = this.state;
     return layerOrder.indexOf(a.id) > layerOrder.indexOf(b.id) ? 1 : -1;
   }
 
   render() {
-    const { disabledLayers, mapConfig, mapLoaded } = this.state;
+    const { disabledLayers, mapConfig, mapLoaded, selectedLayer } = this.state;
 
-    const layerListObjects = React.Children
-      .map(this.props.children, child => child.props)
+    let layerListObjects = [];
+    let children = [];
+    let mapConfigArray = [];
+
+    if (this.props.children) {
+      layerListObjects = React.Children
+        .map(this.props.children, child => child.props)
+        .sort(this.sort);
+
+      children = React.Children.toArray(this.props.children);
+
+      mapConfigArray = React.Children.map(this.props.children, (child) => {
+        const thisMapConfig = mapConfig[child.props.id];
+
+        const mapConfigObject = {
+          id: child.props.id,
+          sources: thisMapConfig ? thisMapConfig.sources : [],
+          mapLayers: thisMapConfig ? thisMapConfig.mapLayers : [],
+        };
+
+        // append legend
+        if (thisMapConfig && thisMapConfig.legend) {
+          mapConfigObject.legend = thisMapConfig.legend;
+        }
+
+        return mapConfigObject;
+      })
+      .filter((thisMapConfig) => {
+        const disabled = disabledLayers.indexOf(thisMapConfig.id) > -1;
+        return !disabled;
+      })
       .sort(this.sort);
+    }
 
-
-    const mapConfigArray = React.Children.map(this.props.children, (child) => {
-      const thisMapConfig = mapConfig[child.props.id];
-
-      return {
-        id: child.props.id,
-        sources: thisMapConfig ? thisMapConfig.sources : [],
-        mapLayers: thisMapConfig ? thisMapConfig.mapLayers : [],
-      };
-    }).sort(this.sort);
-
-    // // add legendItems for each layer
-    // const legendItems = [];
-    // mapConfig.layers.forEach((layer) => {
-    //   if (layer.visible && layer.legend) {
-    //     legendItems.push(<div key={layer.id}>{layer.legend}</div>);
-    //   }
-    // });
+    // add legendItems for each layer
+    const legendItems = [];
+    mapConfigArray.forEach((thisMapConfig) => {
+      if (thisMapConfig.legend) {
+        legendItems.push(<div key={thisMapConfig.id}>{thisMapConfig.legend}</div>);
+      }
+    });
 
     let leftOffset = 0;
     if (this.state.layerListExpanded) leftOffset += 164;
     if (this.state.layerContentVisible) leftOffset += 320;
-
-    const { selectedLayer } = this.state;
 
     return (
 
@@ -217,7 +247,7 @@ class Jane extends React.Component {
             )
           }
 
-          { /*
+          {
             legendItems.length > 0 && (
               <div
                 className="jane-legend"
@@ -225,7 +255,7 @@ class Jane extends React.Component {
               >
                 {legendItems}
               </div>
-            ) */
+            )
           }
 
           <GLMap
@@ -260,7 +290,7 @@ class Jane extends React.Component {
         <LayerContent
           offset={this.state.layerListExpanded}
           visible={this.state.layerContentVisible}
-          layers={this.props.children}
+          layers={children}
           disabledLayers={disabledLayers}
           selectedLayer={selectedLayer}
           onLayerUpdate={this.handleLayerUpdate}
@@ -286,8 +316,9 @@ Jane.propTypes = {
   fitBounds: PropTypes.array,
   onZoomEnd: PropTypes.func,
   onDragEnd: PropTypes.func,
-  children: PropTypes.array,
+  children: PropTypes.node,
   initialSelectedJaneLayer: PropTypes.string,
+  initialDisabledJaneLayers: PropTypes.array,
 };
 
 Jane.defaultProps = {
@@ -307,8 +338,11 @@ Jane.defaultProps = {
   fitBounds: null,
   children: null,
   initialSelectedJaneLayer: null,
+  initialDisabledJaneLayers: [],
   onZoomEnd: () => {},
   onDragEnd: () => {},
 };
+
+Jane.displayName = 'Jane';
 
 export default Jane;

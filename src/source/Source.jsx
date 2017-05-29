@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import GeoJsonSource from './GeoJsonSource';
-import RasterSource from './RasterSource';
+import VectorSource from './VectorSource';
 import CartoVectorSource from './CartoVectorSource';
+import RasterSource from './RasterSource';
 import CartoRasterSource from './CartoRasterSource';
 
 
@@ -22,8 +23,9 @@ class Source extends React.Component {
     const source = this.props.source;
 
     if (source.type === 'geojson') return <GeoJsonSource {...this.props} />;
-    if (source.type === 'raster') return <RasterSource {...this.props} />;
+    if (source.type === 'vector') return <VectorSource {...this.props} />;
     if (source.type === 'cartovector' && source.options) return <CartoVectorSource {...this.props} />;
+    if (source.type === 'raster') return <RasterSource {...this.props} />;
     if (source.type === 'cartoraster') return <CartoRasterSource {...this.props} />;
 
     return null;

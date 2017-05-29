@@ -1,6 +1,5 @@
 import React from 'react';
 import Component from './Component.jsx';
-import config from './config';
 import { JaneLayer } from '../../dist';
 
 function transportationJaneLayer() {
@@ -11,8 +10,7 @@ function transportationJaneLayer() {
       icon="subway"
       component={<Component />}
     />
-  )
+  );
 }
-
 
 export default transportationJaneLayer;
