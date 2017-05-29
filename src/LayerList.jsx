@@ -66,7 +66,7 @@ class LayerList extends React.Component {
       let className = this.props.selectedLayer === layer.id ? 'list-item selected' : 'list-item';
       if (disabled) className += ' disabled';
 
-      if (layer.showInLayerList !== false) {
+      if (layer.hidden !== true) {
         return (
           <ListItem
             className={className}

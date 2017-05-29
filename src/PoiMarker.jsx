@@ -12,7 +12,6 @@ class PoiMarker extends React.Component {
     el.style.backgroundImage = 'url(//capitalplanning.nyc.gov/img/orange-marker.png)';
     el.style.width = '32px';
     el.style.height = '32px';
-    el.style.zIndex = 10;
 
     this.marker = new mapboxgl.Marker(el, { // eslint-disable-line no-undef
       offset: [-16, -32],

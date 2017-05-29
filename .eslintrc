@@ -15,6 +15,7 @@
     "jsx-a11y/no-static-element-interactions": [0],
     "import/extensions": [0],
     "import/no-unresolved": [0],
+    "no-console": [2, { allow: ["warn", "error"] }],
   },
   "env": {
     "browser": true,

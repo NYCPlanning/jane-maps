@@ -49,6 +49,8 @@ class Jane extends React.Component {
     this.setState({ mapLoaded: true });
   }
 
+  getFilteredChildren = () => this.props.children.filter(child => child.type && child.type.displayName === 'JaneLayer');
+
   handleLayerReorder = (layers) => {
     const layerOrder = layers.map(layer => layer.id);
     this.setState({ layerOrder });
@@ -77,7 +79,7 @@ class Jane extends React.Component {
   handleMapLayerClick = (e) => {
     const { mapConfig, disabledLayers } = this.state;
 
-    React.Children.map(this.props.children, (janeLayer) => {
+    React.Children.map(this.getFilteredChildren(), (janeLayer) => {
       const { id, onMapLayerClick } = janeLayer.props;
 
       const disabled = disabledLayers.indexOf(id) > -1;
@@ -98,10 +100,10 @@ class Jane extends React.Component {
   handleMapMousemove = (e) => {
     const { mapConfig, disabledLayers, mapLoaded } = this.state;
     if (!mapLoaded) return;
+    const features = [];
 
-    React.Children.map(this.props.children, (janeLayer) => {
+    React.Children.map(this.getFilteredChildren(), (janeLayer) => {
       const { id, onMapLayerClick } = janeLayer.props;
-
       const disabled = disabledLayers.indexOf(id) > -1;
 
       if (!disabled && onMapLayerClick) {
@@ -109,10 +111,14 @@ class Jane extends React.Component {
           .map(mapLayer => mapLayer.id)
           .filter(mapLayerId => (this.map.mapObject.getLayer(mapLayerId) !== undefined));
 
-        const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
-        this.map.mapObject.getCanvas().style.cursor = (features && features.length > 0) ? 'pointer' : '';
+        const layerFeatures = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
+        layerFeatures.forEach((layerFeature) => {
+          features.push(layerFeature);
+        });
       }
     });
+
+    this.map.mapObject.getCanvas().style.cursor = (features && features.length > 0) ? 'pointer' : '';
   }
 
   handleLayerToggle = (id) => {
@@ -154,7 +160,7 @@ class Jane extends React.Component {
       layerContentVisible: !this.state.layerContentVisible,
     }, () => {
       if (!this.state.layerContentVisible) {
-        const selectedLayer = '';
+        const selectedLayer = null;
         this.setState({ selectedLayer });
       }
     });
@@ -187,14 +193,17 @@ class Jane extends React.Component {
     let children = [];
     let mapConfigArray = [];
 
-    if (this.props.children) {
+    // filter out children that are not JaneLayers
+    const filteredChildren = this.getFilteredChildren();
+
+    if (filteredChildren) {
       layerListObjects = React.Children
-        .map(this.props.children, child => child.props)
+        .map(filteredChildren, child => child.props)
         .sort(this.sort);
 
-      children = React.Children.toArray(this.props.children);
+      children = React.Children.toArray(filteredChildren);
 
-      mapConfigArray = React.Children.map(this.props.children, (child) => {
+      mapConfigArray = React.Children.map(filteredChildren, (child) => {
         const thisMapConfig = mapConfig[child.props.id];
 
         const mapConfigObject = {
@@ -215,6 +224,10 @@ class Jane extends React.Component {
         return !disabled;
       })
       .sort(this.sort);
+
+      // throw error if selectedLayer is not in layerListObjects
+      const match = layerListObjects.filter(l => l.id === selectedLayer);
+      if (match.length < 1 && selectedLayer !== null) console.error(`jane-maps: the selectedLayer prop is '${selectedLayer}', but could not find a JaneLayer with this id`);
     }
 
     // add legendItems for each layer
