@@ -14,7 +14,7 @@ JaneLayer.propTypes = {
 };
 
 JaneLayer.defaultProps = {
-  onMapLayerClick: () => {},
+  onMapLayerClick: null,
 };
 
 export default JaneLayer;
