@@ -103,7 +103,6 @@ class Jane extends React.Component {
     const features = [];
 
     React.Children.map(this.getFilteredChildren(), (janeLayer) => {
-      console.log(janeLayer.props);
       const { id, onMapLayerClick } = janeLayer.props;
       const disabled = disabledLayers.indexOf(id) > -1;
 
@@ -118,8 +117,6 @@ class Jane extends React.Component {
         });
       }
     });
-
-    console.log(features);
 
     this.map.mapObject.getCanvas().style.cursor = (features && features.length > 0) ? 'pointer' : '';
   }
