@@ -3,8 +3,9 @@ const appConfig = {
   carto_domain: 'cartoprod.capitalplanning.nyc',
 };
 
-const config = {
-  bus_stops: {
+const config = [
+  {
+    id: 'bus_stops',
     sources: [
       {
         id: 'bus_stops',
@@ -42,59 +43,22 @@ const config = {
           'circle-pitch-scale': 'map',
         },
       },
-    ],
+    ]
   },
-  bus_routes: {
+  {
+    id: 'subways',
     sources: [
-      {
-        id: 'bus_routes',
-        type: 'cartovector',
-        options: {
-          carto_user: appConfig.carto_user,
-          carto_domain: appConfig.carto_domain,
-          sql: ['SELECT * FROM support_trans_mta_bus_routes'],
-        },
-      },
-    ],
-    mapLayers: [
-      {
-        id: 'bus_routes',
-        type: 'line',
-        source: 'bus_routes',
-        'source-layer': 'layer0',
-        minzoom: 11,
-        paint: {
-          'line-color': 'blue',
-          'line-opacity': 0.7,
-          'line-width': {
-            stops: [
-              [
-                10,
-                0.5,
-              ],
-              [
-                16,
-                3,
-              ],
-            ],
-          },
-        },
-      },
-    ],
-  },
-  subways: {
-    sources: [
-      {
-        id: 'subway_lines',
-        type: 'geojson',
-        data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_mta_subway_routes&format=geojson`,
-      },
-      {
-        id: 'subway_stations',
-        type: 'geojson',
-        data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_mta_subway_stops&format=geojson`,
-      },
-    ],
+    {
+      id: 'subway_lines',
+      type: 'geojson',
+      data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_mta_subway_routes&format=geojson`,
+    },
+    {
+      id: 'subway_stations',
+      type: 'geojson',
+      data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_mta_subway_stops&format=geojson`,
+    },
+  ],
     mapLayers: [
       {
         id: 'subway_green',
@@ -399,26 +363,27 @@ const config = {
           ],
         },
       },
-    ],
+    ]
   },
-  path: {
+  {
+    id: 'path',
     sources: [
-      {
-        id: 'path_routes',
-        type: 'geojson',
-        data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_path_rail_routes&format=geojson`,
-        // options: {
-        //   carto_user: appConfig.carto_user,
-        //   carto_domain: appConfig.carto_domain,
-        //   sql: ['SELECT * FROM bus_stops'],
-        // },
-      },
-      {
-        id: 'path_stops',
-        type: 'geojson',
-        data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_path_rail_stops&format=geojson`,
-      },
-    ],
+    {
+      id: 'path_routes',
+      type: 'geojson',
+      data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_path_rail_routes&format=geojson`,
+      // options: {
+      //   carto_user: appConfig.carto_user,
+      //   carto_domain: appConfig.carto_domain,
+      //   sql: ['SELECT * FROM bus_stops'],
+      // },
+    },
+    {
+      id: 'path_stops',
+      type: 'geojson',
+      data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_path_rail_stops&format=geojson`,
+    },
+  ],
     mapLayers: [
       {
         id: 'path_routes',
@@ -489,16 +454,17 @@ const config = {
           ],
         },
       },
-    ],
+    ]
   },
-  bike_routes: {
+  {
+    id: 'bike_routes',
     sources: [
-      {
-        id: 'bike_routes',
-        type: 'vector',
-        tiles: ['https://api.capitalplanning.nyc/bike_routes/{z}/{y}/{x}.mvt'],
-      },
-    ],
+    {
+      id: 'bike_routes',
+      type: 'vector',
+      tiles: ['https://api.capitalplanning.nyc/static_tiles/bike_routes/{z}/{x}/{y}.mvt'],
+    },
+  ],
     mapLayers: [
       {
         id: 'bike_routes',
@@ -511,24 +477,24 @@ const config = {
             property: 'ft_facilit',
             type: 'categorical',
             stops: [
-                ['Sidewalk', '#fbb03b'],
-                ['Bike-Friendly Parking', '#223b53'],
-                ['Velodrome', '#e55e5e'],
-                ['Protected Path', '#3bb2d0'],
-                ['Sharrows/Standard', '#ccc'],
-                ['<Null>', '#fbb03b'],
-                ['Sharrows', '#223b53'],
-                ['Dirt Trail', '#e55e5e'],
-                ['Curbside', '#3bb2d0'],
-                ['Curbside/Sharrows', '#ccc'],
-                ['Ped Plaza', '#fbb03b'],
-                ['Standard', '#223b53'],
-                ['Standard/Sharrows', '#e55e5e'],
-                ['Signed Route', '#3bb2d0'],
-                ['Boardwalk', '#ccc'],
-                ['Sharrows/Protected Path', '#3bb2d0'],
-                ['Greenway', '#ccc'],
-                ['Opposite Sidewalk', '#ccc'],
+              ['Sidewalk', '#fbb03b'],
+              ['Bike-Friendly Parking', '#223b53'],
+              ['Velodrome', '#e55e5e'],
+              ['Protected Path', '#3bb2d0'],
+              ['Sharrows/Standard', '#ccc'],
+              ['<Null>', '#fbb03b'],
+              ['Sharrows', '#223b53'],
+              ['Dirt Trail', '#e55e5e'],
+              ['Curbside', '#3bb2d0'],
+              ['Curbside/Sharrows', '#ccc'],
+              ['Ped Plaza', '#fbb03b'],
+              ['Standard', '#223b53'],
+              ['Standard/Sharrows', '#e55e5e'],
+              ['Signed Route', '#3bb2d0'],
+              ['Boardwalk', '#ccc'],
+              ['Sharrows/Protected Path', '#3bb2d0'],
+              ['Greenway', '#ccc'],
+              ['Opposite Sidewalk', '#ccc'],
             ],
           },
           'line-opacity': 0.7,
@@ -546,8 +512,8 @@ const config = {
           },
         },
       },
-    ],
-  },
-};
+    ]
+  }
+];
 
 export default config;

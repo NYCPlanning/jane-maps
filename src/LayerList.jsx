@@ -4,6 +4,7 @@ import update from 'react/lib/update';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import IconButton from 'material-ui/IconButton';
+import cx from 'classnames';
 
 
 import ListItem from './ListItem';
@@ -60,13 +61,16 @@ class LayerList extends React.Component {
       },
     };
 
-    let layers = this.state.layers.map((layer, i) => {
-      const disabled = disabledLayers.indexOf(layer.id) > -1;
+    const layers = this.state.layers
+      // reverse layers so the list reflects the map (first in array will be bottom on map)
+      .slice().reverse()
+      .map((layer, i) => {
+        const disabled  = disabledLayers.indexOf(layer.id) > -1;
+        const className = cx('list-item', {
+          selected: this.props.selectedLayer === layer.id,
+          disabled
+        });
 
-      let className = this.props.selectedLayer === layer.id ? 'list-item selected' : 'list-item';
-      if (disabled) className += ' disabled';
-
-      if (layer.hidden !== true) {
         return (
           <ListItem
             className={className}
@@ -81,13 +85,7 @@ class LayerList extends React.Component {
             onLayerToggle={this.props.onLayerToggle}
           />
         );
-      }
-
-      return null;
-    });
-
-    // reverse layers so the list reflects the map (first in array will be bottom on map)
-    layers = layers.slice().reverse();
+      });
 
     return (
       <div className={`jane-drawer ${this.props.expanded ? 'expanded' : ''}`}>

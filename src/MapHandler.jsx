@@ -21,18 +21,13 @@ class MapHandler extends React.Component {
 
   render() {
     // load all sources for visible layers
-    const sources = [];
     const { mapConfig, map } = this.props;
 
-    mapConfig.forEach((layer) => {
-      if (layer.sources) {
-        layer.sources.forEach((source) => {
-          sources.push(
-            <Source map={map} source={source} onLoaded={this.handleSourceLoaded} key={source.id} />,
-          );
-        });
-      }
-    });
+    const sources = mapConfig
+      .reduce((result, layer) => result.concat(layer.sources), [])
+      .map((source) => (
+        <Source map={map} source={source} onLoaded={this.handleSourceLoaded} key={source.id} />
+      );
 
     // check to see if all sources for visible layers are loaded
     let allSourcesLoaded = true;

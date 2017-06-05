@@ -20,6 +20,7 @@
     "url": "https://github.com/NYCPlanning/jane-maps/issues"
   },
   "dependencies": {
+    "classnames": "^2.2.5",
     "jquery": "^3.1.1",
     "mapbox-gl": "^0.37.0",
     "material-ui": "^0.18.1",

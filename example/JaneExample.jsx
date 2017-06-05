@@ -10,6 +10,46 @@ import './node_modules/jane-maps/dist/styles.css';
 
 injectTapEventPlugin();
 
+const sources = [
+  {
+    'feature',
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Point',
+            coordinates: [
+              -74.0083,
+              40.7121,
+            ],
+          },
+        },
+      ],
+    },
+  },
+];
+
+const mapLayers = [
+  {
+    'feature',
+    source: 'feature',
+    type: 'circle',
+    paint: {
+      'circle-radius': 10,
+      'circle-color': 'steelblue',
+      'circle-opacity': 0.7,
+    },
+  },
+];
+
+const mapConfig = [
+  { id: 'whateverLayer', mapLayers, sources }
+];
+
 const JaneExample = () => {
   const mapboxGLOptions = {
     mapbox_accessToken: 'pk.eyJ1IjoiY3dob25nbnljIiwiYSI6ImNpczF1MXdrdjA4MXcycXA4ZGtyN2x5YXIifQ.3HGyME8tBs6BnljzUVIt4Q',
@@ -51,9 +91,11 @@ const JaneExample = () => {
             id="feature"
             name="Feature"
             icon="university"
+            mapConfig={mapConfig}
             component={<DummyComponent />}
           />
-          { TransportationJaneLayer() }
+
+          <TransportationJaneLayer />
         </Jane>
       </div>
     </MuiThemeProvider>

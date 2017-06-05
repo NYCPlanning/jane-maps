@@ -16,8 +16,8 @@ class Jane extends React.Component {
     super(props);
 
     this.state = {
-      poiFeature: this.props.poiFeature ? this.props.poiFeature : null,
-      poiLabel: this.props.poiLabel ? this.props.poiLabel : null,
+      poiFeature: this.props.poiFeature || null,
+      poiLabel: this.props.poiLabel || null,
       mapLoaded: false,
       layerListExpanded: false,
       layerContentVisible: this.props.layerContentVisible,
@@ -25,8 +25,42 @@ class Jane extends React.Component {
       selectedLayer: this.props.initialSelectedJaneLayer,
       mapConfig: {},
       layerOrder: [],
+      layers: {}
     };
+
+    this.layers = {};
   }
+
+  getChildContext = () => ({
+    registerLayer: this.registerLayer,
+    unregisterLayer: this.unregisterLayer,
+    updateLayer: this.handleLayerUpdate
+  });
+
+  static childContextTypes = {
+    registerLayer: PropTypes.func,
+    unregisterLayer: PropTypes.func,
+    updateLayer: PropTypes.func
+  };
+
+  registerLayer = (layerId, layerConfig) => {
+    this.layers = {
+      ...this.layers,
+      [layerId]: layerConfig
+    };
+
+    this.setState({ layers: this.layers });
+    this.handleLayerUpdate(layerId, layerConfig);
+  };
+
+  unregisterLayer = (layerId) => {
+    this.layers = {
+      ...this.layers,
+      [layerId]: undefined
+    };
+
+    this.setState({ layers: this.layers });
+  };
 
   componentDidMount() {
     // // pass dragend and zoomend up, handle click and mousemove
@@ -49,8 +83,6 @@ class Jane extends React.Component {
     this.setState({ mapLoaded: true });
   }
 
-  getFilteredChildren = () => this.props.children.filter(child => child.type && child.type.displayName === 'JaneLayer');
-
   handleLayerReorder = (layers) => {
     const layerOrder = layers.map(layer => layer.id);
     this.setState({ layerOrder });
@@ -66,8 +98,7 @@ class Jane extends React.Component {
     if (selectedLayer !== layerid) {
       // if clicked layer is enabled (visible), make it active
       if (!disabled) {
-        const newSelectedLayer = layerid;
-        this.setState({ selectedLayer: newSelectedLayer });
+        this.setState({ selectedLayer: layerid });
         return;
       }
 
@@ -79,9 +110,10 @@ class Jane extends React.Component {
   handleMapLayerClick = (e) => {
     const { mapConfig, disabledLayers } = this.state;
 
-    React.Children.map(this.getFilteredChildren(), (janeLayer) => {
-      const { id, onMapLayerClick } = janeLayer.props;
+    Object.keys(this.state.layers).map((layerId) => {
+      const janeLayer = this.state.layers[layerId];
 
+      const { id, onMapLayerClick } = janeLayer;
       const disabled = disabledLayers.indexOf(id) > -1;
 
       if (!disabled && onMapLayerClick) {
@@ -102,8 +134,9 @@ class Jane extends React.Component {
     if (!mapLoaded) return;
     const features = [];
 
-    React.Children.map(this.getFilteredChildren(), (janeLayer) => {
-      const { id, onMapLayerClick } = janeLayer.props;
+    Object.keys(this.state.layers).map((layerId) => {
+      const janeLayer = this.state.layers[layerId];
+      const { id, onMapLayerClick } = janeLayer;
       const disabled = disabledLayers.indexOf(id) > -1;
 
       if (!disabled && onMapLayerClick) {
@@ -171,8 +204,13 @@ class Jane extends React.Component {
     const { mapConfig } = this.state;
     const oldConfig = mapConfig[layerid];
 
-    if (JSON.stringify(oldConfig) !== JSON.stringify(config)) {
-      mapConfig[layerid] = config;
+    const newConfig = {
+      mapLayers: config.mapConfig.reduce((result, { mapLayers }) => result.concat(mapLayers), []),
+      sources: config.mapConfig.reduce((result, { sources }) => result.concat(sources), [])
+    };
+
+    if (JSON.stringify(oldConfig) !== JSON.stringify(newConfig)) {
+      mapConfig[layerid] = newConfig;
       this.setState({ mapConfig });
     }
   }
@@ -189,65 +227,45 @@ class Jane extends React.Component {
   render() {
     const { disabledLayers, mapConfig, mapLoaded, selectedLayer } = this.state;
 
-    let layerListObjects = [];
-    let children = [];
-    let mapConfigArray = [];
+    const mapConfigArray = Object.keys(this.state.layers).map((layerId) => {
+      const child = this.state.layers[layerId];
+      const currentLayer = mapConfig[child.id];
 
-    // filter out children that are not JaneLayers
-    const filteredChildren = this.getFilteredChildren();
+      const mapConfigObject = {
+        id: child.id,
+        sources: currentLayer ? currentLayer.sources : [],
+        mapLayers: currentLayer ? currentLayer.mapLayers : [],
+      };
 
-    if (filteredChildren) {
-      layerListObjects = React.Children
-        .map(filteredChildren, child => child.props)
-        .sort(this.sort);
+      // append legend
+      if (currentLayer && currentLayer.legend) {
+        mapConfigObject.legend = currentLayer.legend;
+      }
 
-      children = React.Children.toArray(filteredChildren);
+      return mapConfigObject;
+    })
+    .filter((thisMapConfig) => disabledLayers.indexOf(thisMapConfig.id) == -1)
+    .sort(this.sort);
 
-      mapConfigArray = React.Children.map(filteredChildren, (child) => {
-        const thisMapConfig = mapConfig[child.props.id];
-
-        const mapConfigObject = {
-          id: child.props.id,
-          sources: thisMapConfig ? thisMapConfig.sources : [],
-          mapLayers: thisMapConfig ? thisMapConfig.mapLayers : [],
-        };
-
-        // append legend
-        if (thisMapConfig && thisMapConfig.legend) {
-          mapConfigObject.legend = thisMapConfig.legend;
-        }
-
-        return mapConfigObject;
-      })
-      .filter((thisMapConfig) => {
-        const disabled = disabledLayers.indexOf(thisMapConfig.id) > -1;
-        return !disabled;
-      })
-      .sort(this.sort);
-
-      // throw error if selectedLayer is not in layerListObjects
-      const match = layerListObjects.filter(l => l.id === selectedLayer);
-      if (match.length < 1 && selectedLayer !== null) console.error(`jane-maps: the selectedLayer prop is '${selectedLayer}', but could not find a JaneLayer with this id`);
-    }
+    // throw error if selectedLayer is not in layerListObjects
+    const match = Object.keys(this.state.layers).filter(layerId => layerId === selectedLayer);
+    if (match.length < 1 && selectedLayer !== null) console.error(`jane-maps: the selectedLayer prop is '${selectedLayer}', but could not find a JaneLayer with this id`);
 
     // add legendItems for each layer
-    const legendItems = [];
-    mapConfigArray.forEach((thisMapConfig) => {
-      if (thisMapConfig.legend) {
-        legendItems.push(<div key={thisMapConfig.id}>{thisMapConfig.legend}</div>);
-      }
-    });
+    const legendItems = mapConfigArray
+      .filter((layer) => layer.legend)
+      .map((layer) => (<div key={layer.id}>{layer.legend}</div>));
 
     let leftOffset = 0;
     if (this.state.layerListExpanded) leftOffset += 164;
     if (this.state.layerContentVisible) leftOffset += 320;
 
-    return (
+    const layerList = Object.keys(this.state.layers)
+      .map((layerId) => this.state.layers[layerId]);
 
+    return (
       <div className="jane-container" style={this.props.style}>
-        <div
-          className="jane-map-container"
-        >
+        <div className="jane-map-container">
           {
             this.props.search && (
               <Search
@@ -262,10 +280,7 @@ class Jane extends React.Component {
 
           {
             legendItems.length > 0 && (
-              <div
-                className="jane-legend"
-                style={{ left: leftOffset }}
-              >
+              <div className="jane-legend" style={{ left: leftOffset }}>
                 {legendItems}
               </div>
             )
@@ -291,7 +306,7 @@ class Jane extends React.Component {
 
         <LayerList
           expanded={this.state.layerListExpanded}
-          layers={layerListObjects}
+          layers={layerList}
           disabledLayers={disabledLayers}
           selectedLayer={selectedLayer}
           onLayerReorder={this.handleLayerReorder}
@@ -303,13 +318,13 @@ class Jane extends React.Component {
         <LayerContent
           offset={this.state.layerListExpanded}
           visible={this.state.layerContentVisible}
-          layers={children}
           disabledLayers={disabledLayers}
           selectedLayer={selectedLayer}
           onLayerUpdate={this.handleLayerUpdate}
           onLayerToggle={this.handleLayerToggle}
-          onClose={this.toggleLayerContent}
-        />
+          onClose={this.toggleLayerContent}>
+          { this.props.children }
+        </LayerContent>
 
         { mapLoaded && <MapHandler map={this.map} mapConfig={mapConfigArray} /> }
       </div>

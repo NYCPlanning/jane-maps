@@ -1,66 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Checkbox from 'material-ui/Checkbox';
 import { Tabs, Tab } from 'material-ui/Tabs';
-import config from './config';
 
 class UIComponent extends React.Component {
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      activeCheckboxes: ['subways'],
-    };
-  }
-
-  componentDidUpdate() {
-    this.updateMapConfig();
-  }
-
-  handleCheck(id) {
-    const { activeCheckboxes } = this.state
-    const i = activeCheckboxes.indexOf(id);
-
-    if (i > -1) {
-      activeCheckboxes.splice(i, 1);
-    } else {
-      activeCheckboxes.push(id);
-    }
-
-    this.setState({ activeCheckboxes });
-  }
-
-  // build mapConfig based on state, pass it up to Jane
-  updateMapConfig() {
-    const { activeCheckboxes } = this.state;
-    const sources = [];
-    const mapLayers = [];
-
-    activeCheckboxes.forEach((id) => {
-      config[id].sources.forEach((source) => {
-        sources.push(source);
-      });
-
-      config[id].mapLayers.forEach((mapLayer) => {
-        mapLayers.push(mapLayer);
-      });
-    });
-
-    const mapConfig = { sources, mapLayers };
-    this.props.onUpdate(mapConfig);
-  }
-
   render() {
-
-    const listItemStyle = {
-      marginTop: '14px',
-    };
-
-    const listHeaderStyle = {
-      marginBottom: '4px',
-    };
-
+    const listItemStyle = { marginTop: '14px' };
+    const listHeaderStyle = { marginBottom: '4px' };
 
     return (
       <div>
@@ -72,28 +17,28 @@ class UIComponent extends React.Component {
 
                 <Checkbox
                   label="Subways"
-                  checked={this.state.activeCheckboxes.includes('subways')}
-                  onCheck={this.handleCheck.bind(this, 'subways')}
+                  checked={this.props.checkboxes.subways}
+                  onCheck={() => this.props.onCheckboxChange('subways')}
                 />
                 <Checkbox
                   label="Bus Stops"
-                  checked={this.state.activeCheckboxes.includes('bus_stops')}
-                  onCheck={this.handleCheck.bind(this, 'bus_stops')}
+                  checked={this.props.checkboxes.bus_stops}
+                  onCheck={() => this.props.onCheckboxChange('bus_stops')}
                 />
                 {/* <Checkbox
                   label="Bus Routes"
-                  checked={this.state.activeCheckboxes.includes('bus_routes')}
-                  onCheck={this.handleCheck.bind(this, 'bus_routes')}
+                  checked={this.props.checkboxes.bus_routes}
+                  onCheck={() => this.props.onCheckboxChange('bus_routes')}
                 /> */}
                 <Checkbox
                   label="PATH"
-                  checked={this.state.activeCheckboxes.includes('path')}
-                  onCheck={this.handleCheck.bind(this, 'path')}
+                  checked={this.props.checkboxes.path}
+                  onCheck={() => this.props.onCheckboxChange('path')}
                 />
                 <Checkbox
                   label="Bike Routes"
-                  checked={this.state.activeCheckboxes.includes('bike_routes')}
-                  onCheck={this.handleCheck.bind(this, 'bike_routes')}
+                  checked={this.props.checkboxes.bike_routes}
+                  onCheck={() => this.props.onCheckboxChange('bike_routes')}
                 />
               </div>
             </div>
