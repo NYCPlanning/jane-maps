@@ -272,7 +272,7 @@ class Jane extends React.Component {
           }
 
           <GLMap
-            {...this.props.mapInit}
+            {...this.props.mapboxGLOptions}
             ref={(map) => { this.map = map; }}
             onLoad={this.onMapLoad}
           />
@@ -322,7 +322,7 @@ Jane.propTypes = {
   poiFeature: PropTypes.object,
   poiLabel: PropTypes.string,
   layerContentVisible: PropTypes.bool,
-  mapInit: PropTypes.object.isRequired,
+  mapboxGLOptions: PropTypes.object.isRequired,
   style: PropTypes.object,
   search: PropTypes.bool,
   searchConfig: PropTypes.object,

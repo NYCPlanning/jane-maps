@@ -11,7 +11,7 @@ import './node_modules/jane-maps/dist/styles.css';
 injectTapEventPlugin();
 
 const JaneExample = () => {
-  const mapInit = {
+  const mapboxGLOptions = {
     mapbox_accessToken: 'pk.eyJ1IjoiY3dob25nbnljIiwiYSI6ImNpczF1MXdrdjA4MXcycXA4ZGtyN2x5YXIifQ.3HGyME8tBs6BnljzUVIt4Q',
     center: [-74.0084, 40.7121],
     zoom: 13.62,
@@ -41,7 +41,7 @@ const JaneExample = () => {
         }}
       >
         <Jane
-          mapInit={mapInit}
+          mapboxGLOptions={mapboxGLOptions}
           search
           searchConfig={searchConfig}
           layerContentVisible
@@ -53,7 +53,7 @@ const JaneExample = () => {
             icon="university"
             component={<DummyComponent />}
           />
-          { /* TransportationJaneLayer() */ }
+          { TransportationJaneLayer() }
         </Jane>
       </div>
     </MuiThemeProvider>
