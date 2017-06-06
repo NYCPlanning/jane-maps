@@ -8,7 +8,7 @@ class TransportationJaneLayer extends React.Component {
     super();
 
     this.state = {
-      mapConfig: config.filter((sublayer) => sublayer === 'subways'),
+      mapConfig: config.filter((sublayer) => sublayer.id === 'subways'),
       checkboxes: {
         subways: true,
         bus_stops: false,
@@ -21,13 +21,14 @@ class TransportationJaneLayer extends React.Component {
   }
 
   onCheckboxChange(name) {
-    this.setState({
-      mapConfig: config.filter((sublayer) => !this.state.checkboxes[sublayer.id]),
-      checkboxes: {
-        ...this.state.checkboxes,
-        [name]: !this.state.checkboxes[name]
-      }
-    });
+    const checkboxes = {
+      ...this.state.checkboxes,
+      [name]: !this.state.checkboxes[name]
+    };
+
+    const mapConfig = config.filter((sublayer) => checkboxes[sublayer.id]);
+
+    this.setState({ mapConfig, checkboxes });
   };
 
   render() {

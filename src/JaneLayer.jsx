@@ -35,7 +35,7 @@ class JaneLayer extends React.Component {
 
   componentWillReceiveProps(newProps) {
     if (JSON.stringify(newProps.mapConfig) !== JSON.stringify(this.props.mapConfig)) {
-      this.context.updateLayer(this.props.id, this.props);
+      this.context.updateLayer(this.props.id, newProps);
     }
   }
 
@@ -86,7 +86,7 @@ JaneLayer.propTypes = {
   name: PropTypes.string.isRequired,
   icon: PropTypes.string.isRequired,
   component: PropTypes.object.isRequired,
-  mapConfig: PropTypes.object.isRequired,
+  mapConfig: PropTypes.array.isRequired,
   onMapLayerClick: PropTypes.func,
 };
 

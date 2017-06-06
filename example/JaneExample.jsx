@@ -6,13 +6,13 @@ import { Jane, JaneLayer } from '../dist';
 import TransportationJaneLayer from './transportation/JaneLayer';
 import DummyComponent from './DummyComponent';
 
-import './node_modules/jane-maps/dist/styles.css';
+import '../dist/styles.css';
 
 injectTapEventPlugin();
 
 const sources = [
   {
-    'feature',
+    id: 'feature',
     type: 'geojson',
     data: {
       type: 'FeatureCollection',
@@ -35,7 +35,7 @@ const sources = [
 
 const mapLayers = [
   {
-    'feature',
+    id: 'feature',
     source: 'feature',
     type: 'circle',
     paint: {

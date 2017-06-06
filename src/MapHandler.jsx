@@ -17,7 +17,7 @@ class MapHandler extends React.Component {
 
   handleSourceLoaded = (loadedSources) => {
     this.setState({ loadedSources });
-  }
+  };
 
   render() {
     // load all sources for visible layers
@@ -27,7 +27,7 @@ class MapHandler extends React.Component {
       .reduce((result, layer) => result.concat(layer.sources), [])
       .map((source) => (
         <Source map={map} source={source} onLoaded={this.handleSourceLoaded} key={source.id} />
-      );
+      ));
 
     // check to see if all sources for visible layers are loaded
     let allSourcesLoaded = true;
