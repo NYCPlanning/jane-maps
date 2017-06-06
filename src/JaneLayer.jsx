@@ -42,7 +42,8 @@ class JaneLayer extends React.Component {
   static contextTypes = {
     registerLayer: PropTypes.func,
     unregisterLayer: PropTypes.func,
-    updateLayer: PropTypes.func
+    updateLayer: PropTypes.func,
+    map: PropTypes.object
   };
 
   componentDidMount() {
@@ -76,6 +77,7 @@ class JaneLayer extends React.Component {
         </div>
 
         { SidebarComponent }
+        { this.props.children }
       </div>
     );
   }

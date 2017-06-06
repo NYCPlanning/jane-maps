@@ -22,6 +22,7 @@ class Jane extends React.Component {
       layerContentVisible: this.props.layerContentVisible,
       selectedLayer: this.props.initialSelectedJaneLayer,
       mapConfig: {},
+      loadedSources: {},
       layerOrder: [],
       layers: {}
     };
@@ -32,13 +33,17 @@ class Jane extends React.Component {
   getChildContext = () => ({
     registerLayer: this.registerLayer,
     unregisterLayer: this.unregisterLayer,
-    updateLayer: this.handleLayerUpdate
+    updateLayer: this.handleLayerUpdate,
+    onSourceLoaded: this.handleSourceLoaded,
+    map: this.state.mapLoaded ? this.map : null
   });
 
   static childContextTypes = {
     registerLayer: PropTypes.func,
     unregisterLayer: PropTypes.func,
-    updateLayer: PropTypes.func
+    updateLayer: PropTypes.func,
+    onSourceLoaded: PropTypes.func,
+    map: PropTypes.object
   };
 
   registerLayer = (layerId, layerConfig) => {
@@ -87,6 +92,10 @@ class Jane extends React.Component {
     this.setState({ mapLoaded: true });
   }
 
+  handleSourceLoaded = (loadedSources) => {
+    this.setState({ loadedSources });
+  };
+
   handleLayerReorder = (layers) => {
     const layerOrder = layers.map(layer => layer.id);
     this.setState({ layerOrder });
@@ -114,7 +123,7 @@ class Jane extends React.Component {
   handleMapLayerClick = (e) => {
     const { mapConfig } = this.state;
 
-    Object.keys(this.state.layers).map((layerId) => {
+    Object.keys(this.state.layers).forEach((layerId) => {
       const { id, onMapLayerClick, disabled } = this.state.layers[layerId];
 
       if (!disabled && onMapLayerClick) {
@@ -135,7 +144,7 @@ class Jane extends React.Component {
     if (!mapLoaded) return;
     const features = [];
 
-    Object.keys(this.state.layers).map((layerId) => {
+    Object.keys(this.state.layers).forEach((layerId) => {
       const { id, onMapLayerClick, disabled } = this.state.layers[layerId];
 
       if (!disabled && onMapLayerClick) {
@@ -327,7 +336,7 @@ class Jane extends React.Component {
           { this.props.children }
         </LayerContent>
 
-        { mapLoaded && <MapHandler map={this.map} mapConfig={mapConfigArray} /> }
+        { mapLoaded && <MapHandler map={this.map} mapConfig={mapConfigArray} loadedSources={this.state.loadedSources}/> }
       </div>
 
     );

@@ -9,33 +9,36 @@ import CartoRasterSource from './CartoRasterSource';
 
 
 class Source extends React.Component {
-  componentWillUnmount() {
-    this.removeSource();
-  }
+  static contextTypes = {
+    map: PropTypes.object,
+    onSourceLoaded: PropTypes.func
+  };
 
-  removeSource() {
-    this.props.map.mapObject.removeSource(this.props.source.id);
+  componentWillUnmount() {
+    this.context.map.mapObject.removeSource(this.props.id);
     // let jane know what sources are still loaded
-    this.props.onLoaded(this.props.map.mapObject.getStyle().sources);
+    this.context.onSourceLoaded(this.context.map.mapObject.getStyle().sources);
   }
 
   render() {
-    const source = this.props.source;
+    if (!this.context.map) {
+      return null;
+    }
 
-    if (source.type === 'geojson') return <GeoJsonSource {...this.props} />;
-    if (source.type === 'vector') return <VectorSource {...this.props} />;
-    if (source.type === 'cartovector' && source.options) return <CartoVectorSource {...this.props} />;
-    if (source.type === 'raster') return <RasterSource {...this.props} />;
-    if (source.type === 'cartoraster') return <CartoRasterSource {...this.props} />;
+    const source = this.props;
+    const onLoaded = this.context.onSourceLoaded;
+    const map = this.context.map;
+
+    if (source.type === 'geojson') return <GeoJsonSource map={map} source={source} onLoaded={onLoaded}/>;
+    if (source.type === 'vector') return <VectorSource map={map} source={source} onLoaded={onLoaded}/>;
+    if (source.type === 'cartovector' && source.options) return <CartoVectorSource map={map} source={source} onLoaded={onLoaded}/>;
+    if (source.type === 'raster') return <RasterSource map={map} source={source} onLoaded={onLoaded}/>;
+    if (source.type === 'cartoraster') return <CartoRasterSource map={map} source={source} onLoaded={onLoaded}/>;
 
     return null;
   }
 }
 
-Source.propTypes = {
-  map: PropTypes.object.isRequired,
-  source: PropTypes.object.isRequired,
-  onLoaded: PropTypes.func.isRequired,
-};
+Source.propTypes = {};
 
 export default Source;

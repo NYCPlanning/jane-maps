@@ -1,7 +1,7 @@
 import React from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
-import { Jane, JaneLayer } from '../dist';
+import { Jane, JaneLayer, Source } from '../dist';
 
 import TransportationJaneLayer from './transportation/JaneLayer';
 import DummyComponent from './DummyComponent';
@@ -10,28 +10,22 @@ import '../dist/styles.css';
 
 injectTapEventPlugin();
 
-const sources = [
-  {
-    id: 'feature',
-    type: 'geojson',
-    data: {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'Point',
-            coordinates: [
-              -74.0083,
-              40.7121,
-            ],
-          },
-        },
-      ],
+const featureSource = {
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'Point',
+        coordinates: [
+          -74.0083,
+          40.7121,
+        ],
+      },
     },
-  },
-];
+  ],
+};
 
 const mapLayers = [
   {
@@ -53,7 +47,7 @@ const legend = (
 );
 
 const mapConfig = [
-  { id: 'whateverLayer', mapLayers, sources, legend }
+  { id: 'whateverLayer', mapLayers, sources: [], legend }
 ];
 
 const JaneExample = () => {
@@ -100,7 +94,9 @@ const JaneExample = () => {
             defaultDisabled={true}
             mapConfig={mapConfig}
             component={<DummyComponent />}
-          />
+          >
+            <Source id="feature" type="geojson" data={featureSource}/>
+          </JaneLayer>
 
           <TransportationJaneLayer />
         </Jane>

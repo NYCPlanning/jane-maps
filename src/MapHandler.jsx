@@ -4,30 +4,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import MapLayer from './MapLayer';
-import Source from './source/Source';
 
 class MapHandler extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      loadedSources: {},
-    };
-  }
-
-  handleSourceLoaded = (loadedSources) => {
-    this.setState({ loadedSources });
-  };
-
   render() {
     // load all sources for visible layers
     const { mapConfig, map } = this.props;
-
-    const sources = mapConfig
-      .reduce((result, layer) => result.concat(layer.sources), [])
-      .map((source) => (
-        <Source map={map} source={source} onLoaded={this.handleSourceLoaded} key={source.id} />
-      ));
 
     // check to see if all sources for visible layers are loaded
     let allSourcesLoaded = true;
@@ -35,7 +16,7 @@ class MapHandler extends React.Component {
     mapConfig.forEach((layer) => {
       if (layer.sources && layer.mapLayers) {
         layer.mapLayers.forEach((mapLayer) => {
-          if (!Object.prototype.hasOwnProperty.call(this.state.loadedSources, mapLayer.source)) { allSourcesLoaded = false; }
+          if (!Object.prototype.hasOwnProperty.call(this.props.loadedSources, mapLayer.source)) { allSourcesLoaded = false; }
         });
       }
     });
@@ -44,22 +25,18 @@ class MapHandler extends React.Component {
     const mapLayers = [];
 
     if (allSourcesLoaded) {
-      this.order = 0;
-      mapConfig.forEach((layer) => {
+      mapConfig.forEach((layer, index) => {
         // render layers in order
         if (layer.sources && layer.mapLayers) {
           layer.mapLayers.forEach((mapLayer) => {
-            mapLayers.push(<MapLayer map={map} config={mapLayer} key={mapLayer.id + this.order} />);
+            mapLayers.push(<MapLayer map={map} config={mapLayer} key={mapLayer.id + index} />);
           });
-
-          this.order = this.order + 1;
         }
       });
     }
 
     return (
       <div>
-        {sources}
         {mapLayers}
       </div>
     );
@@ -69,6 +46,7 @@ class MapHandler extends React.Component {
 MapHandler.propTypes = {
   mapConfig: PropTypes.array.isRequired,
   map: PropTypes.object.isRequired,
+  loadedSources: PropTypes.object.isRequired,
 };
 
 export default MapHandler;
