@@ -8,7 +8,7 @@ import MapLayer from './MapLayer';
 class MapHandler extends React.Component {
   render() {
     // load all sources for visible layers
-    const { mapConfig, map } = this.props;
+    const { mapConfig } = this.props;
 
     // check to see if all sources for visible layers are loaded
     let allSourcesLoaded = true;
@@ -29,7 +29,7 @@ class MapHandler extends React.Component {
         // render layers in order
         if (layer.sources && layer.mapLayers) {
           layer.mapLayers.forEach((mapLayer) => {
-            mapLayers.push(<MapLayer map={map} config={mapLayer} key={mapLayer.id + index} />);
+            mapLayers.push(<MapLayer config={mapLayer} key={mapLayer.id + index} />);
           });
         }
       });
@@ -45,7 +45,6 @@ class MapHandler extends React.Component {
 
 MapHandler.propTypes = {
   mapConfig: PropTypes.array.isRequired,
-  map: PropTypes.object.isRequired,
   loadedSources: PropTypes.object.isRequired,
 };
 

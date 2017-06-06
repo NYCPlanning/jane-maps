@@ -19,9 +19,7 @@ class MapLayer extends React.Component {
   }
 
   render() {
-    return (
-      null
-    );
+    return null;
   }
 }
 
@@ -30,4 +28,16 @@ MapLayer.propTypes = {
   config: PropTypes.object.isRequired,
 };
 
-export default MapLayer;
+const MapLayerWrapper = (props, context) => {
+  if (!context.map) {
+    return null;
+  }
+
+  return <MapLayer {...props} map={context.map}/>
+};
+
+MapLayerWrapper.contextTypes = {
+  map: PropTypes.object
+};
+
+export default MapLayerWrapper;
