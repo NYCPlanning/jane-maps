@@ -97,6 +97,7 @@ const JaneExample = () => {
             id="feature"
             name="Feature"
             icon="university"
+            defaultDisabled={true}
             mapConfig={mapConfig}
             component={<DummyComponent />}
           />

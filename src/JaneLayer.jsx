@@ -91,6 +91,7 @@ JaneLayer.propTypes = {
   mapConfig: PropTypes.array.isRequired,
   onClose: PropTypes.func,
   onMapLayerClick: PropTypes.func,
+  defaultDisabled: PropTypes.bool,
 };
 
 JaneLayer.defaultProps = {

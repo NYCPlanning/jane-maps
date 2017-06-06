@@ -20,7 +20,6 @@ class Jane extends React.Component {
       mapLoaded: false,
       layerListExpanded: false,
       layerContentVisible: this.props.layerContentVisible,
-      disabledLayers: this.props.initialDisabledJaneLayers,
       selectedLayer: this.props.initialSelectedJaneLayer,
       mapConfig: {},
       layerOrder: [],
@@ -43,9 +42,15 @@ class Jane extends React.Component {
   };
 
   registerLayer = (layerId, layerConfig) => {
+    const layer = {
+      ...layerConfig,
+      selected: layerConfig.defaultSelected || false,
+      disabled: layerConfig.defaultDisabled || false
+    };
+
     this.layers = {
       ...this.layers,
-      [layerId]: layerConfig
+      [layerId]: layer
     };
 
     this.setState({ layers: this.layers });
@@ -88,8 +93,8 @@ class Jane extends React.Component {
   }
 
   handleLayerClick = (layerid) => {
-    const { disabledLayers, layerContentVisible, selectedLayer } = this.state;
-    const disabled = disabledLayers.indexOf(layerid) > -1;
+    const { layerContentVisible, selectedLayer } = this.state;
+    const { disabled } = this.state.layers[layerid];
 
     if (!layerContentVisible && !disabled) this.toggleLayerContent();
 
@@ -107,11 +112,10 @@ class Jane extends React.Component {
   }
 
   handleMapLayerClick = (e) => {
-    const { mapConfig, disabledLayers } = this.state;
+    const { mapConfig } = this.state;
 
     Object.keys(this.state.layers).map((layerId) => {
-      const { id, onMapLayerClick } = this.state.layers[layerId];
-      const disabled = disabledLayers.indexOf(id) > -1;
+      const { id, onMapLayerClick, disabled } = this.state.layers[layerId];
 
       if (!disabled && onMapLayerClick) {
         const mapLayerIds = mapConfig[id].mapLayers
@@ -127,13 +131,12 @@ class Jane extends React.Component {
   }
 
   handleMapMousemove = (e) => {
-    const { mapConfig, disabledLayers, mapLoaded } = this.state;
+    const { mapConfig, mapLoaded } = this.state;
     if (!mapLoaded) return;
     const features = [];
 
     Object.keys(this.state.layers).map((layerId) => {
-      const { id, onMapLayerClick } = this.state.layers[layerId];
-      const disabled = disabledLayers.indexOf(id) > -1;
+      const { id, onMapLayerClick, disabled } = this.state.layers[layerId];
 
       if (!disabled && onMapLayerClick) {
         const mapLayerIds = mapConfig[id].mapLayers
@@ -150,25 +153,31 @@ class Jane extends React.Component {
     this.map.mapObject.getCanvas().style.cursor = (features && features.length > 0) ? 'pointer' : '';
   }
 
-  handleLayerToggle = (id) => {
-    const { disabledLayers, layerContentVisible } = this.state;
-    let { selectedLayer } = this.state;
-    const i = disabledLayers.indexOf(id);
+  handleLayerToggle = (layerId) => {
+    const { layerContentVisible, selectedLayer, layers } = this.state;
+    const disabled = layers[layerId].disabled;
 
-    if (i > -1) { // enable
+    const updatedLayers = {
+      ...layers,
+      [layerId]: {
+        ...layers[layerId],
+        disabled: !layers[layerId].disabled
+      }
+    };
+
+    if (disabled) { // enable
       if (!layerContentVisible) this.toggleLayerContent();
-      selectedLayer = id;
-      disabledLayers.splice(i, 1);
-    } else { // disable
-      if (layerContentVisible && selectedLayer === id) this.toggleLayerContent();
-      disabledLayers.push(id);
+      this.setState({
+        selectedLayer: layerId,
+        layers: updatedLayers
+      });
+    } else {
+      if (layerContentVisible && selectedLayer === layerId) this.toggleLayerContent();
+      this.setState({
+        layers: updatedLayers
+      });
     }
-
-    this.setState({
-      disabledLayers,
-      selectedLayer,
-    });
-  }
+  };
 
   hidePoiMarker = () => {
     this.setState({
@@ -222,26 +231,27 @@ class Jane extends React.Component {
   }
 
   render() {
-    const { disabledLayers, mapConfig, mapLoaded, selectedLayer } = this.state;
+    const { mapConfig, mapLoaded, selectedLayer } = this.state;
 
     const mapConfigArray = Object.keys(this.state.layers).map((layerId) => {
-      const childId = this.state.layers[layerId].id;
-      const currentLayer = mapConfig[childId];
+      const layer = this.state.layers[layerId];
+      const currentLayer = mapConfig[layer.id];
 
-      const mapConfigObject = {
-        id: childId,
+      const layerConfig = {
+        id: layer.id,
+        disabled: layer.disabled,
         sources: currentLayer ? currentLayer.sources : [],
         mapLayers: currentLayer ? currentLayer.mapLayers : [],
       };
 
       // append legend
       if (currentLayer && currentLayer.legend) {
-        mapConfigObject.legend = currentLayer.legend;
+        layerConfig.legend = currentLayer.legend;
       }
 
-      return mapConfigObject;
+      return layerConfig;
     })
-    .filter((thisMapConfig) => disabledLayers.indexOf(thisMapConfig.id) == -1)
+    .filter((layerConfig) => !layerConfig.disabled)
     .sort(this.sort);
 
     // throw error if selectedLayer is not in layerListObjects
@@ -301,7 +311,6 @@ class Jane extends React.Component {
         <LayerList
           expanded={this.state.layerListExpanded}
           layers={layerList}
-          disabledLayers={disabledLayers}
           selectedLayer={selectedLayer}
           onLayerReorder={this.handleLayerReorder}
           onLayerClick={this.handleLayerClick}

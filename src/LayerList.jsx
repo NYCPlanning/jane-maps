@@ -48,8 +48,6 @@ class LayerList extends React.Component {
   }
 
   render() {
-    const { disabledLayers } = this.props;
-
     const style = {
       fontIcon: {
         fontSize: '15px',
@@ -65,17 +63,16 @@ class LayerList extends React.Component {
       // reverse layers so the list reflects the map (first in array will be bottom on map)
       .slice().reverse()
       .map((layer, i) => {
-        const disabled  = disabledLayers.indexOf(layer.id) > -1;
         const className = cx('list-item', {
           selected: this.props.selectedLayer === layer.id,
-          disabled
+          disabled: layer.disabled
         });
 
         return (
           <ListItem
             className={className}
             expanded={this.props.expanded}
-            disabled={disabled}
+            disabled={layer.disabled}
             layer={layer}
             moveListItem={this.moveListItem}
             index={i}
@@ -118,7 +115,6 @@ LayerList.propTypes = {
   selectedLayer: PropTypes.string,
   onToggleExpanded: PropTypes.func.isRequired,
   onLayerToggle: PropTypes.func.isRequired,
-  disabledLayers: PropTypes.array.isRequired,
 };
 
 LayerList.defaultProps = {
