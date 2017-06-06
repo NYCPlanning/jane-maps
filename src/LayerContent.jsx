@@ -1,32 +1,21 @@
 import React from 'react'; // eslint-disable-line
 import PropTypes from 'prop-types';
+import cx from 'classnames';
 
 class LayerContent extends React.Component {
-
-  handleToggle(layerid) {
-    this.props.onLayerToggle(layerid);
-  }
-
   render() {
+    const { offset, visible, selectedLayer, onClose, children } = this.props;
+
     return (
-      <div
-        className={`second-drawer ${this.props.offset ? 'offset' : ''}`}
-        style={{
-          transform: this.props.visible ? 'translate(0px, 0px)' : 'translate(-320px, 0px)',
-        }}
-      >
-        {
-          React.Children.map(this.props.children, (child) => React.cloneElement(child, {
-            selectedLayer: this.props.selectedLayer
-          }))
-        }
+      <div className={cx('second-drawer', { offset })}
+           style={{ transform: visible ? 'translate(0px, 0px)' : 'translate(-320px, 0px)' }}>
+        { React.Children.map(children, (child) => React.cloneElement(child, { selectedLayer, onClose })) }
       </div>
     );
   }
 }
 
 LayerContent.propTypes = {
-  onLayerToggle: PropTypes.func.isRequired,
   onLayerUpdate: PropTypes.func.isRequired,
   selectedLayer: PropTypes.string,
   onClose: PropTypes.func.isRequired,

@@ -19,6 +19,22 @@ const style = {
     right: '28px',
     top: '7px',
   },
+  closeIcon: {
+    width: 36,
+    height: 36,
+    padding: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  closeIconMaterial: {
+    fontSize: '15px',
+    margin: '8px',
+    height: '15px',
+    width: '15px',
+    float: 'right',
+    color: '#5F5F5F',
+  }
 };
 
 class JaneLayer extends React.Component {
@@ -53,22 +69,8 @@ class JaneLayer extends React.Component {
           {this.props.name}
           <IconButton
             iconClassName={'fa fa-times'}
-            style={{
-              width: 36,
-              height: 36,
-              padding: 0,
-              position: 'absolute',
-              right: 0,
-              top: 0,
-            }}
-            iconStyle={{
-              fontSize: '15px',
-              margin: '8px',
-              height: '15px',
-              width: '15px',
-              float: 'right',
-              color: '#5F5F5F',
-            }}
+            style={style.closeIcon}
+            iconStyle={style.closeIconMaterial}
             onTouchTap={this.props.onClose}
           />
         </div>
@@ -87,6 +89,7 @@ JaneLayer.propTypes = {
   icon: PropTypes.string.isRequired,
   component: PropTypes.object.isRequired,
   mapConfig: PropTypes.array.isRequired,
+  onClose: PropTypes.func,
   onMapLayerClick: PropTypes.func,
 };
 

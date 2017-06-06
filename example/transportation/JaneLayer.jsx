@@ -38,6 +38,7 @@ class TransportationJaneLayer extends React.Component {
         name="Transportation"
         icon="subway"
         selectedLayer={this.props.selectedLayer}
+        onClose={this.props.onClose}
         mapConfig={this.state.mapConfig}
         component={<Component checkboxes={this.state.checkboxes} onCheckboxChange={this.onCheckboxChange}/>}
       />

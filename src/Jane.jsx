@@ -1,5 +1,4 @@
 import React from 'react'; // eslint-disable-line
-import update from 'react/lib/update'; // eslint-disable-line
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 
@@ -111,9 +110,7 @@ class Jane extends React.Component {
     const { mapConfig, disabledLayers } = this.state;
 
     Object.keys(this.state.layers).map((layerId) => {
-      const janeLayer = this.state.layers[layerId];
-
-      const { id, onMapLayerClick } = janeLayer;
+      const { id, onMapLayerClick } = this.state.layers[layerId];
       const disabled = disabledLayers.indexOf(id) > -1;
 
       if (!disabled && onMapLayerClick) {
@@ -135,8 +132,7 @@ class Jane extends React.Component {
     const features = [];
 
     Object.keys(this.state.layers).map((layerId) => {
-      const janeLayer = this.state.layers[layerId];
-      const { id, onMapLayerClick } = janeLayer;
+      const { id, onMapLayerClick } = this.state.layers[layerId];
       const disabled = disabledLayers.indexOf(id) > -1;
 
       if (!disabled && onMapLayerClick) {
@@ -205,6 +201,7 @@ class Jane extends React.Component {
     const oldConfig = mapConfig[layerid];
 
     const newConfig = {
+      legend: config.legend,
       mapLayers: config.mapConfig.reduce((result, { mapLayers }) => result.concat(mapLayers), []),
       sources: config.mapConfig.reduce((result, { sources }) => result.concat(sources), [])
     };
@@ -228,11 +225,11 @@ class Jane extends React.Component {
     const { disabledLayers, mapConfig, mapLoaded, selectedLayer } = this.state;
 
     const mapConfigArray = Object.keys(this.state.layers).map((layerId) => {
-      const child = this.state.layers[layerId];
-      const currentLayer = mapConfig[child.id];
+      const childId = this.state.layers[layerId].id;
+      const currentLayer = mapConfig[childId];
 
       const mapConfigObject = {
-        id: child.id,
+        id: childId,
         sources: currentLayer ? currentLayer.sources : [],
         mapLayers: currentLayer ? currentLayer.mapLayers : [],
       };
@@ -267,23 +264,21 @@ class Jane extends React.Component {
       <div className="jane-container" style={this.props.style}>
         <div className="jane-map-container">
           {
-            this.props.search && (
-              <Search
-                {...this.props.searchConfig}
-                onGeocoderSelection={this.showPoiMarker}
-                onClear={this.hidePoiMarker}
-                selectionActive={this.state.poiFeature}
-                leftOffset={leftOffset}
-              />
-            )
+            this.props.search &&
+            <Search
+              {...this.props.searchConfig}
+              onGeocoderSelection={this.showPoiMarker}
+              onClear={this.hidePoiMarker}
+              selectionActive={this.state.poiFeature}
+              leftOffset={leftOffset}
+            />
           }
 
           {
-            legendItems.length > 0 && (
-              <div className="jane-legend" style={{ left: leftOffset }}>
-                {legendItems}
-              </div>
-            )
+            legendItems.length > 0 &&
+            <div className="jane-legend" style={{ left: leftOffset }}>
+              {legendItems}
+            </div>
           }
 
           <GLMap
@@ -291,7 +286,6 @@ class Jane extends React.Component {
             ref={(map) => { this.map = map; }}
             onLoad={this.onMapLoad}
           />
-
         </div>
 
         {
@@ -318,10 +312,8 @@ class Jane extends React.Component {
         <LayerContent
           offset={this.state.layerListExpanded}
           visible={this.state.layerContentVisible}
-          disabledLayers={disabledLayers}
           selectedLayer={selectedLayer}
           onLayerUpdate={this.handleLayerUpdate}
-          onLayerToggle={this.handleLayerToggle}
           onClose={this.toggleLayerContent}>
           { this.props.children }
         </LayerContent>
