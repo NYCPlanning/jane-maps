@@ -42,22 +42,64 @@ class JaneLayer extends React.Component {
   static contextTypes = {
     registerLayer: PropTypes.func,
     unregisterLayer: PropTypes.func,
-    updateLayer: PropTypes.func,
+    loadedSources: PropTypes.object,
+    onSourceLoaded: PropTypes.func,
+    getJaneLayer: PropTypes.func,
+    onLayerClose: PropTypes.func,
     map: PropTypes.object
   };
 
   componentDidMount() {
+    if (this.props.hidden) {
+      return;
+    }
+
     this.context.registerLayer(this.props.id, this.props);
   }
 
-  componentWillReceiveProps(newProps) {
-    if (JSON.stringify(newProps.mapConfig) !== JSON.stringify(this.props.mapConfig)) {
-      this.context.updateLayer(this.props.id, newProps);
+  componentWillUnmount() {
+    if (this.props.hidden) {
+      return;
     }
+
+    this.context.unregisterLayer(this.props.id);
   }
 
-  componentWillUnmount() {
-    this.context.unregisterLayer(this.props.id);
+  renderChildren() {
+    const { map, loadedSources, onSourceLoaded, getJaneLayer } = this.context;
+    const janeLayer = getJaneLayer(this.props.id);
+
+    if (!map || (janeLayer && janeLayer.disabled)) {
+      return;
+    }
+
+    let previousMapLayer = null;
+
+    return React.Children.map(this.props.children, (child) => {
+      if (!child || !child.type) {
+        return child;
+      }
+
+      switch (child.type.name) {
+        case 'MapLayer':
+          const modifiedLayer = loadedSources[child.props.source]
+            ? React.cloneElement(child, { janeLayer: this.props.id, map, previousMapLayer })
+            : null;
+
+          previousMapLayer = child.props.id;
+
+          return modifiedLayer;
+
+        case 'Source':
+          return React.cloneElement(child, { map, onSourceLoaded });
+
+        case 'Marker':
+          return React.cloneElement(child, { map });
+
+        default:
+          return child;
+      }
+    });
   }
 
   render() {
@@ -72,26 +114,23 @@ class JaneLayer extends React.Component {
             iconClassName={'fa fa-times'}
             style={style.closeIcon}
             iconStyle={style.closeIconMaterial}
-            onTouchTap={this.props.onClose}
+            onTouchTap={this.context.onLayerClose}
           />
         </div>
 
         { SidebarComponent }
-        { this.props.children }
+        { this.renderChildren() }
       </div>
     );
   }
 }
 
-JaneLayer.displayName = 'JaneLayer';
-
 JaneLayer.propTypes = {
   id: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  icon: PropTypes.string.isRequired,
-  component: PropTypes.object.isRequired,
-  mapConfig: PropTypes.array.isRequired,
-  onClose: PropTypes.func,
+  hidden: PropTypes.bool,
+  name: PropTypes.string,
+  icon: PropTypes.string,
+  component: PropTypes.object,
   onMapLayerClick: PropTypes.func,
   defaultDisabled: PropTypes.bool,
 };

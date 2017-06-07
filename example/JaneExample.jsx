@@ -1,7 +1,7 @@
 import React from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import injectTapEventPlugin from 'react-tap-event-plugin';
-import { Jane, JaneLayer, Source } from '../dist';
+import { Jane, JaneLayer, Source, MapLayer, Legend, Marker } from '../dist';
 
 import TransportationJaneLayer from './transportation/JaneLayer';
 import DummyComponent from './DummyComponent';
@@ -27,28 +27,26 @@ const featureSource = {
   ],
 };
 
-const mapLayers = [
-  {
-    id: 'feature',
-    source: 'feature',
-    type: 'circle',
-    paint: {
-      'circle-radius': 10,
-      'circle-color': 'steelblue',
-      'circle-opacity': 0.7,
-    },
+const featureMapLayer = {
+  type: 'circle',
+  paint: {
+    'circle-radius': 10,
+    'circle-color': 'steelblue',
+    'circle-opacity': 0.7,
   },
-];
+};
 
-const legend = (
-  <div className="legendSection">
-    <p>Disclaimer: This map aggregates data from multiple public sources, and DCP cannot verify the accuracy of all records. Not all sites are service locations, among other limitations. <a href="http://docs.capitalplanning.nyc/facdb/#iii-limitations-and-disclaimers">Read more</a>.</p>
-  </div>
-);
-
-const mapConfig = [
-  { id: 'whateverLayer', mapLayers, sources: [], legend }
-];
+const markerFeature = {
+  "type": "Feature",
+  "properties": {},
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -74.00390625,
+      40.71499673906409
+    ]
+  }
+};
 
 const JaneExample = () => {
   const mapboxGLOptions = {
@@ -84,18 +82,27 @@ const JaneExample = () => {
           mapboxGLOptions={mapboxGLOptions}
           search
           searchConfig={searchConfig}
-          layerContentVisible
-          initialSelectedJaneLayer={'transportation'}
-        >
+          layerContentVisible>
           <JaneLayer
             id="feature"
             name="Feature"
             icon="university"
-            defaultDisabled={true}
-            mapConfig={mapConfig}
-            component={<DummyComponent />}
-          >
+            defaultSelected={true}
+            component={<DummyComponent />}>
+
             <Source id="feature" type="geojson" data={featureSource}/>
+            <MapLayer id="feature" source="feature" config={featureMapLayer}/>
+
+            <Marker label="Example Marker" feature={markerFeature}/>
+
+            <Legend>
+              <div className="legendSection">
+                <p>Disclaimer: This map aggregates data from multiple public sources, and DCP cannot verify the accuracy
+                  of all records. Not all sites are service locations, among other limitations. <a
+                    href="http://docs.capitalplanning.nyc/facdb/#iii-limitations-and-disclaimers">Read more</a>.</p>
+              </div>
+            </Legend>
+
           </JaneLayer>
 
           <TransportationJaneLayer />

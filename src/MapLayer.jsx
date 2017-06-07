@@ -2,20 +2,45 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 class MapLayer extends React.Component {
+  componentWillMount() {
+    if (!this.props.janeLayer) {
+      console.error(`<MapLayer /> has to be a direct child of <JaneLayer />. Check layer with id ${this.props.id}`);
+    }
+  }
+
   componentDidMount() {
-    this.map = this.props.map.mapObject;
-    this.map.addLayer(this.props.config);
+    this.addLayer(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
+    if (this.props.previousMapLayer !== nextProps.previousMapLayer) {
+      this.removeLayer();
+      this.addLayer(nextProps);
+      return;
+    }
+
     if (JSON.stringify(this.props.config) !== JSON.stringify(nextProps.config)) {
-      this.map.removeLayer(this.props.config.id);
-      this.map.addLayer(nextProps.config);
+      this.removeLayer();
+      this.addLayer(nextProps);
     }
   }
 
   componentWillUnmount() {
-    this.map.removeLayer(this.props.config.id);
+    this.removeLayer();
+  }
+
+  addLayer(props) {
+    const config = {
+      ...props.config,
+      id: props.id,
+      source: props.source
+    };
+
+    this.props.map.mapObject.addLayer(config, props.previousMapLayer);
+  }
+
+  removeLayer() {
+    this.props.map.mapObject.removeLayer(this.props.id);
   }
 
   render() {
@@ -25,19 +50,11 @@ class MapLayer extends React.Component {
 
 MapLayer.propTypes = {
   map: PropTypes.object.isRequired,
+  id: PropTypes.string.isRequired,
+  source: PropTypes.string.isRequired,
   config: PropTypes.object.isRequired,
+  janeLayer: PropTypes.string,
+  previousMapLayer: PropTypes.string
 };
 
-const MapLayerWrapper = (props, context) => {
-  if (!context.map) {
-    return null;
-  }
-
-  return <MapLayer {...props} map={context.map}/>
-};
-
-MapLayerWrapper.contextTypes = {
-  map: PropTypes.object
-};
-
-export default MapLayerWrapper;
+export default MapLayer;

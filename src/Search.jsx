@@ -65,12 +65,12 @@ class Search extends React.Component {
       value: o.suggestionValue,
     });
 
-    // pass up to Jane to create/update PoiMarker
+    // pass up to Jane to create/update Marker
     this.props.onGeocoderSelection(o.suggestion, o.suggestion.properties.name);
   }
 
   clearInput= () => {
-    // tell Jane to hide PoiMarker
+    // tell Jane to hide Marker
     this.props.onClear();
 
     // set the input field to ''

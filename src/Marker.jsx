@@ -1,7 +1,7 @@
 import React from 'react'; // eslint-disable-line
 import PropTypes from 'prop-types';
 
-class PoiMarker extends React.Component {
+class Marker extends React.Component {
 
   componentDidMount() {
     const el = document.createElement('div');
@@ -53,19 +53,22 @@ class PoiMarker extends React.Component {
       .setHTML(`<p>${label}</p>`)
       .addTo(map.mapObject);
 
-    map.flyMap(feature);
+    if (this.props.flyMap) {
+      map.flyMap(feature);
+    }
   }
 
   render() {
-    return (<div />);
+    return null;
   }
 }
 
-PoiMarker.propTypes = {
+Marker.propTypes = {
+  flyMap: PropTypes.bool,
   feature: PropTypes.object.isRequired,
   map: PropTypes.object.isRequired,
   label: PropTypes.string.isRequired,
 };
 
 
-export default PoiMarker;
+export default Marker;

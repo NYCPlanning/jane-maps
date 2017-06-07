@@ -9,25 +9,16 @@ import CartoRasterSource from './CartoRasterSource';
 
 
 class Source extends React.Component {
-  static contextTypes = {
-    map: PropTypes.object,
-    onSourceLoaded: PropTypes.func
-  };
-
   componentWillUnmount() {
-    this.context.map.mapObject.removeSource(this.props.id);
+    this.props.map.mapObject.removeSource(this.props.id);
     // let jane know what sources are still loaded
-    this.context.onSourceLoaded(this.context.map.mapObject.getStyle().sources);
+    this.props.onSourceLoaded(this.props.map.mapObject.getStyle().sources);
   }
 
   render() {
-    if (!this.context.map) {
-      return null;
-    }
-
     const source = this.props;
-    const onLoaded = this.context.onSourceLoaded;
-    const map = this.context.map;
+    const onLoaded = this.props.onSourceLoaded;
+    const map = this.props.map;
 
     if (source.type === 'geojson') return <GeoJsonSource map={map} source={source} onLoaded={onLoaded}/>;
     if (source.type === 'vector') return <VectorSource map={map} source={source} onLoaded={onLoaded}/>;
@@ -39,6 +30,9 @@ class Source extends React.Component {
   }
 }
 
-Source.propTypes = {};
+Source.propTypes = {
+  map: PropTypes.object,
+  onSourceLoaded: PropTypes.func
+};
 
 export default Source;

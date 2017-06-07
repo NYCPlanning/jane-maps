@@ -1,13 +1,13 @@
 import React from 'react'; // eslint-disable-line
 import PropTypes from 'prop-types';
 import _ from 'underscore';
+import cx from 'classnames';
 
 import GLMap from './GLMap';
-import LayerContent from './LayerContent';
 import LayerList from './LayerList';
-import PoiMarker from './PoiMarker';
+import JaneLayer from './JaneLayer';
+import Marker from './Marker';
 import Search from './Search';
-import MapHandler from './MapHandler';
 
 class Jane extends React.Component {
 
@@ -15,15 +15,15 @@ class Jane extends React.Component {
     super(props);
 
     this.state = {
-      poiFeature: this.props.poiFeature || null,
-      poiLabel: this.props.poiLabel || null,
+      searchResultMarker: null,
       mapLoaded: false,
       layerListExpanded: false,
       layerContentVisible: this.props.layerContentVisible,
-      selectedLayer: this.props.initialSelectedJaneLayer,
+      selectedLayer: null,
       mapConfig: {},
       loadedSources: {},
       layerOrder: [],
+      legend: [],
       layers: []
     };
 
@@ -33,16 +33,24 @@ class Jane extends React.Component {
   getChildContext = () => ({
     registerLayer: this.registerLayer,
     unregisterLayer: this.unregisterLayer,
-    updateLayer: this.handleLayerUpdate,
+    loadedSources: this.state.loadedSources,
+    getJaneLayer: (janeLayerId) => this.state.layers.find(({ id }) => id === janeLayerId),
     onSourceLoaded: this.handleSourceLoaded,
+    onLayerClose: this.toggleLayerContent,
+    addLegend: this.addLegend,
+    removeLegend: this.removeLegend,
     map: this.state.mapLoaded ? this.map : null
   });
 
   static childContextTypes = {
     registerLayer: PropTypes.func,
     unregisterLayer: PropTypes.func,
-    updateLayer: PropTypes.func,
     onSourceLoaded: PropTypes.func,
+    loadedSources: PropTypes.object,
+    getJaneLayer: PropTypes.func,
+    onLayerClose: PropTypes.func,
+    addLegend: PropTypes.func,
+    removeLegend: PropTypes.func,
     map: PropTypes.object
   };
 
@@ -55,14 +63,31 @@ class Jane extends React.Component {
 
     this.layers.push(layer);
 
-    this.setState({ layers: this.layers });
-    this.handleLayerUpdate(layerId, layerConfig);
+    const newState = { layers: this.layers };
+
+    if (layer.selected) {
+      newState.selectedLayer = layer.id
+    }
+
+    this.setState(newState);
   };
 
   unregisterLayer = (layerId) => {
     this.layers = this.layers.filter(layer => layer !== layerId);
 
     this.setState({ layers: this.layers });
+  };
+
+  addLegend = (legend) => {
+    this.setState({
+      legend: this.state.legend.concat(legend)
+    })
+  };
+
+  removeLegend = (legend) => {
+    this.setState({
+      legend: this.state.legend.filter((item) => item !== legend)
+    })
   };
 
   componentDidMount() {
@@ -84,7 +109,7 @@ class Jane extends React.Component {
 
   onMapLoad = () => {
     this.setState({ mapLoaded: true });
-  }
+  };
 
   handleSourceLoaded = (loadedSources) => {
     this.setState({ loadedSources });
@@ -93,7 +118,7 @@ class Jane extends React.Component {
   handleLayerReorder = (layers) => {
     const layerOrder = layers.map(layer => layer.id);
     this.setState({ layerOrder });
-  }
+  };
 
   handleLayerClick = (layerid) => {
     const { layerContentVisible, selectedLayer } = this.state;
@@ -112,7 +137,7 @@ class Jane extends React.Component {
       // otherwise expand the layerlist
       if (!this.state.layerListExpanded) this.setState({ layerListExpanded: true });
     }
-  }
+  };
 
   handleMapLayerClick = (e) => {
     const { mapConfig } = this.state;
@@ -131,7 +156,7 @@ class Jane extends React.Component {
         if (uniqueFeatures.length > 0) onMapLayerClick(uniqueFeatures);
       }
     });
-  }
+  };
 
   handleMapMousemove = (e) => {
     const { mapConfig, mapLoaded } = this.state;
@@ -154,7 +179,7 @@ class Jane extends React.Component {
     });
 
     this.map.mapObject.getCanvas().style.cursor = (features && features.length > 0) ? 'pointer' : '';
-  }
+  };
 
   handleLayerToggle = (layerId) => {
     const { layerContentVisible, selectedLayer, layers } = this.state;
@@ -179,19 +204,13 @@ class Jane extends React.Component {
     }
   };
 
-  hidePoiMarker = () => {
-    this.setState({
-      poiFeature: null,
-      poiLabel: null,
-    });
-  }
+  removeSearchResultMarker = () => {
+    this.setState({ searchResultMarker: null });
+  };
 
-  showPoiMarker = (feature, label) => {
-    this.setState({
-      poiFeature: feature,
-      poiLabel: label,
-    });
-  }
+  addSearchResultMarker = (feature, label) => {
+    this.setState({ searchResultMarker: { feature, label }});
+  };
 
   toggleLayerContent = () => {
     this.setState({
@@ -202,69 +221,34 @@ class Jane extends React.Component {
         this.setState({ selectedLayer });
       }
     });
-  }
-
-  // handles updates to a layer's configuration
-  handleLayerUpdate = (layerid, config) => {
-    const { mapConfig } = this.state;
-    const oldConfig = mapConfig[layerid];
-
-    const newConfig = {
-      legend: config.legend,
-      mapLayers: config.mapConfig.reduce((result, { mapLayers }) => result.concat(mapLayers), []),
-      sources: config.mapConfig.reduce((result, { sources }) => result.concat(sources), [])
-    };
-
-    if (JSON.stringify(oldConfig) !== JSON.stringify(newConfig)) {
-      mapConfig[layerid] = newConfig;
-      this.setState({ mapConfig });
-    }
-  }
+  };
 
   handleToggleExpanded = () => {
     this.setState({ layerListExpanded: !this.state.layerListExpanded });
-  }
+  };
 
   sort = (a, b) => {
     const { layerOrder } = this.state;
     return layerOrder.indexOf(a.id) > layerOrder.indexOf(b.id) ? 1 : -1;
-  }
+  };
+
+  renderJaneLayers = () => {
+    return React.Children.map(this.props.children, (child) =>
+      React.cloneElement(child, {
+        selectedLayer: this.state.selectedLayer
+      })
+    );
+  };
 
   render() {
-    const { mapConfig, mapLoaded, selectedLayer } = this.state;
-
-    const mapConfigArray = this.state.layers.map((layer) => {
-      const currentLayer = mapConfig[layer.id];
-
-      const layerConfig = {
-        id: layer.id,
-        disabled: layer.disabled,
-        sources: currentLayer ? currentLayer.sources : [],
-        mapLayers: currentLayer ? currentLayer.mapLayers : [],
-      };
-
-      // append legend
-      if (currentLayer && currentLayer.legend) {
-        layerConfig.legend = currentLayer.legend;
-      }
-
-      return layerConfig;
-    })
-    .filter((layerConfig) => !layerConfig.disabled)
-    .sort(this.sort);
-
-    // throw error if selectedLayer is not in layerListObjects
-    const match = this.state.layers.filter(layer => layer.id === selectedLayer);
-    if (match.length < 1 && selectedLayer !== null) console.error(`jane-maps: the selectedLayer prop is '${selectedLayer}', but could not find a JaneLayer with this id`);
-
-    // add legendItems for each layer
-    const legendItems = mapConfigArray
-      .filter((layer) => layer.legend)
-      .map((layer) => (<div key={layer.id}>{layer.legend}</div>));
-
     let leftOffset = 0;
     if (this.state.layerListExpanded) leftOffset += 164;
     if (this.state.layerContentVisible) leftOffset += 320;
+
+    const drawerClassName = cx('second-drawer', { offset: this.state.layerListExpanded });
+    const drawerStyle = {
+      transform: this.state.layerContentVisible ? 'translate(0px, 0px)' : 'translate(-320px, 0px)'
+    };
 
     return (
       <div className="jane-container" style={this.props.style}>
@@ -273,17 +257,17 @@ class Jane extends React.Component {
             this.props.search &&
             <Search
               {...this.props.searchConfig}
-              onGeocoderSelection={this.showPoiMarker}
-              onClear={this.hidePoiMarker}
-              selectionActive={this.state.poiFeature}
+              onGeocoderSelection={this.addSearchResultMarker}
+              onClear={this.removeSearchResultMarker}
+              selectionActive={!!this.state.searchResultMarker}
               leftOffset={leftOffset}
             />
           }
 
           {
-            legendItems.length > 0 &&
+            this.state.legend.length > 0 &&
             <div className="jane-legend" style={{ left: leftOffset }}>
-              {legendItems}
+              { this.state.legend }
             </div>
           }
 
@@ -294,36 +278,25 @@ class Jane extends React.Component {
           />
         </div>
 
-        {
-          (this.state.poiFeature && this.map) && (
-            <PoiMarker
-              feature={this.state.poiFeature}
-              label={this.state.poiLabel}
-              map={this.map}
-            />
-          )
-        }
-
         <LayerList
           expanded={this.state.layerListExpanded}
           layers={this.state.layers.sort(this.sort)}
-          selectedLayer={selectedLayer}
+          selectedLayer={this.state.selectedLayer}
           onLayerReorder={this.handleLayerReorder}
           onLayerClick={this.handleLayerClick}
           onToggleExpanded={this.handleToggleExpanded}
-          onLayerToggle={this.handleLayerToggle}
-        />
+          onLayerToggle={this.handleLayerToggle}/>
 
-        <LayerContent
-          offset={this.state.layerListExpanded}
-          visible={this.state.layerContentVisible}
-          selectedLayer={selectedLayer}
-          onLayerUpdate={this.handleLayerUpdate}
-          onClose={this.toggleLayerContent}>
-          { this.props.children }
-        </LayerContent>
+        <div className={drawerClassName} style={drawerStyle}>
+          { this.renderJaneLayers() }
 
-        { mapLoaded && <MapHandler mapConfig={mapConfigArray} loadedSources={this.state.loadedSources}/> }
+          {
+            this.state.searchResultMarker &&
+            <JaneLayer id="searchResult" hidden={true}>
+              <Marker {...this.state.searchResultMarker} flyMap={true}/>
+            </JaneLayer>
+          }
+        </div>
       </div>
 
     );
@@ -331,8 +304,6 @@ class Jane extends React.Component {
 }
 
 Jane.propTypes = {
-  poiFeature: PropTypes.object,
-  poiLabel: PropTypes.string,
   layerContentVisible: PropTypes.bool,
   mapboxGLOptions: PropTypes.object.isRequired,
   style: PropTypes.object,
@@ -342,13 +313,9 @@ Jane.propTypes = {
   onZoomEnd: PropTypes.func,
   onDragEnd: PropTypes.func,
   children: PropTypes.node,
-  initialSelectedJaneLayer: PropTypes.string,
-  initialDisabledJaneLayers: PropTypes.array,
 };
 
 Jane.defaultProps = {
-  poiFeature: null,
-  poiLabel: null,
   layerContentVisible: false,
   style: {
     position: 'absolute',
@@ -361,13 +328,8 @@ Jane.defaultProps = {
   search: false,
   searchConfig: null,
   fitBounds: null,
-  children: null,
-  initialSelectedJaneLayer: null,
-  initialDisabledJaneLayers: [],
   onZoomEnd: () => {},
   onDragEnd: () => {},
 };
-
-Jane.displayName = 'Jane';
 
 export default Jane;
