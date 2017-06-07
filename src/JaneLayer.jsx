@@ -51,19 +51,15 @@ class JaneLayer extends React.Component {
   };
 
   componentDidMount() {
-    if (this.props.hidden) {
-      return;
+    if (!this.props.hidden) {
+      this.context.registerLayer(this.props.id, this.props);
     }
-
-    this.context.registerLayer(this.props.id, this.props);
   }
 
   componentWillUnmount() {
-    if (this.props.hidden) {
-      return;
+    if (!this.props.hidden) {
+      this.context.unregisterLayer(this.props.id);
     }
-
-    this.context.unregisterLayer(this.props.id);
   }
 
   renderChildren() {

@@ -81,8 +81,7 @@ const JaneExample = () => {
         <Jane
           mapboxGLOptions={mapboxGLOptions}
           search
-          searchConfig={searchConfig}
-          layerContentVisible>
+          searchConfig={searchConfig}>
           <JaneLayer
             id="feature"
             name="Feature"

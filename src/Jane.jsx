@@ -18,7 +18,6 @@ class Jane extends React.Component {
       searchResultMarker: null,
       mapLoaded: false,
       layerListExpanded: false,
-      layerContentVisible: this.props.layerContentVisible,
       selectedLayer: null,
       mapConfig: {},
       loadedSources: {},
@@ -37,7 +36,7 @@ class Jane extends React.Component {
     selectedLayer: this.state.selectedLayer,
     getJaneLayer: (janeLayerId) => this.state.layers.find(({ id }) => id === janeLayerId),
     onSourceLoaded: this.handleSourceLoaded,
-    onLayerClose: this.toggleLayerContent,
+    onLayerClose: this.deselectLayer,
     addLegend: this.addLegend,
     removeLegend: this.removeLegend,
     map: this.state.mapLoaded ? this.map : null
@@ -68,7 +67,7 @@ class Jane extends React.Component {
     const newState = { layers: this.layers };
 
     if (layer.selected) {
-      newState.selectedLayer = layer.id
+      newState.selectedLayer = layer.id;
     }
 
     this.setState(newState);
@@ -123,10 +122,8 @@ class Jane extends React.Component {
   };
 
   handleLayerClick = (layerid) => {
-    const { layerContentVisible, selectedLayer } = this.state;
+    const { selectedLayer } = this.state;
     const { disabled } = this.state.layers.find(layer => layer.id);
-
-    if (!layerContentVisible && !disabled) this.toggleLayerContent();
 
     // if selected layer was clicked, toggle second drawer, else make clicked layer selected
     if (selectedLayer !== layerid) {
@@ -184,7 +181,7 @@ class Jane extends React.Component {
   };
 
   handleLayerToggle = (layerId) => {
-    const { layerContentVisible, selectedLayer, layers } = this.state;
+    const { selectedLayer, layers } = this.state;
     const disabled = layers.find(layer => layer.id).disabled;
 
     const updatedLayers = layers.map((layer) => layer.id === layerId
@@ -193,14 +190,13 @@ class Jane extends React.Component {
     );
 
     if (disabled) { // enable
-      if (!layerContentVisible) this.toggleLayerContent();
       this.setState({
         selectedLayer: layerId,
         layers: updatedLayers
       });
     } else {
-      if (layerContentVisible && selectedLayer === layerId) this.toggleLayerContent();
       this.setState({
+        selectedLayer: layerId === selectedLayer ? null : selectedLayer,
         layers: updatedLayers
       });
     }
@@ -214,15 +210,8 @@ class Jane extends React.Component {
     this.setState({ searchResultMarker: { feature, label }});
   };
 
-  toggleLayerContent = () => {
-    this.setState({
-      layerContentVisible: !this.state.layerContentVisible,
-    }, () => {
-      if (!this.state.layerContentVisible) {
-        const selectedLayer = null;
-        this.setState({ selectedLayer });
-      }
-    });
+  deselectLayer = () => {
+    this.setState({ selectedLayer: null });
   };
 
   handleToggleExpanded = () => {
@@ -237,11 +226,11 @@ class Jane extends React.Component {
   render() {
     let leftOffset = 0;
     if (this.state.layerListExpanded) leftOffset += 164;
-    if (this.state.layerContentVisible) leftOffset += 320;
+    if (this.state.selectedLayer) leftOffset += 320;
 
     const drawerClassName = cx('second-drawer', { offset: this.state.layerListExpanded });
     const drawerStyle = {
-      transform: this.state.layerContentVisible ? 'translate(0px, 0px)' : 'translate(-320px, 0px)'
+      transform: this.state.selectedLayer ? 'translate(0px, 0px)' : 'translate(-320px, 0px)'
     };
 
     return (
@@ -298,7 +287,6 @@ class Jane extends React.Component {
 }
 
 Jane.propTypes = {
-  layerContentVisible: PropTypes.bool,
   mapboxGLOptions: PropTypes.object.isRequired,
   style: PropTypes.object,
   search: PropTypes.bool,
@@ -310,7 +298,6 @@ Jane.propTypes = {
 };
 
 Jane.defaultProps = {
-  layerContentVisible: false,
   style: {
     position: 'absolute',
     top: 0,
