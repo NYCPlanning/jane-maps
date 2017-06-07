@@ -34,6 +34,7 @@ class Jane extends React.Component {
     registerLayer: this.registerLayer,
     unregisterLayer: this.unregisterLayer,
     loadedSources: this.state.loadedSources,
+    selectedLayer: this.state.selectedLayer,
     getJaneLayer: (janeLayerId) => this.state.layers.find(({ id }) => id === janeLayerId),
     onSourceLoaded: this.handleSourceLoaded,
     onLayerClose: this.toggleLayerContent,
@@ -47,6 +48,7 @@ class Jane extends React.Component {
     unregisterLayer: PropTypes.func,
     onSourceLoaded: PropTypes.func,
     loadedSources: PropTypes.object,
+    selectedLayer: PropTypes.string,
     getJaneLayer: PropTypes.func,
     onLayerClose: PropTypes.func,
     addLegend: PropTypes.func,
@@ -232,14 +234,6 @@ class Jane extends React.Component {
     return layerOrder.indexOf(a.id) > layerOrder.indexOf(b.id) ? 1 : -1;
   };
 
-  renderJaneLayers = () => {
-    return React.Children.map(this.props.children, (child) =>
-      React.cloneElement(child, {
-        selectedLayer: this.state.selectedLayer
-      })
-    );
-  };
-
   render() {
     let leftOffset = 0;
     if (this.state.layerListExpanded) leftOffset += 164;
@@ -288,7 +282,7 @@ class Jane extends React.Component {
           onLayerToggle={this.handleLayerToggle}/>
 
         <div className={drawerClassName} style={drawerStyle}>
-          { this.renderJaneLayers() }
+          { this.props.children }
 
           {
             this.state.searchResultMarker &&

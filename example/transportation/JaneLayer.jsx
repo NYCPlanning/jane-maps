@@ -30,7 +30,7 @@ class TransportationJaneLayer extends React.Component {
 
   renderSubways() {
     if (!this.state.checkboxes.subways) {
-      return;
+      return null;
     }
 
     return [
@@ -53,7 +53,7 @@ class TransportationJaneLayer extends React.Component {
 
   renderBusStops() {
     if (!this.state.checkboxes.bus_stops) {
-      return;
+      return null;
     }
 
     return [
@@ -64,7 +64,7 @@ class TransportationJaneLayer extends React.Component {
 
   renderPath() {
     if (!this.state.checkboxes.path) {
-      return;
+      return null;
     }
 
     return [
@@ -79,7 +79,7 @@ class TransportationJaneLayer extends React.Component {
 
   renderBikeRoutes() {
     if (!this.state.checkboxes.bike_routes) {
-      return;
+      return null;
     }
 
     return [
@@ -94,7 +94,6 @@ class TransportationJaneLayer extends React.Component {
         id="transportation"
         name="Transportation"
         icon="subway"
-        selectedLayer={this.props.selectedLayer}
         component={<Component checkboxes={this.state.checkboxes} onCheckboxChange={this.onCheckboxChange}/>}>
 
         { this.renderSubways() }

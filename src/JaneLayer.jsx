@@ -43,6 +43,7 @@ class JaneLayer extends React.Component {
     registerLayer: PropTypes.func,
     unregisterLayer: PropTypes.func,
     loadedSources: PropTypes.object,
+    selectedLayer: PropTypes.string,
     onSourceLoaded: PropTypes.func,
     getJaneLayer: PropTypes.func,
     onLayerClose: PropTypes.func,
@@ -106,7 +107,7 @@ class JaneLayer extends React.Component {
     const SidebarComponent = this.props.component;
 
     return (
-      <div style={{ display: this.props.id === this.props.selectedLayer ? 'inline' : 'none' }}>
+      <div style={{ display: this.props.id === this.context.selectedLayer ? 'inline' : 'none' }}>
         <div className="drawer-header">
           <FontIcon className={`fa fa-${this.props.icon}`} style={style.fontIcon} />
           {this.props.name}
