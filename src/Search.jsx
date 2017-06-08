@@ -54,7 +54,7 @@ class Search extends React.Component {
     });
   }
 
-  onChange = (e, obj) =>  {
+  onChange = (e, obj) => {
     this.setState({
       value: obj.newValue,
     });

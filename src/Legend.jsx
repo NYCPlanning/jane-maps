@@ -5,8 +5,19 @@ class Legend extends React.Component {
 
   static contextTypes = {
     addLegend: PropTypes.func,
-    removeLegend: PropTypes.func
+    removeLegend: PropTypes.func,
   };
+
+  static propTypes = {
+    children: PropTypes.oneOfType([
+      PropTypes.array,
+      PropTypes.object,
+    ]),
+  }
+
+  static defaultProps = {
+    children: null,
+  }
 
   componentDidMount() {
     this.context.addLegend(this.props.children);
