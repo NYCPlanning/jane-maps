@@ -96,7 +96,7 @@ MapLayer.propTypes = {
   sourceLayer: PropTypes.string,
   minzoom: PropTypes.number,
   maxzoom: PropTypes.number,
-  filter: PropTypes.object,
+  filter: PropTypes.array,
   layout: PropTypes.object,
   paint: PropTypes.object,
   janeLayer: PropTypes.string,
