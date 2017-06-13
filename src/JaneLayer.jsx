@@ -127,7 +127,7 @@ class JaneLayer extends React.Component {
           />
         </div>
 
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative', height: '100%' }}>
           { janeLayer && janeLayer.disabled && <div style={style.blockerStyle} /> }
           { SidebarComponent }
         </div>
