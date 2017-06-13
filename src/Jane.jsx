@@ -60,9 +60,6 @@ class Jane extends React.Component {
     // // this.map is the GLMap Component, not the map object itself
     this.map.mapObject.on('zoomend', this.props.onZoomEnd);
     this.map.mapObject.on('dragend', this.props.onDragEnd);
-
-    this.map.mapObject.on('click', this.handleMapLayerClick);
-    this.map.mapObject.on('mousemove', this.handleMapMousemove);
   }
 
   componentDidUpdate(prevProps) {
@@ -72,22 +69,22 @@ class Jane extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    this.map.mapObject.off('zoomend', this.props.onZoomEnd);
+    this.map.mapObject.off('dragend', this.props.onDragEnd);
+  }
+
   onMapLoad = () => {
     this.setState({ mapLoaded: true });
   };
 
   removeLegend = (legend) => {
-    this.setState({
-      legend: this.state.legend.filter(item => item !== legend),
-    });
+    this.setState({ legend: this.state.legend.filter(item => item !== legend) });
   };
 
   addLegend = (legend) => {
-    this.setState({
-      legend: this.state.legend.concat(legend),
-    });
+    this.setState({ legend: this.state.legend.concat(legend) });
   };
-
 
   unregisterLayer = (layerId) => {
     this.layers = this.layers.filter(layer => layer !== layerId);
@@ -137,47 +134,6 @@ class Jane extends React.Component {
       // otherwise expand the layerlist
       if (!this.state.layerListExpanded) this.setState({ layerListExpanded: true });
     }
-  };
-
-  handleMapLayerClick = (e) => {
-    const { mapLoaded, layers } = this.state;
-    if (!mapLoaded) return;
-
-    layers.forEach((layer) => {
-      const { onMapLayerClick, disabled, children } = layer;
-
-      if (!disabled && onMapLayerClick) {
-        const mapLayerIds = children.filter(child => child.type.name === 'MapLayer')
-          .map(mapLayer => mapLayer.props.id);
-
-        const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
-        // de-dup
-        const uniqueFeatures = _.uniq(features, feature => feature.id);
-        if (uniqueFeatures.length > 0) onMapLayerClick(uniqueFeatures);
-      }
-    });
-  };
-
-  handleMapMousemove = (e) => {
-    const { mapLoaded, layers } = this.state;
-    if (!mapLoaded) return;
-    const features = [];
-
-    layers.forEach((layer) => {
-      const { onMapLayerClick, disabled, children } = layer;
-
-      if (!disabled && onMapLayerClick) {
-        const mapLayerIds = children.filter(child => child.type.name === 'MapLayer')
-          .map(mapLayer => mapLayer.props.id);
-
-        const layerFeatures = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
-        layerFeatures.forEach((layerFeature) => {
-          features.push(layerFeature);
-        });
-      }
-    });
-
-    this.map.mapObject.getCanvas().style.cursor = (features && features.length > 0) ? 'pointer' : '';
   };
 
   handleLayerToggle = (layerId) => {

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'underscore';
 
 class MapLayer extends React.Component {
   componentWillMount() {
@@ -37,11 +38,35 @@ class MapLayer extends React.Component {
     };
 
     this.props.map.mapObject.addLayer(config, props.previousMapLayer);
+
+    if (this.props.onClick) {
+      this.props.map.mapObject.on('mousemove', this.onMouseMove);
+      this.props.map.mapObject.on('click', this.onClick);
+    }
   }
 
   removeLayer() {
     this.props.map.mapObject.removeLayer(this.props.id);
+
+    if (this.props.onClick) {
+      this.props.map.mapObject.off('mousemove', this.onMouseMove);
+      this.props.map.mapObject.off('click', this.onClick);
+    }
   }
+
+  onMouseMove = (event) => {
+    const layerFeatures = this.props.map.mapObject.queryRenderedFeatures(event.point, { layers: [this.props.id] });
+    this.props.map.mapObject.getCanvas().style.cursor = (layerFeatures && layerFeatures.length > 0) ? 'pointer' : '';
+  };
+
+  onClick = (event) => {
+    const features = this.props.map.mapObject.queryRenderedFeatures(event.point, { layers: [this.props.id] });
+    const uniqueFeatures = _.uniq(features, feature => feature.id);
+
+    if (uniqueFeatures.length > 0) {
+      this.props.onClick(uniqueFeatures);
+    }
+  };
 
   render() {
     return null;
@@ -54,6 +79,7 @@ MapLayer.propTypes = {
   config: PropTypes.object.isRequired,
   janeLayer: PropTypes.string,
   previousMapLayer: PropTypes.string,
+  onClick: PropTypes.func,
 };
 
 MapLayer.defaultProps = {
