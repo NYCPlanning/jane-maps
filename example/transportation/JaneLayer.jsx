@@ -71,7 +71,7 @@ class TransportationJaneLayer extends React.Component {
 
     return [
       <Source id="bus_stops" type="cartovector" options={sources.bus_stops.options} />,
-      <MapLayer id="bus_stops" source="bus_stops" config={mapLayers.bus_stops} />,
+      <MapLayer id="bus_stops" source="bus_stops" {...mapLayers.bus_stops} />,
     ].map((child, index) => ({ ...child, key: index }));
   }
 
@@ -84,9 +84,9 @@ class TransportationJaneLayer extends React.Component {
       <Source id="path_routes" type="geojson" data={sources.path_routes.data} />,
       <Source id="path_stops" type="geojson" data={sources.path_stops.data} />,
 
-      <MapLayer id="path_stops_labels" source="path_stops" config={mapLayers.path_stops_labels} />,
-      <MapLayer id="path_stops" source="path_stops" config={mapLayers.path_stops} />,
-      <MapLayer id="path_routes" source="path_routes" config={mapLayers.path_routes} />,
+      <MapLayer id="path_stops_labels" source="path_stops" {...mapLayers.path_stops_labels} />,
+      <MapLayer id="path_stops" source="path_stops" {...mapLayers.path_stops} />,
+      <MapLayer id="path_routes" source="path_routes" {...mapLayers.path_routes} />,
     ].map((child, index) => ({ ...child, key: index }));
   }
 
@@ -97,7 +97,7 @@ class TransportationJaneLayer extends React.Component {
 
     return [
       <Source id="bike_routes" type="vector" tiles={sources.bike_routes.tiles} />,
-      <MapLayer id="bike_routes" source="bike_routes" config={mapLayers.bike_routes} />,
+      <MapLayer id="bike_routes" source="bike_routes" {...mapLayers.bike_routes} />,
     ].map((child, index) => ({ ...child, key: index }));
   }
 
