@@ -23,19 +23,16 @@ class LayerList extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      layers: nextProps.layers,
-    });
+    this.setState({ layers: nextProps.layers });
   }
 
   handleDrop = () => {
     // on drop pass the current state up to Jane
     this.props.onLayerReorder(this.state.layers);
-  }
+  };
 
   moveListItem = (dragIndex, hoverIndex) => {
-    const { layers } = this.state;
-    const dragLayer = layers[dragIndex];
+    const dragLayer = this.state.layers[dragIndex];
 
     this.setState(update(this.state, {
       layers: {
@@ -45,7 +42,7 @@ class LayerList extends React.Component {
         ],
       },
     }));
-  }
+  };
 
   render() {
     const style = {
@@ -61,7 +58,6 @@ class LayerList extends React.Component {
 
     const layers = this.state.layers
       // reverse layers so the list reflects the map (first in array will be bottom on map)
-      .slice().reverse()
       .map((layer, i) => {
         const className = cx('list-item', {
           selected: this.props.selectedLayer === layer.id,
@@ -100,7 +96,7 @@ class LayerList extends React.Component {
               onTouchTap={this.props.onToggleExpanded}
             />
           </div>
-          {layers}
+          { layers.slice().reverse() }
         </div>
       </div>
     );
