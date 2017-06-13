@@ -65,7 +65,7 @@ class LayerList extends React.Component {
       .map((layer, i) => {
         const className = cx('list-item', {
           selected: this.props.selectedLayer === layer.id,
-          disabled: layer.disabled
+          disabled: layer.disabled,
         });
 
         return (

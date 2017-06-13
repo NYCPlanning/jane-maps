@@ -106,8 +106,8 @@ export const mapLayers = {
     },
   },
   subway_brown: {
-      type: 'line',
-      filter: [
+    type: 'line',
+    filter: [
       'all',
       [
         '==',
@@ -115,9 +115,9 @@ export const mapLayers = {
         'J',
       ],
     ],
-      paint: {
+    paint: {
       'line-color': 'rgba(153, 102, 51, 1)',
-        'line-width': {
+      'line-width': {
         stops: [
           [
             10,
@@ -414,30 +414,30 @@ export const mapLayers = {
         ],
       },
     },
-  }
-}
+  },
+};
 
 export const sources = {
   subway_lines: {
-    data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_mta_subway_routes&format=geojson`
+    data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_mta_subway_routes&format=geojson`,
   },
   subway_stations: {
-    data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_mta_subway_stops&format=geojson`
+    data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_mta_subway_stops&format=geojson`,
   },
   bus_stops: {
     options: {
       carto_user: appConfig.carto_user,
       carto_domain: appConfig.carto_domain,
       sql: ['SELECT * FROM support_trans_mta_bus_stops'],
-    }
+    },
   },
   path_routes: {
-    data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_path_rail_routes&format=geojson`
+    data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_path_rail_routes&format=geojson`,
   },
   path_stops: {
-    data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_path_rail_stops&format=geojson`
+    data: `https://${appConfig.carto_domain}/user/${appConfig.carto_user}/api/v2/sql?q=SELECT%20*%20FROM%20support_trans_path_rail_stops&format=geojson`,
   },
   bike_routes: {
-    tiles: ['https://api.capitalplanning.nyc/static_tiles/bike_routes/{z}/{x}/{y}.mvt']
-  }
+    tiles: ['https://api.capitalplanning.nyc/static_tiles/bike_routes/{z}/{x}/{y}.mvt'],
+  },
 };

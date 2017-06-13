@@ -37,15 +37,15 @@ const featureMapLayer = {
 };
 
 const markerFeature = {
-  "type": "Feature",
-  "properties": {},
-  "geometry": {
-    "type": "Point",
-    "coordinates": [
+  type: 'Feature',
+  properties: {},
+  geometry: {
+    type: 'Point',
+    coordinates: [
       -74.00390625,
-      40.71499673906409
-    ]
-  }
+      40.71499673906409,
+    ],
+  },
 };
 
 const JaneExample = () => {
@@ -81,24 +81,25 @@ const JaneExample = () => {
         <Jane
           mapboxGLOptions={mapboxGLOptions}
           search
-          searchConfig={searchConfig}>
+          searchConfig={searchConfig}
+          >
           <JaneLayer
             id="feature"
             name="Feature"
             icon="university"
-            defaultSelected={true}
-            component={<DummyComponent />}>
+            defaultSelected
+            component={<DummyComponent />}
+          >
 
-            <Source id="feature" type="geojson" data={featureSource}/>
-            <MapLayer id="feature" source="feature" config={featureMapLayer}/>
+            <Source id="feature" type="geojson" data={featureSource} />
+            <MapLayer id="feature" source="feature" config={featureMapLayer} />
 
-            <Marker label="Example Marker" feature={markerFeature}/>
+            <Marker label="Example Marker" feature={markerFeature} />
 
             <Legend>
               <div className="legendSection">
                 <p>Disclaimer: This map aggregates data from multiple public sources, and DCP cannot verify the accuracy
-                  of all records. Not all sites are service locations, among other limitations. <a
-                    href="http://docs.capitalplanning.nyc/facdb/#iii-limitations-and-disclaimers">Read more</a>.</p>
+                  of all records. Not all sites are service locations, among other limitations. <a href="http://docs.capitalplanning.nyc/facdb/#iii-limitations-and-disclaimers"> Read more</a>.</p>
               </div>
             </Legend>
 

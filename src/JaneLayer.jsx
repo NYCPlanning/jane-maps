@@ -34,7 +34,7 @@ const style = {
     width: '15px',
     float: 'right',
     color: '#5F5F5F',
-  }
+  },
 };
 
 class JaneLayer extends React.Component {
@@ -47,7 +47,7 @@ class JaneLayer extends React.Component {
     onSourceLoaded: PropTypes.func,
     getJaneLayer: PropTypes.func,
     onLayerClose: PropTypes.func,
-    map: PropTypes.object
+    map: PropTypes.object,
   };
 
   componentDidMount() {
@@ -67,7 +67,7 @@ class JaneLayer extends React.Component {
     const janeLayer = getJaneLayer(this.props.id);
 
     if (!map || (janeLayer && janeLayer.disabled)) {
-      return;
+      return null;
     }
 
     let previousMapLayer = null;
@@ -78,7 +78,7 @@ class JaneLayer extends React.Component {
       }
 
       switch (child.type.name) {
-        case 'MapLayer':
+        case 'MapLayer': // eslint-disable-line
           const modifiedLayer = loadedSources[child.props.source]
             ? React.cloneElement(child, { janeLayer: this.props.id, map, previousMapLayer })
             : null;
@@ -128,12 +128,16 @@ JaneLayer.propTypes = {
   name: PropTypes.string,
   icon: PropTypes.string,
   component: PropTypes.object,
-  onMapLayerClick: PropTypes.func,
-  defaultDisabled: PropTypes.bool,
+  children: PropTypes.array,
 };
 
 JaneLayer.defaultProps = {
-  onMapLayerClick: null,
+  defaultDisabled: false,
+  hidden: false,
+  name: null,
+  icon: null,
+  component: null,
+  children: null,
 };
 
 export default JaneLayer;

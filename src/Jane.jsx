@@ -11,6 +11,19 @@ import Search from './Search';
 
 class Jane extends React.Component {
 
+  static childContextTypes = {
+    registerLayer: PropTypes.func,
+    unregisterLayer: PropTypes.func,
+    onSourceLoaded: PropTypes.func,
+    loadedSources: PropTypes.object,
+    selectedLayer: PropTypes.string,
+    getJaneLayer: PropTypes.func,
+    onLayerClose: PropTypes.func,
+    addLegend: PropTypes.func,
+    removeLegend: PropTypes.func,
+    map: PropTypes.object,
+  };
+
   constructor(props) {
     super(props);
 
@@ -23,7 +36,7 @@ class Jane extends React.Component {
       loadedSources: {},
       layerOrder: [],
       legend: [],
-      layers: []
+      layers: [],
     };
 
     this.layers = [];
@@ -34,62 +47,13 @@ class Jane extends React.Component {
     unregisterLayer: this.unregisterLayer,
     loadedSources: this.state.loadedSources,
     selectedLayer: this.state.selectedLayer,
-    getJaneLayer: (janeLayerId) => this.state.layers.find(({ id }) => id === janeLayerId),
+    getJaneLayer: janeLayerId => this.state.layers.find(({ id }) => id === janeLayerId),
     onSourceLoaded: this.handleSourceLoaded,
     onLayerClose: this.deselectLayer,
     addLegend: this.addLegend,
     removeLegend: this.removeLegend,
-    map: this.state.mapLoaded ? this.map : null
+    map: this.state.mapLoaded ? this.map : null,
   });
-
-  static childContextTypes = {
-    registerLayer: PropTypes.func,
-    unregisterLayer: PropTypes.func,
-    onSourceLoaded: PropTypes.func,
-    loadedSources: PropTypes.object,
-    selectedLayer: PropTypes.string,
-    getJaneLayer: PropTypes.func,
-    onLayerClose: PropTypes.func,
-    addLegend: PropTypes.func,
-    removeLegend: PropTypes.func,
-    map: PropTypes.object
-  };
-
-  registerLayer = (layerId, layerConfig) => {
-    const layer = {
-      ...layerConfig,
-      selected: layerConfig.defaultSelected || false,
-      disabled: layerConfig.defaultDisabled || false
-    };
-
-    this.layers.push(layer);
-
-    const newState = { layers: this.layers };
-
-    if (layer.selected) {
-      newState.selectedLayer = layer.id;
-    }
-
-    this.setState(newState);
-  };
-
-  unregisterLayer = (layerId) => {
-    this.layers = this.layers.filter(layer => layer !== layerId);
-
-    this.setState({ layers: this.layers });
-  };
-
-  addLegend = (legend) => {
-    this.setState({
-      legend: this.state.legend.concat(legend)
-    })
-  };
-
-  removeLegend = (legend) => {
-    this.setState({
-      legend: this.state.legend.filter((item) => item !== legend)
-    })
-  };
 
   componentDidMount() {
     // // pass dragend and zoomend up, handle click and mousemove
@@ -110,6 +74,43 @@ class Jane extends React.Component {
 
   onMapLoad = () => {
     this.setState({ mapLoaded: true });
+  };
+
+  removeLegend = (legend) => {
+    this.setState({
+      legend: this.state.legend.filter(item => item !== legend),
+    });
+  };
+
+  addLegend = (legend) => {
+    this.setState({
+      legend: this.state.legend.concat(legend),
+    });
+  };
+
+
+  unregisterLayer = (layerId) => {
+    this.layers = this.layers.filter(layer => layer !== layerId);
+
+    this.setState({ layers: this.layers });
+  };
+
+  registerLayer = (layerId, layerConfig) => {
+    const layer = {
+      ...layerConfig,
+      selected: layerConfig.defaultSelected || false,
+      disabled: layerConfig.defaultDisabled || false,
+    };
+
+    this.layers.push(layer);
+
+    const newState = { layers: this.layers };
+
+    if (layer.selected) {
+      newState.selectedLayer = layer.id;
+    }
+
+    this.setState(newState);
   };
 
   handleSourceLoaded = (loadedSources) => {
@@ -139,15 +140,15 @@ class Jane extends React.Component {
   };
 
   handleMapLayerClick = (e) => {
-    const { mapConfig } = this.state;
+    const { mapLoaded, layers } = this.state;
+    if (!mapLoaded) return;
 
-    this.state.layers.forEach((layer) => {
-      const { id, onMapLayerClick, disabled } = layer;
+    layers.forEach((layer) => {
+      const { onMapLayerClick, disabled, children } = layer;
 
       if (!disabled && onMapLayerClick) {
-        const mapLayerIds = mapConfig[id].mapLayers
-          .map(mapLayer => mapLayer.id)
-          .filter(mapLayerId => (this.map.mapObject.getLayer(mapLayerId) !== undefined));
+        const mapLayerIds = children.filter(child => child.type.name === 'MapLayer')
+          .map(mapLayer => mapLayer.props.id);
 
         const features = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
         // de-dup
@@ -158,17 +159,16 @@ class Jane extends React.Component {
   };
 
   handleMapMousemove = (e) => {
-    const { mapConfig, mapLoaded } = this.state;
+    const { mapLoaded, layers } = this.state;
     if (!mapLoaded) return;
     const features = [];
 
-    this.state.layers.forEach((layer) => {
-      const { id, onMapLayerClick, disabled } = layer;
+    layers.forEach((layer) => {
+      const { onMapLayerClick, disabled, children } = layer;
 
       if (!disabled && onMapLayerClick) {
-        const mapLayerIds = mapConfig[id].mapLayers
-          .map(mapLayer => mapLayer.id)
-          .filter(mapLayerId => (this.map.mapObject.getLayer(mapLayerId) !== undefined));
+        const mapLayerIds = children.filter(child => child.type.name === 'MapLayer')
+          .map(mapLayer => mapLayer.props.id);
 
         const layerFeatures = this.map.mapObject.queryRenderedFeatures(e.point, { layers: mapLayerIds });
         layerFeatures.forEach((layerFeature) => {
@@ -184,20 +184,20 @@ class Jane extends React.Component {
     const { selectedLayer, layers } = this.state;
     const disabled = layers.find(layer => layer.id).disabled;
 
-    const updatedLayers = layers.map((layer) => layer.id === layerId
-      ? { ...layer, disabled: !layer.disabled }
-      : layer
-    );
+    const updatedLayers = layers.map((layer) => {
+      if (layer.id === layerId) return { ...layer, disabled: !layer.disabled };
+      return layer;
+    });
 
     if (disabled) { // enable
       this.setState({
         selectedLayer: layerId,
-        layers: updatedLayers
+        layers: updatedLayers,
       });
     } else {
       this.setState({
         selectedLayer: layerId === selectedLayer ? null : selectedLayer,
-        layers: updatedLayers
+        layers: updatedLayers,
       });
     }
   };
@@ -207,7 +207,7 @@ class Jane extends React.Component {
   };
 
   addSearchResultMarker = (feature, label) => {
-    this.setState({ searchResultMarker: { feature, label }});
+    this.setState({ searchResultMarker: { feature, label } });
   };
 
   deselectLayer = () => {
@@ -230,7 +230,7 @@ class Jane extends React.Component {
 
     const drawerClassName = cx('second-drawer', { offset: this.state.layerListExpanded });
     const drawerStyle = {
-      transform: this.state.selectedLayer ? 'translate(0px, 0px)' : 'translate(-320px, 0px)'
+      transform: this.state.selectedLayer ? 'translate(0px, 0px)' : 'translate(-320px, 0px)',
     };
 
     return (
@@ -268,15 +268,16 @@ class Jane extends React.Component {
           onLayerReorder={this.handleLayerReorder}
           onLayerClick={this.handleLayerClick}
           onToggleExpanded={this.handleToggleExpanded}
-          onLayerToggle={this.handleLayerToggle}/>
+          onLayerToggle={this.handleLayerToggle}
+        />
 
         <div className={drawerClassName} style={drawerStyle}>
           { this.props.children }
 
           {
             this.state.searchResultMarker &&
-            <JaneLayer id="searchResult" hidden={true}>
-              <Marker {...this.state.searchResultMarker} flyMap={true}/>
+            <JaneLayer id="searchResult" hidden >
+              <Marker {...this.state.searchResultMarker} flyMap />
             </JaneLayer>
           }
         </div>
@@ -294,7 +295,7 @@ Jane.propTypes = {
   fitBounds: PropTypes.array,
   onZoomEnd: PropTypes.func,
   onDragEnd: PropTypes.func,
-  children: PropTypes.node,
+  children: PropTypes.node.isRequired,
 };
 
 Jane.defaultProps = {

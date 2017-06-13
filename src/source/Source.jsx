@@ -20,19 +20,25 @@ class Source extends React.Component {
     const onLoaded = this.props.onSourceLoaded;
     const map = this.props.map;
 
-    if (source.type === 'geojson') return <GeoJsonSource map={map} source={source} onLoaded={onLoaded}/>;
-    if (source.type === 'vector') return <VectorSource map={map} source={source} onLoaded={onLoaded}/>;
-    if (source.type === 'cartovector' && source.options) return <CartoVectorSource map={map} source={source} onLoaded={onLoaded}/>;
-    if (source.type === 'raster') return <RasterSource map={map} source={source} onLoaded={onLoaded}/>;
-    if (source.type === 'cartoraster') return <CartoRasterSource map={map} source={source} onLoaded={onLoaded}/>;
+    if (source.type === 'geojson') return <GeoJsonSource map={map} source={source} onLoaded={onLoaded} />;
+    if (source.type === 'vector') return <VectorSource map={map} source={source} onLoaded={onLoaded} />;
+    if (source.type === 'cartovector' && source.options) return <CartoVectorSource map={map} source={source} onLoaded={onLoaded} />;
+    if (source.type === 'raster') return <RasterSource map={map} source={source} onLoaded={onLoaded} />;
+    if (source.type === 'cartoraster') return <CartoRasterSource map={map} source={source} onLoaded={onLoaded} />;
 
     return null;
   }
 }
 
 Source.propTypes = {
+  id: PropTypes.string.isRequired,
   map: PropTypes.object,
-  onSourceLoaded: PropTypes.func
+  onSourceLoaded: PropTypes.func,
+};
+
+Source.defaultProps = {
+  map: null,
+  onSourceLoaded: null,
 };
 
 export default Source;

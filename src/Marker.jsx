@@ -66,8 +66,13 @@ class Marker extends React.Component {
 Marker.propTypes = {
   flyMap: PropTypes.bool,
   feature: PropTypes.object.isRequired,
-  map: PropTypes.object.isRequired,
+  map: PropTypes.object,
   label: PropTypes.string.isRequired,
+};
+
+Marker.defaultProps = {
+  flyMap: false,
+  map: {},
 };
 
 

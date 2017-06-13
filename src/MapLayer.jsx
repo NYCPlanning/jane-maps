@@ -33,7 +33,7 @@ class MapLayer extends React.Component {
     const config = {
       ...props.config,
       id: props.id,
-      source: props.source
+      source: props.source,
     };
 
     this.props.map.mapObject.addLayer(config, props.previousMapLayer);
@@ -51,10 +51,15 @@ class MapLayer extends React.Component {
 MapLayer.propTypes = {
   map: PropTypes.object.isRequired,
   id: PropTypes.string.isRequired,
-  source: PropTypes.string.isRequired,
   config: PropTypes.object.isRequired,
   janeLayer: PropTypes.string,
-  previousMapLayer: PropTypes.string
+  previousMapLayer: PropTypes.string,
+};
+
+MapLayer.defaultProps = {
+  map: {},
+  previousMapLayer: null,
+  janeLayer: null,
 };
 
 export default MapLayer;
