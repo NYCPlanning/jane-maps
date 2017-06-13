@@ -20,7 +20,7 @@ class MapLayer extends React.Component {
       return;
     }
 
-    if (!_.isEqual(this.props.config, nextProps.config)) {
+    if (!_.isEqual(this.props, nextProps)) {
       this.removeLayer();
       this.addLayer(nextProps);
     }
@@ -31,11 +31,24 @@ class MapLayer extends React.Component {
   }
 
   addLayer(props) {
-    const config = {
-      ...props.config,
-      id: props.id,
-      source: props.source,
-    };
+    const config = _.pick(props,
+      'id',
+      'type',
+      'metadata',
+      'ref',
+      'source',
+      'sourceLayer',
+      'minzoom',
+      'maxzoom',
+      'filter',
+      'layout',
+      'paint'
+    );
+
+    if (config.sourceLayer) {
+      config['source-layer'] = config.sourceLayer;
+      delete config.sourceLayer
+    }
 
     this.props.map.mapObject.addLayer(config, props.previousMapLayer);
 
@@ -76,7 +89,16 @@ class MapLayer extends React.Component {
 MapLayer.propTypes = {
   map: PropTypes.object.isRequired,
   id: PropTypes.string.isRequired,
-  config: PropTypes.object.isRequired,
+  type: PropTypes.oneOf(['fill', 'line', 'symbol', 'circle', 'fill-extrusion', 'raster', 'background']),
+  metadata: PropTypes.object,
+  ref: PropTypes.string,
+  source: PropTypes.string,
+  sourceLayer: PropTypes.string,
+  minzoom: PropTypes.number,
+  maxzoom: PropTypes.number,
+  filter: PropTypes.object,
+  layout: PropTypes.object,
+  paint: PropTypes.object,
   janeLayer: PropTypes.string,
   previousMapLayer: PropTypes.string,
   onClick: PropTypes.func,

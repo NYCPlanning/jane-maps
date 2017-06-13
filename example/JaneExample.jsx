@@ -27,15 +27,6 @@ const featureSource = {
   ],
 };
 
-const featureMapLayer = {
-  type: 'circle',
-  paint: {
-    'circle-radius': 10,
-    'circle-color': 'steelblue',
-    'circle-opacity': 0.7,
-  },
-};
-
 const markerFeature = {
   type: 'Feature',
   properties: {},
@@ -92,7 +83,15 @@ const JaneExample = () => {
           >
 
             <Source id="feature" type="geojson" data={featureSource} />
-            <MapLayer id="feature" source="feature" config={featureMapLayer} />
+
+            <MapLayer id="feature"
+                      source="feature"
+                      type="circle"
+                      paint={{
+                        'circle-radius': 10,
+                        'circle-color': 'steelblue',
+                        'circle-opacity': 0.7,
+                      }}/>
 
             <Marker label="Example Marker" feature={markerFeature} />
 

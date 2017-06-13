@@ -15,7 +15,7 @@ class TransportationJaneLayer extends React.Component {
   static defaultProps = {
     defaultSelected: false,
     defaultDisabled: false,
-  }
+  };
 
   constructor() {
     super();
@@ -50,17 +50,17 @@ class TransportationJaneLayer extends React.Component {
       <Source id="subway_lines" type="geojson" data={sources.subway_lines.data} />,
       <Source id="subway_stations" type="geojson" data={sources.subway_stations.data} />,
 
-      <MapLayer id="subway_stations_labels" source="subway_stations" config={mapLayers.subway_stations_labels} />,
-      <MapLayer id="subway_stations" source="subway_stations" config={mapLayers.subway_stations} />,
-      <MapLayer id="subway_red" source="subway_lines" config={mapLayers.subway_red} />,
-      <MapLayer id="subway_purple" source="subway_lines" config={mapLayers.subway_purple} />,
-      <MapLayer id="subway_blue" source="subway_lines" config={mapLayers.subway_blue} />,
-      <MapLayer id="subway_orange" source="subway_lines" config={mapLayers.subway_orange} />,
-      <MapLayer id="subway_light_green" source="subway_lines" config={mapLayers.subway_light_green} />,
-      <MapLayer id="subway_brown" source="subway_lines" config={mapLayers.subway_brown} />,
-      <MapLayer id="subway_gray" source="subway_lines" config={mapLayers.subway_gray} />,
-      <MapLayer id="subway_yellow" source="subway_lines" config={mapLayers.subway_yellow} />,
-      <MapLayer id="subway_green" source="subway_lines" config={mapLayers.subway_green} />,
+      <MapLayer id="subway_stations_labels" source="subway_stations" {...mapLayers.subway_stations_labels} />,
+      <MapLayer id="subway_stations" source="subway_stations" {...mapLayers.subway_stations} />,
+      <MapLayer id="subway_red" source="subway_lines" {...mapLayers.subway_red} />,
+      <MapLayer id="subway_purple" source="subway_lines" {...mapLayers.subway_purple} />,
+      <MapLayer id="subway_blue" source="subway_lines" {...mapLayers.subway_blue} />,
+      <MapLayer id="subway_orange" source="subway_lines" {...mapLayers.subway_orange} />,
+      <MapLayer id="subway_light_green" source="subway_lines" {...mapLayers.subway_light_green} />,
+      <MapLayer id="subway_brown" source="subway_lines" {...mapLayers.subway_brown} />,
+      <MapLayer id="subway_gray" source="subway_lines" {...mapLayers.subway_gray} />,
+      <MapLayer id="subway_yellow" source="subway_lines" {...mapLayers.subway_yellow} />,
+      <MapLayer id="subway_green" source="subway_lines" {...mapLayers.subway_green} />,
     ].map((child, index) => ({ ...child, key: index }));
   }
 
