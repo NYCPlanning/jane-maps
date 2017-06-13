@@ -20,7 +20,7 @@ class MapLayer extends React.Component {
       return;
     }
 
-    if (JSON.stringify(this.props.config) !== JSON.stringify(nextProps.config)) {
+    if (!_.isEqual(this.props.config, nextProps.config)) {
       this.removeLayer();
       this.addLayer(nextProps);
     }

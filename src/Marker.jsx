@@ -1,5 +1,6 @@
 import React from 'react'; // eslint-disable-line
 import PropTypes from 'prop-types';
+import _ from 'underscore';
 
 class Marker extends React.Component {
 
@@ -31,7 +32,7 @@ class Marker extends React.Component {
   }
 
   componentWillUpdate(nextProps) {
-    if (JSON.stringify(nextProps.feature) !== JSON.stringify(this.props.feature)) {
+    if (!_.isEqual(nextProps.feature, this.props.feature)) {
       this.updateMarker(nextProps.feature, nextProps.label);
     }
   }

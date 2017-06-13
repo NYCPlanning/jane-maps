@@ -64,7 +64,7 @@ class Jane extends React.Component {
 
   componentDidUpdate(prevProps) {
     // fit map to fitBounds property if it is different from previous props
-    if (JSON.stringify(prevProps.fitBounds) !== JSON.stringify(this.props.fitBounds)) {
+    if (!_.isEqual(prevProps.fitBounds, this.props.fitBounds)) {
       this.map.mapObject.fitBounds(this.props.fitBounds);
     }
   }
