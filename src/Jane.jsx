@@ -157,10 +157,10 @@ class Jane extends React.Component {
     this.setState({ layerListExpanded: !this.state.layerListExpanded });
 
   componentDidUpdate(prevProps, prevState) {
-    const prevDisabledCount = this.state.layers.reduce((acc, l) => l.disabled ? acc + 1 : acc, 0);
-    const nextDisabledCount = prevState.layers.reduce((acc, l) => l.disabled ? acc + 1 : acc, 0);
+    const prevDisabledCount = prevState.layers.reduce((acc, l) => l.disabled ? acc + 1 : acc, 0);
+    const currentDisabledCount = this.state.layers.reduce((acc, l) => l.disabled ? acc + 1 : acc, 0);
 
-    if (!prevDisabledCount !== nextDisabledCount) {
+    if (!prevDisabledCount !== currentDisabledCount) {
       prevState.layers.forEach((layer) => layer.redrawChildren());
     }
   }
