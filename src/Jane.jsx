@@ -9,6 +9,9 @@ import JaneLayer from './JaneLayer';
 import Marker from './Marker';
 import Search from './Search';
 
+// const {whyDidYouUpdate} = require('why-did-you-update');
+// whyDidYouUpdate(React)
+
 class Jane extends React.Component {
 
   static childContextTypes = {
@@ -45,31 +48,31 @@ class Jane extends React.Component {
     unregisterLayer: this.unregisterLayer,
     loadedSources: this.state.loadedSources,
     selectedLayer: this.state.selectedLayer,
-    getJaneLayer: janeLayerId => this.state.layers.find(({ id }) => id === janeLayerId),
+    getJaneLayer: janeLayerId => this.layers.find(({ id }) => id === janeLayerId),
     onSourceLoaded: this.handleSourceLoaded,
     onLayerClose: this.deselectLayer,
     addLegend: this.addLegend,
     removeLegend: this.removeLegend,
-    map: this.state.mapLoaded ? this.map : null,
+    map: this.state.mapLoaded ? this.GLMap.map : null,
   });
 
   componentDidMount() {
     // // pass dragend and zoomend up, handle click and mousemove
-    // // this.map is the GLMap Component, not the map object itself
-    this.map.mapObject.on('zoomend', this.props.onZoomEnd);
-    this.map.mapObject.on('dragend', this.props.onDragEnd);
+    // // this.GLMap is the GLMap Component, not the map object itself
+    this.GLMap.map.on('zoomend', this.props.onZoomEnd);
+    this.GLMap.map.on('dragend', this.props.onDragEnd);
   }
 
   componentDidUpdate(prevProps) {
     // fit map to fitBounds property if it is different from previous props
     if (!_.isEqual(prevProps.fitBounds, this.props.fitBounds)) {
-      this.map.mapObject.fitBounds(this.props.fitBounds);
+      this.GLMap.map.fitBounds(this.props.fitBounds);
     }
   }
 
   componentWillUnmount() {
-    this.map.mapObject.off('zoomend', this.props.onZoomEnd);
-    this.map.mapObject.off('dragend', this.props.onDragEnd);
+    this.GLMap.map.off('zoomend', this.props.onZoomEnd);
+    this.GLMap.map.off('dragend', this.props.onDragEnd);
   }
 
   onMapLoad = () =>
@@ -198,7 +201,7 @@ class Jane extends React.Component {
 
           <GLMap
             {...this.props.mapboxGLOptions}
-            ref={(map) => { this.map = map; }}
+            ref={(map) => { this.GLMap = map; }}
             onLoad={this.onMapLoad}
           />
         </div>
@@ -218,7 +221,7 @@ class Jane extends React.Component {
 
           {
             this.state.searchResultMarker &&
-            <JaneLayer id="searchResult" hidden >
+            <JaneLayer id="searchResult" hidden>
               <Marker {...this.state.searchResultMarker} flyMap />
             </JaneLayer>
           }

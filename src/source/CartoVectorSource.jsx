@@ -5,7 +5,7 @@ import Carto from '../Carto';
 class CartoVectorSource extends React.Component {
 
   componentWillMount() {
-    this.map = this.props.map.mapObject;
+    this.map = this.props.map;
     // fetch data if necessary, add layer to map
     if (!this.props.source.tiles) {
       this.fetchData(this.props.source.options.sql, this.addSource);

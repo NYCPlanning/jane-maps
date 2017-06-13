@@ -47,20 +47,20 @@ class MapLayer extends React.Component {
       delete config.sourceLayer
     }
 
-    this.props.map.mapObject.addLayer(config, props.previousMapLayer);
+    this.props.map.addLayer(config, props.previousMapLayer);
 
     if (this.props.onClick) {
-      this.props.map.mapObject.on('mousemove', this.onMouseMove);
-      this.props.map.mapObject.on('click', this.onClick);
+      this.props.map.on('mousemove', this.onMouseMove);
+      this.props.map.on('click', this.onClick);
     }
   }
 
   removeLayer() {
-    this.props.map.mapObject.removeLayer(this.props.id);
+    this.props.map.removeLayer(this.props.id);
 
     if (this.props.onClick) {
-      this.props.map.mapObject.off('mousemove', this.onMouseMove);
-      this.props.map.mapObject.off('click', this.onClick);
+      this.props.map.off('mousemove', this.onMouseMove);
+      this.props.map.off('click', this.onClick);
     }
   }
 
@@ -70,12 +70,12 @@ class MapLayer extends React.Component {
   };
 
   onMouseMove = (event) => {
-    const layerFeatures = this.props.map.mapObject.queryRenderedFeatures(event.point, { layers: [this.props.id] });
-    this.props.map.mapObject.getCanvas().style.cursor = (layerFeatures && layerFeatures.length > 0) ? 'pointer' : '';
+    const layerFeatures = this.props.map.queryRenderedFeatures(event.point, { layers: [this.props.id] });
+    this.props.map.getCanvas().style.cursor = (layerFeatures && layerFeatures.length > 0) ? 'pointer' : '';
   };
 
   onClick = (event) => {
-    const features = this.props.map.mapObject.queryRenderedFeatures(event.point, { layers: [this.props.id] });
+    const features = this.props.map.queryRenderedFeatures(event.point, { layers: [this.props.id] });
     const uniqueFeatures = _.uniq(features, feature => feature.id);
 
     if (uniqueFeatures.length > 0) {

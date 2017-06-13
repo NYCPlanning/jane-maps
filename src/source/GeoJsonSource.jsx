@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 class GeoJsonSource extends React.Component {
 
   componentWillMount() {
-    this.map = this.props.map.mapObject;
+    this.map = this.props.map;
     // fetch data if necessary, add layer to map
     if (!this.props.source.data) {
       this.fetchData();

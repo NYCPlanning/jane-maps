@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 class RasterSource extends React.Component {
 
   componentWillMount() {
-    this.map = this.props.map.mapObject;
+    this.map = this.props.map;
     // fetch data if necessary, add layer to map
     this.addSource();
   }

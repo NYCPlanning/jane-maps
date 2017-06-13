@@ -47,12 +47,12 @@ class Marker extends React.Component {
 
     this.marker
       .setLngLat(feature.geometry.coordinates)
-      .addTo(map.mapObject);
+      .addTo(map);
 
     this.label
       .setLngLat(feature.geometry.coordinates)
       .setHTML(`<p>${label}</p>`)
-      .addTo(map.mapObject);
+      .addTo(map);
 
     if (this.props.flyMap) {
       map.flyMap(feature);

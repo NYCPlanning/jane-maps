@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 class CartoRasterSource extends React.Component {
 
   componentWillMount() {
-    this.map = this.props.map.mapObject;
+    this.map = this.props.map;
     // fetch data if necessary, add layer to map
     if (!this.props.source.tiles) {
       this.fetchData(this.props.source.sql);

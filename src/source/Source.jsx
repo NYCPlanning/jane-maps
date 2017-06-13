@@ -10,9 +10,9 @@ import CartoRasterSource from './CartoRasterSource';
 
 class Source extends React.Component {
   componentWillUnmount() {
-    this.props.map.mapObject.removeSource(this.props.id);
+    this.props.map.removeSource(this.props.id);
     // let jane know what sources are still loaded
-    this.props.onSourceLoaded(this.props.map.mapObject.getStyle().sources);
+    this.props.onSourceLoaded(this.props.map.getStyle().sources);
   }
 
   render() {

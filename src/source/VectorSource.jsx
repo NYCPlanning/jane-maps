@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 class VectorSource extends React.Component {
 
   componentWillMount() {
-    this.map = this.props.map.mapObject;
+    this.map = this.props.map;
     this.addSource();
   }
 

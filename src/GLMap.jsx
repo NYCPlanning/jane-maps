@@ -1,22 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'underscore';
 
 class GLMap extends React.Component {
   componentDidMount() {
     this.initializeMap();
   }
 
+  shouldComponentUpdate(nextProps) {
+    return !_.isEqual(this.props, nextProps);
+  }
+
   componentDidUpdate() {
     // TODO this is a hack to get the GL map to resize to its container after changing the container size.  Need to find a less hacky way to do this
-    setTimeout(() => this.mapObject && this.mapObject.resize(), 500);
+    setTimeout(() => this.map && this.map.resize(), 500);
   }
 
   initializeMap() {
-    const self = this;
-
     mapboxgl.accessToken = this.props.mapbox_accessToken;
 
-    this.mapObject = new mapboxgl.Map({
+    this.map = new mapboxgl.Map({
       container: this.container,
       style: this.props.mapStyle,
       zoom: this.props.zoom,
@@ -26,17 +29,15 @@ class GLMap extends React.Component {
       hash: this.props.hash,
     });
 
-    const map = this.mapObject;
-
-    this.mapObject.on('load', () => {
-      self.props.onLoad(self.mapObject.getStyle());
+    this.map.on('load', () => {
+      this.props.onLoad(this.map.getStyle());
     });
 
-    if (this.props.navigationControl) map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+    if (this.props.navigationControl) this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
   }
 
   flyMap(feature, zoom = 15) {
-    this.mapObject.flyTo({
+    this.map.flyTo({
       center: feature.geometry.coordinates,
       zoom,
     });
@@ -44,10 +45,7 @@ class GLMap extends React.Component {
 
   render() {
     return (
-      <div
-        className="gl-map"
-        ref={(x) => { this.container = x; }}
-      />
+      <div className="gl-map" ref={(node) => { this.container = node; }}/>
     );
   }
 }
