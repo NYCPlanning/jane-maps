@@ -6,6 +6,21 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import IconButton from 'material-ui/IconButton';
 import cx from 'classnames';
 
+const style = {
+  fontIcon: {
+    fontSize: '15px',
+    margin: '7px 10px',
+    height: '15px',
+    width: '15px',
+    color: '#5F5F5F',
+    left: 0,
+  },
+  drawerIcon: {
+    width: 36,
+    height: 36,
+    padding: 0,
+  }
+};
 
 import ListItem from './ListItem';
 
@@ -45,16 +60,8 @@ class LayerList extends React.Component {
   };
 
   render() {
-    const style = {
-      fontIcon: {
-        fontSize: '15px',
-        margin: '7px 10px',
-        height: '15px',
-        width: '15px',
-        color: '#5F5F5F',
-        left: 0,
-      },
-    };
+    const drawerClassName = cx('jane-drawer', { expanded: this.props.expanded });
+    const drawerIconClassName = cx('fa', this.props.expanded ? 'fa-chevron-left' : 'fa-list-ul');
 
     const layers = this.state.layers
       // reverse layers so the list reflects the map (first in array will be bottom on map)
@@ -74,26 +81,22 @@ class LayerList extends React.Component {
             index={i}
             onDrop={this.handleDrop}
             key={layer.id}
-            onClick={this.props.onLayerClick}
+            onClick={this.props.onLayerSelect}
             onLayerToggle={this.props.onLayerToggle}
           />
         );
       });
 
     return (
-      <div className={`jane-drawer ${this.props.expanded ? 'expanded' : ''}`}>
-        <div className={'jane-drawer-inner'}>
-          <div className="drawer-header" >
+      <div className={drawerClassName}>
+        <div className="jane-drawer-inner">
+          <div className="drawer-header">
             Layers
             <IconButton
-              style={{
-                width: 36,
-                height: 36,
-                padding: 0,
-              }}
-              iconClassName={this.props.expanded ? 'fa fa-chevron-left' : 'fa fa-list-ul'}
+              style={style.drawerIcon}
+              iconClassName={drawerIconClassName}
               iconStyle={style.fontIcon}
-              onTouchTap={this.props.onToggleExpanded}
+              onTouchTap={this.props.toggleList}
             />
           </div>
           { layers.slice().reverse() }
@@ -107,9 +110,9 @@ LayerList.propTypes = {
   layers: PropTypes.array.isRequired,
   onLayerReorder: PropTypes.func.isRequired,
   expanded: PropTypes.bool.isRequired,
-  onLayerClick: PropTypes.func.isRequired,
+  onLayerSelect: PropTypes.func.isRequired,
   selectedLayer: PropTypes.string,
-  onToggleExpanded: PropTypes.func.isRequired,
+  toggleList: PropTypes.func.isRequired,
   onLayerToggle: PropTypes.func.isRequired,
 };
 

@@ -74,17 +74,14 @@ class Jane extends React.Component {
     this.map.mapObject.off('dragend', this.props.onDragEnd);
   }
 
-  onMapLoad = () => {
+  onMapLoad = () =>
     this.setState({ mapLoaded: true });
-  };
 
-  removeLegend = (legend) => {
+  removeLegend = (legend) =>
     this.setState({ legend: this.state.legend.filter(item => item !== legend) });
-  };
 
-  addLegend = (legend) => {
+  addLegend = (legend) =>
     this.setState({ legend: this.state.legend.concat(legend) });
-  };
 
   unregisterLayer = (layerId) => {
     this.layers = this.layers.filter(layer => layer !== layerId);
@@ -110,31 +107,14 @@ class Jane extends React.Component {
     this.setState(newState);
   };
 
-  handleSourceLoaded = (loadedSources) => {
+  handleSourceLoaded = (loadedSources) =>
     this.setState({ loadedSources });
-  };
 
-  handleLayerReorder = (layers) => {
-    const layerOrder = layers.map(layer => layer.id);
-    this.setState({ layerOrder });
-  };
+  handleLayerReorder = (layers) =>
+    this.setState({ layerOrder: layers.map(layer => layer.id) });
 
-  handleLayerClick = (layerid) => {
-    const { selectedLayer } = this.state;
-    const { disabled } = this.state.layers.find(layer => layer.id);
-
-    // if selected layer was clicked, toggle second drawer, else make clicked layer selected
-    if (selectedLayer !== layerid) {
-      // if clicked layer is enabled (visible), make it active
-      if (!disabled) {
-        this.setState({ selectedLayer: layerid });
-        return;
-      }
-
-      // otherwise expand the layerlist
-      if (!this.state.layerListExpanded) this.setState({ layerListExpanded: true });
-    }
-  };
+  selectLayer = (layerid) =>
+    this.setState({ selectedLayer: layerid });
 
   handleLayerToggle = (layerId) => {
     const { selectedLayer, layers } = this.state;
@@ -158,21 +138,17 @@ class Jane extends React.Component {
     }
   };
 
-  removeSearchResultMarker = () => {
+  removeSearchResultMarker = () =>
     this.setState({ searchResultMarker: null });
-  };
 
-  addSearchResultMarker = (feature, label) => {
+  addSearchResultMarker = (feature, label) =>
     this.setState({ searchResultMarker: { feature, label } });
-  };
 
-  deselectLayer = () => {
+  deselectLayer = () =>
     this.setState({ selectedLayer: null });
-  };
 
-  handleToggleExpanded = () => {
+  toggleList = () =>
     this.setState({ layerListExpanded: !this.state.layerListExpanded });
-  };
 
   sort = (a, b) => {
     const { layerOrder } = this.state;
@@ -222,8 +198,8 @@ class Jane extends React.Component {
           layers={this.state.layers.sort(this.sort)}
           selectedLayer={this.state.selectedLayer}
           onLayerReorder={this.handleLayerReorder}
-          onLayerClick={this.handleLayerClick}
-          onToggleExpanded={this.handleToggleExpanded}
+          onLayerSelect={this.selectLayer}
+          toggleList={this.toggleList}
           onLayerToggle={this.handleLayerToggle}
         />
 
