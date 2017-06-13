@@ -4,6 +4,7 @@ import update from 'react/lib/update';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import IconButton from 'material-ui/IconButton';
+import _ from 'underscore';
 import cx from 'classnames';
 
 const style = {
@@ -35,6 +36,11 @@ class LayerList extends React.Component {
     this.state = {
       layers: this.props.layers,
     };
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !_.isEqual(this.props, nextProps) ||
+           !_.isEqual(this.state, nextState);
   }
 
   componentWillReceiveProps(nextProps) {
