@@ -2,11 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 
+const LAYER_TYPES = ['fill', 'line', 'symbol', 'circle', 'fill-extrusion', 'raster', 'background'];
+
 class MapLayer extends React.Component {
   componentWillMount() {
     if (!this.props.janeLayer) {
       console.error(`<MapLayer /> has to be a direct child of <JaneLayer />. Check layer with id ${this.props.id}`);
     }
+
+    this.props.registerRedrawCallback(this.redrawLayer);
   }
 
   componentDidMount() {
@@ -14,15 +18,8 @@ class MapLayer extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.previousMapLayer !== nextProps.previousMapLayer) {
-      this.removeLayer();
-      this.addLayer(nextProps);
-      return;
-    }
-
     if (!_.isEqual(this.props, nextProps)) {
-      this.removeLayer();
-      this.addLayer(nextProps);
+      this.redrawLayer(nextProps)
     }
   }
 
@@ -67,6 +64,11 @@ class MapLayer extends React.Component {
     }
   }
 
+  redrawLayer = (props) => {
+    this.removeLayer();
+    this.addLayer(props || this.props);
+  };
+
   onMouseMove = (event) => {
     const layerFeatures = this.props.map.mapObject.queryRenderedFeatures(event.point, { layers: [this.props.id] });
     this.props.map.mapObject.getCanvas().style.cursor = (layerFeatures && layerFeatures.length > 0) ? 'pointer' : '';
@@ -89,7 +91,7 @@ class MapLayer extends React.Component {
 MapLayer.propTypes = {
   map: PropTypes.object.isRequired,
   id: PropTypes.string.isRequired,
-  type: PropTypes.oneOf(['fill', 'line', 'symbol', 'circle', 'fill-extrusion', 'raster', 'background']),
+  type: PropTypes.oneOf(LAYER_TYPES),
   metadata: PropTypes.object,
   ref: PropTypes.string,
   source: PropTypes.string,
@@ -102,10 +104,12 @@ MapLayer.propTypes = {
   janeLayer: PropTypes.string,
   previousMapLayer: PropTypes.string,
   onClick: PropTypes.func,
+  registerRedrawCallback: PropTypes.func.isRequired,
 };
 
 MapLayer.defaultProps = {
   map: {},
+  registerRedrawCallback: () => null,
   previousMapLayer: null,
   janeLayer: null,
 };

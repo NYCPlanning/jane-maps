@@ -32,9 +32,7 @@ class Jane extends React.Component {
       mapLoaded: false,
       layerListExpanded: false,
       selectedLayer: null,
-      mapConfig: {},
       loadedSources: {},
-      layerOrder: [],
       legend: [],
       layers: [],
     };
@@ -89,13 +87,14 @@ class Jane extends React.Component {
     this.setState({ layers: this.layers });
   };
 
-  registerLayer = (layerId, layerConfig) => {
+  registerLayer = (layerId, layerConfig, redrawChildren) => {
     this.selectedLayer = this.selectedLayer || null;
 
     const layer = {
       ...layerConfig,
       selected: layerConfig.defaultSelected || false,
       disabled: layerConfig.defaultDisabled || false,
+      redrawChildren
     };
 
     this.layers.push(layer);
@@ -117,8 +116,11 @@ class Jane extends React.Component {
   handleSourceLoaded = (loadedSources) =>
     this.setState({ loadedSources });
 
-  handleLayerReorder = (layers) =>
-    this.setState({ layerOrder: layers.map(layer => layer.id) });
+  handleLayerReorder = (layers) => {
+    this.layers = layers;
+
+    this.setState({ layers: this.layers }, () => layers.forEach((layer) => layer.redrawChildren()));
+  };
 
   selectLayer = (layerid) =>
     this.setState({ selectedLayer: layerid });
@@ -132,17 +134,14 @@ class Jane extends React.Component {
       return layer;
     });
 
-    if (disabled) { // enable
-      this.setState({
-        selectedLayer: layerId,
-        layers: updatedLayers,
-      });
-    } else {
-      this.setState({
-        selectedLayer: layerId === selectedLayer ? null : selectedLayer,
-        layers: updatedLayers,
-      });
-    }
+    const newSelectedLayer = disabled
+      ? layerId
+      : selectedLayer ? null : selectedLayer;
+
+    this.setState({
+      selectedLayer: newSelectedLayer,
+      layers: updatedLayers,
+    });
   };
 
   removeSearchResultMarker = () =>
@@ -157,10 +156,14 @@ class Jane extends React.Component {
   toggleList = () =>
     this.setState({ layerListExpanded: !this.state.layerListExpanded });
 
-  sort = (a, b) => {
-    const { layerOrder } = this.state;
-    return layerOrder.indexOf(a.id) > layerOrder.indexOf(b.id) ? 1 : -1;
-  };
+  componentDidUpdate(prevProps, prevState) {
+    const prevDisabledCount = this.state.layers.reduce((acc, l) => l.disabled ? acc + 1 : acc, 0);
+    const nextDisabledCount = prevState.layers.reduce((acc, l) => l.disabled ? acc + 1 : acc, 0);
+
+    if (!prevDisabledCount !== nextDisabledCount) {
+      prevState.layers.forEach((layer) => layer.redrawChildren());
+    }
+  }
 
   render() {
     let leftOffset = 0;
@@ -202,7 +205,7 @@ class Jane extends React.Component {
 
         <LayerList
           expanded={this.state.layerListExpanded}
-          layers={this.state.layers.sort(this.sort)}
+          layers={this.state.layers}
           selectedLayer={this.state.selectedLayer}
           onLayerReorder={this.handleLayerReorder}
           onLayerSelect={this.selectLayer}

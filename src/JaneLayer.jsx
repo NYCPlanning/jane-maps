@@ -61,9 +61,15 @@ class JaneLayer extends React.Component {
     map: PropTypes.object,
   };
 
+  constructor() {
+    super();
+
+    this.redrawCallbacks = [];
+  }
+
   componentDidMount() {
     if (!this.props.hidden) {
-      this.context.registerLayer(this.props.id, this.props);
+      this.context.registerLayer(this.props.id, this.props, this.redrawChildren);
     }
   }
 
@@ -72,6 +78,17 @@ class JaneLayer extends React.Component {
       this.context.unregisterLayer(this.props.id);
     }
   }
+
+  registerRedrawCallback = (redrawMapLayerCallback) =>
+    this.redrawCallbacks.push(redrawMapLayerCallback);
+
+  redrawChildren = () => {
+    const janeLayer = this.context.getJaneLayer(this.props.id);
+
+    if (janeLayer && !janeLayer.disabled) {
+      this.redrawCallbacks.forEach(cb => cb());
+    }
+  };
 
   renderChildren() {
     const { map, loadedSources, onSourceLoaded, getJaneLayer } = this.context;
@@ -90,8 +107,15 @@ class JaneLayer extends React.Component {
 
       switch (child.type.name) {
         case 'MapLayer': // eslint-disable-line
+          const mapLayerProps = {
+            janeLayer: this.props.id,
+            registerRedrawCallback: this.registerRedrawCallback,
+            map,
+            previousMapLayer
+          };
+
           const modifiedLayer = loadedSources[child.props.source]
-            ? React.cloneElement(child, { janeLayer: this.props.id, map, previousMapLayer })
+            ? React.cloneElement(child, mapLayerProps)
             : null;
 
           previousMapLayer = child.props.id;
