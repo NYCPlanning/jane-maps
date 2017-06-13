@@ -7,6 +7,11 @@ class GeoJsonSource extends React.Component {
 
   componentWillMount() {
     this.map = this.props.map;
+
+    if (this.props.isLoaded) {
+      return;
+    }
+
     // fetch data if necessary, add layer to map
     if (!this.props.source.data) {
       this.fetchData();
@@ -52,6 +57,7 @@ GeoJsonSource.propTypes = {
   map: PropTypes.object.isRequired,
   source: PropTypes.object.isRequired,
   onLoaded: PropTypes.func.isRequired,
+  isLoaded: PropTypes.bool,
 };
 
 export default GeoJsonSource;

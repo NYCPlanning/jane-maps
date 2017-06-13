@@ -5,6 +5,11 @@ class CartoRasterSource extends React.Component {
 
   componentWillMount() {
     this.map = this.props.map;
+
+    if (this.props.isLoaded) {
+      return;
+    }
+
     // fetch data if necessary, add layer to map
     if (!this.props.source.tiles) {
       this.fetchData(this.props.source.sql);
@@ -79,6 +84,7 @@ CartoRasterSource.propTypes = {
     sql: PropTypes.string,
   }).isRequired,
   onLoaded: PropTypes.func.isRequired,
+  isLoaded: PropTypes.bool,
 };
 
 export default CartoRasterSource;

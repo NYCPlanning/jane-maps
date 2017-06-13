@@ -5,6 +5,11 @@ class RasterSource extends React.Component {
 
   componentWillMount() {
     this.map = this.props.map;
+
+    if (this.props.isLoaded) {
+      return;
+    }
+
     // fetch data if necessary, add layer to map
     this.addSource();
   }
@@ -32,6 +37,7 @@ RasterSource.propTypes = {
   map: PropTypes.object.isRequired,
   source: PropTypes.object.isRequired,
   onLoaded: PropTypes.func.isRequired,
+  isLoaded: PropTypes.bool,
 };
 
 export default RasterSource;

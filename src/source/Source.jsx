@@ -9,26 +9,25 @@ import CartoRasterSource from './CartoRasterSource';
 
 
 class Source extends React.Component {
-  componentWillUnmount() {
-    this.props.map.removeSource(this.props.id);
-    // let jane know what sources are still loaded
-    this.props.onSourceLoaded(this.props.map.getStyle().sources);
-  }
-
   render() {
     const source = this.props;
     const onLoaded = this.props.onSourceLoaded;
     const map = this.props.map;
+    const isLoaded = !!this.context.loadedSources[this.props.id];
 
-    if (source.type === 'geojson') return <GeoJsonSource map={map} source={source} onLoaded={onLoaded} />;
-    if (source.type === 'vector') return <VectorSource map={map} source={source} onLoaded={onLoaded} />;
-    if (source.type === 'cartovector' && source.options) return <CartoVectorSource map={map} source={source} onLoaded={onLoaded} />;
-    if (source.type === 'raster') return <RasterSource map={map} source={source} onLoaded={onLoaded} />;
-    if (source.type === 'cartoraster') return <CartoRasterSource map={map} source={source} onLoaded={onLoaded} />;
+    if (source.type === 'geojson') return <GeoJsonSource map={map} source={source} onLoaded={onLoaded} isLoaded={isLoaded}/>;
+    if (source.type === 'vector') return <VectorSource map={map} source={source} onLoaded={onLoaded} isLoaded={isLoaded} />;
+    if (source.type === 'cartovector' && source.options) return <CartoVectorSource map={map} source={source} onLoaded={onLoaded} isLoaded={isLoaded} />;
+    if (source.type === 'raster') return <RasterSource map={map} source={source} onLoaded={onLoaded} isLoaded={isLoaded} />;
+    if (source.type === 'cartoraster') return <CartoRasterSource map={map} source={source} onLoaded={onLoaded} isLoaded={isLoaded} />;
 
     return null;
   }
 }
+
+Source.contextTypes = {
+  loadedSources: PropTypes.object,
+};
 
 Source.propTypes = {
   id: PropTypes.string.isRequired,

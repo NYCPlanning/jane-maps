@@ -5,6 +5,11 @@ class VectorSource extends React.Component {
 
   componentWillMount() {
     this.map = this.props.map;
+
+    if (this.props.isLoaded) {
+      return;
+    }
+
     this.addSource();
   }
 
@@ -41,6 +46,7 @@ VectorSource.propTypes = {
     id: PropTypes.string,
   }).isRequired,
   onLoaded: PropTypes.func.isRequired,
+  isLoaded: PropTypes.bool,
 };
 
 export default VectorSource;

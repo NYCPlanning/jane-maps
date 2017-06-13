@@ -6,6 +6,11 @@ class CartoVectorSource extends React.Component {
 
   componentWillMount() {
     this.map = this.props.map;
+
+    if (this.props.isLoaded) {
+      return;
+    }
+
     // fetch data if necessary, add layer to map
     if (!this.props.source.tiles) {
       this.fetchData(this.props.source.options.sql, this.addSource);
@@ -77,6 +82,7 @@ CartoVectorSource.propTypes = {
     id: PropTypes.string,
   }).isRequired,
   onLoaded: PropTypes.func.isRequired,
+  isLoaded: PropTypes.bool,
 };
 
 export default CartoVectorSource;
