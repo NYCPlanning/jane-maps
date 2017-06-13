@@ -35,6 +35,17 @@ const style = {
     float: 'right',
     color: '#5F5F5F',
   },
+  blockerStyle: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    mouseEvents: 'none',
+    position: 'absolute',
+    top: 0,
+    height: 2000,
+    left: 0,
+    right: 0,
+    paddingTop: 35,
+    zIndex: 1000000,
+  },
 };
 
 class JaneLayer extends React.Component {
@@ -101,6 +112,7 @@ class JaneLayer extends React.Component {
 
   render() {
     const SidebarComponent = this.props.component;
+    const janeLayer = this.context.getJaneLayer(this.props.id);
 
     return (
       <div style={{ display: this.props.id === this.context.selectedLayer ? 'inline' : 'none' }}>
@@ -115,7 +127,11 @@ class JaneLayer extends React.Component {
           />
         </div>
 
-        { SidebarComponent }
+        <div style={{ position: 'relative' }}>
+          { janeLayer && janeLayer.disabled && <div style={style.blockerStyle} /> }
+          { SidebarComponent }
+        </div>
+
         { this.renderChildren() }
       </div>
     );
