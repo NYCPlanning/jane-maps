@@ -90,6 +90,8 @@ class Jane extends React.Component {
   };
 
   registerLayer = (layerId, layerConfig) => {
+    this.selectedLayer = this.selectedLayer || null;
+
     const layer = {
       ...layerConfig,
       selected: layerConfig.defaultSelected || false,
@@ -101,7 +103,12 @@ class Jane extends React.Component {
     const newState = { layers: this.layers };
 
     if (layer.selected) {
+      if (this.selectedLayer) {
+        console.error(`Multiple JaneLayers are initially selected, check defaultSelected prop on ${layer.id} JaneLayer`);
+      }
+
       newState.selectedLayer = layer.id;
+      this.selectedLayer = layer.id;
     }
 
     this.setState(newState);
