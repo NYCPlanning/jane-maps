@@ -76,7 +76,6 @@
 
     &.selected {
       background-color: #FFF;
-      border-right: 2px solid #C1C1C1;
       border-right: 2px solid #d96b27;
     }
 
@@ -95,6 +94,10 @@
 
     &.disabled:hover, &.disabled:hover .fa {
       color: #808080 !important;
+    }
+
+    &.disabled.selected {
+      border-right: 2px solid #d96b27;
     }
 
     .toggle-container {
