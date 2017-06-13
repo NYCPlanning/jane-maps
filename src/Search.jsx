@@ -4,6 +4,7 @@ import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
 import Autosuggest from 'react-autosuggest';
+import _ from 'underscore';
 
 function getSuggestionValue(suggestion) {
   return suggestion.properties.label;
@@ -30,9 +31,12 @@ class Search extends React.Component {
     };
   }
 
-  onSuggestionsFetchRequested = ({ value }) => {
-    const self = this;
+  shouldComponentUpdate(nextProps, nextState) {
+    return !_.isEqual(this.props, nextProps) ||
+           !_.isEqual(this.state, nextState);
+  }
 
+  onSuggestionsFetchRequested = ({ value }) => {
     let apiCall = `https://search.mapzen.com/v1/autocomplete?text=${value}`;
 
     if (this.props.bounds) {
@@ -42,7 +46,7 @@ class Search extends React.Component {
     apiCall += `&api_key=${this.props.mapzen_api_key}`;
 
     $.getJSON(apiCall, (data) => { // eslint-disable-line no-undef
-      self.setState({
+      this.setState({
         suggestions: data.features,
       });
     });
