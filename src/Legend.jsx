@@ -1,5 +1,6 @@
 import React from 'react'; // eslint-disable-line
 import PropTypes from 'prop-types';
+import _ from 'underscore';
 
 class Legend extends React.Component {
 
@@ -13,14 +14,18 @@ class Legend extends React.Component {
       PropTypes.array,
       PropTypes.object,
     ]),
-  }
+  };
 
   static defaultProps = {
     children: null,
-  }
+  };
 
   componentDidMount() {
     this.context.addLegend(this.props.children);
+  }
+
+  shouldComponentUpdate(nextProps) {
+    return !_.isEqual(this.props.children, nextProps.children);
   }
 
   componentWillUnmount() {
