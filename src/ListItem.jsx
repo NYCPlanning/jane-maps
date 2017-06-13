@@ -6,6 +6,27 @@ import FontIcon from 'material-ui/FontIcon';
 import Toggle from 'material-ui/Toggle';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
+const style = {
+  fontIcon: {
+    fontSize: '15px',
+    margin: '8px 9px 8px 9px',
+    height: '15px',
+    width: '15px',
+    color: '#5F5F5F',
+    left: 0,
+    textAlign: 'center',
+  },
+  track: {
+    backgroundColor: '#9c9c9c',
+  },
+  thumbSwitched: {
+    backgroundColor: '#d96b27',
+  },
+  trackSwitched: {
+    backgroundColor: 'rgba(217, 107, 39, 0.48)',
+  },
+};
+
 const listItemSource = {
   beginDrag(props) {
     return {
@@ -77,27 +98,6 @@ class ListItemClass extends React.Component {
   }
 
   render() {
-    const style = {
-      fontIcon: {
-        fontSize: '15px',
-        margin: '8px 9px 8px 9px',
-        height: '15px',
-        width: '15px',
-        color: '#5F5F5F',
-        left: 0,
-        textAlign: 'center',
-      },
-      track: {
-        backgroundColor: '#9c9c9c',
-      },
-      thumbSwitched: {
-        backgroundColor: '#d96b27',
-      },
-      trackSwitched: {
-        backgroundColor: 'rgba(217, 107, 39, 0.48)',
-      },
-    };
-
     const { connectDragSource, connectDropTarget, layer, disabled } = this.props;
 
     return connectDragSource(connectDropTarget(
