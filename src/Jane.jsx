@@ -128,11 +128,11 @@ class Jane extends React.Component {
   selectLayer = (layerid) =>
     this.setState({ selectedLayer: layerid });
 
-  handleLayerToggle = (layerId) => {
+  toggleLayer = (layerId) => {
     const { selectedLayer, layers } = this.state;
     const disabled = layers.find(layer => layer.id).disabled;
 
-    const updatedLayers = layers.map((layer) => {
+    this.layers = layers.map((layer) => {
       if (layer.id === layerId) return { ...layer, disabled: !layer.disabled };
       return layer;
     });
@@ -143,7 +143,7 @@ class Jane extends React.Component {
 
     this.setState({
       selectedLayer: newSelectedLayer,
-      layers: updatedLayers,
+      layers: this.layers,
     });
   };
 
@@ -213,7 +213,7 @@ class Jane extends React.Component {
           onLayerReorder={this.handleLayerReorder}
           onLayerSelect={this.selectLayer}
           toggleList={this.toggleList}
-          onLayerToggle={this.handleLayerToggle}
+          toggleLayer={this.toggleLayer}
         />
 
         <div className={drawerClassName} style={drawerStyle}>

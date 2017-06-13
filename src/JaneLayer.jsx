@@ -168,7 +168,7 @@ JaneLayer.propTypes = {
   name: PropTypes.string,
   icon: PropTypes.string,
   component: PropTypes.object,
-  children: PropTypes.array,
+  children: PropTypes.any,
 };
 
 JaneLayer.defaultProps = {

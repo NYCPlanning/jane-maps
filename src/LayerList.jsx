@@ -88,7 +88,7 @@ class LayerList extends React.Component {
             onDrop={this.handleDrop}
             key={layer.id}
             onClick={this.props.onLayerSelect}
-            onLayerToggle={this.props.onLayerToggle}
+            toggleLayer={this.props.toggleLayer}
           />
         );
       });
@@ -119,7 +119,7 @@ LayerList.propTypes = {
   onLayerSelect: PropTypes.func.isRequired,
   selectedLayer: PropTypes.string,
   toggleList: PropTypes.func.isRequired,
-  onLayerToggle: PropTypes.func.isRequired,
+  toggleLayer: PropTypes.func.isRequired,
 };
 
 LayerList.defaultProps = {

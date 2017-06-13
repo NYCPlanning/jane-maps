@@ -94,7 +94,7 @@ class ListItemClass extends React.Component {
   }
 
   handleToggle(layerid) {
-    this.props.onLayerToggle(layerid);
+    this.props.toggleLayer(layerid);
   }
 
   render() {
@@ -141,7 +141,7 @@ ListItemClass.propTypes = {
   onClick: PropTypes.func.isRequired,
   className: PropTypes.string.isRequired,
   expanded: PropTypes.bool.isRequired,
-  onLayerToggle: PropTypes.func.isRequired,
+  toggleLayer: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
 };
 
