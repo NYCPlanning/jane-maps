@@ -108,7 +108,7 @@ class JaneLayer extends React.Component {
       switch (child.type.name) {
         case 'MapLayer': // eslint-disable-line
           const mapLayerProps = {
-            janeLayer: this.props.id,
+            janeLayerId: this.props.id,
             registerRedrawCallback: this.registerRedrawCallback,
             map,
             previousMapLayer

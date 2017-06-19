@@ -6,7 +6,7 @@ const LAYER_TYPES = ['fill', 'line', 'symbol', 'circle', 'fill-extrusion', 'rast
 
 class MapLayer extends React.Component {
   componentWillMount() {
-    if (!this.props.janeLayer) {
+    if (!this.props.janeLayerId) {
       console.error(`<MapLayer /> has to be a direct child of <JaneLayer />. Check layer with id ${this.props.id}`);
     }
 
@@ -27,7 +27,15 @@ class MapLayer extends React.Component {
     this.removeLayer();
   }
 
+  layerExists() {
+    return !!this.props.map.getLayer(this.props.id);
+  }
+
   addLayer(props) {
+    if (this.layerExists()) {
+      return;
+    }
+
     const config = _.pick(props,
       'id',
       'type',
@@ -56,6 +64,10 @@ class MapLayer extends React.Component {
   }
 
   removeLayer() {
+    if (!this.layerExists()) {
+      return;
+    }
+
     this.props.map.removeLayer(this.props.id);
 
     if (this.props.onClick) {
@@ -65,6 +77,10 @@ class MapLayer extends React.Component {
   }
 
   redrawLayer = (props) => {
+    if (!this.layerExists()) {
+      return;
+    }
+
     this.removeLayer();
     this.addLayer(props || this.props);
   };
@@ -101,7 +117,7 @@ MapLayer.propTypes = {
   filter: PropTypes.array,
   layout: PropTypes.object,
   paint: PropTypes.object,
-  janeLayer: PropTypes.string,
+  janeLayerId: PropTypes.string,
   previousMapLayer: PropTypes.string,
   onClick: PropTypes.func,
   registerRedrawCallback: PropTypes.func.isRequired,
@@ -111,7 +127,7 @@ MapLayer.defaultProps = {
   map: {},
   registerRedrawCallback: () => null,
   previousMapLayer: null,
-  janeLayer: null,
+  janeLayerId: null,
 };
 
 export default MapLayer;
