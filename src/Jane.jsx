@@ -63,10 +63,24 @@ class Jane extends React.Component {
     this.GLMap.map.on('dragend', this.props.onDragEnd);
   }
 
-  componentDidUpdate(prevProps) {
+  shouldComponentUpdate(nextProps, nextState) {
+    const propsChanged = !_.isEqual(this.props, nextProps);
+    const stateChanged = !_.isEqual(this.state, nextState);
+
+    return propsChanged || stateChanged;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
     // fit map to fitBounds property if it is different from previous props
     if (!_.isEqual(prevProps.fitBounds, this.props.fitBounds)) {
       this.GLMap.map.fitBounds(this.props.fitBounds);
+    }
+
+    const prevDisabledCount = prevState.layers.reduce((acc, l) => l.disabled ? acc + 1 : acc, 0);
+    const currentDisabledCount = this.state.layers.reduce((acc, l) => l.disabled ? acc + 1 : acc, 0);
+
+    if (prevDisabledCount !== currentDisabledCount) {
+      prevState.layers.forEach((layer) => layer.redrawChildren());
     }
   }
 
@@ -158,15 +172,6 @@ class Jane extends React.Component {
 
   toggleList = () =>
     this.setState({ layerListExpanded: !this.state.layerListExpanded });
-
-  componentDidUpdate(prevProps, prevState) {
-    const prevDisabledCount = prevState.layers.reduce((acc, l) => l.disabled ? acc + 1 : acc, 0);
-    const currentDisabledCount = this.state.layers.reduce((acc, l) => l.disabled ? acc + 1 : acc, 0);
-
-    if (prevDisabledCount !== currentDisabledCount) {
-      prevState.layers.forEach((layer) => layer.redrawChildren());
-    }
-  }
 
   render() {
     let leftOffset = 0;
