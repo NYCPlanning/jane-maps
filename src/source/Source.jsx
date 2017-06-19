@@ -33,11 +33,13 @@ Source.propTypes = {
   id: PropTypes.string.isRequired,
   map: PropTypes.object,
   onSourceLoaded: PropTypes.func,
+  nocache: PropTypes.bool,
 };
 
 Source.defaultProps = {
   map: null,
   onSourceLoaded: null,
+  nocache: false,
 };
 
 export default Source;

@@ -8,7 +8,7 @@ class GeoJsonSource extends React.Component {
   componentWillMount() {
     this.map = this.props.map;
 
-    if (this.props.isLoaded) {
+    if (this.props.isLoaded && !this.props.source.nocache) {
       return;
     }
 
@@ -26,6 +26,12 @@ class GeoJsonSource extends React.Component {
     if (!(nextProps.source.data === this.props.source.data)) {
       this.data = nextProps.source.data;
       this.map.getSource(this.props.source.id).setData(this.data);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.source.nocache) {
+      this.map.removeSource(this.props.source.id);
     }
   }
 
@@ -58,6 +64,7 @@ GeoJsonSource.propTypes = {
   source: PropTypes.object.isRequired,
   onLoaded: PropTypes.func.isRequired,
   isLoaded: PropTypes.bool,
+  nocache: PropTypes.bool,
 };
 
 export default GeoJsonSource;

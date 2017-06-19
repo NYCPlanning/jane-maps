@@ -6,7 +6,7 @@ class CartoRasterSource extends React.Component {
   componentWillMount() {
     this.map = this.props.map;
 
-    if (this.props.isLoaded) {
+    if (this.props.isLoaded && !this.props.source.nocache) {
       return;
     }
 
@@ -21,6 +21,12 @@ class CartoRasterSource extends React.Component {
 
     if (!(nextProps.source.sql === this.props.source.sql)) {
       this.fetchData(nextProps.source.sql);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.source.nocache) {
+      this.map.removeSource(this.props.source.id);
     }
   }
 
@@ -85,6 +91,7 @@ CartoRasterSource.propTypes = {
   }).isRequired,
   onLoaded: PropTypes.func.isRequired,
   isLoaded: PropTypes.bool,
+  nocache: PropTypes.bool,
 };
 
 export default CartoRasterSource;

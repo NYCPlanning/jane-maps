@@ -6,12 +6,18 @@ class RasterSource extends React.Component {
   componentWillMount() {
     this.map = this.props.map;
 
-    if (this.props.isLoaded) {
+    if (this.props.isLoaded && !this.props.source.nocache) {
       return;
     }
 
     // fetch data if necessary, add layer to map
     this.addSource();
+  }
+
+  componentWillUnmount() {
+    if (this.props.source.nocache) {
+      this.map.removeSource(this.props.source.id);
+    }
   }
 
   addSource() {
@@ -38,6 +44,7 @@ RasterSource.propTypes = {
   source: PropTypes.object.isRequired,
   onLoaded: PropTypes.func.isRequired,
   isLoaded: PropTypes.bool,
+  nocache: PropTypes.bool,
 };
 
 export default RasterSource;

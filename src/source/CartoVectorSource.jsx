@@ -24,6 +24,12 @@ class CartoVectorSource extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    if (this.props.source.nocache) {
+      this.map.removeSource(this.props.source.id);
+    }
+  }
+
   fetchData = (sqlArray, cb) => {
     const mapConfig = {
       version: '1.3.0',
@@ -59,13 +65,13 @@ class CartoVectorSource extends React.Component {
     });
 
     this.props.onLoaded(this.map.getStyle().sources);
-  }
+  };
 
   updateSource = (template) => {
     const newStyle = this.map.getStyle();
     newStyle.sources[this.props.source.id].tiles = [template];
     this.map.setStyle(newStyle);
-  }
+  };
 
   render() {
     return null;
@@ -83,6 +89,7 @@ CartoVectorSource.propTypes = {
   }).isRequired,
   onLoaded: PropTypes.func.isRequired,
   isLoaded: PropTypes.bool,
+  nocache: PropTypes.bool,
 };
 
 export default CartoVectorSource;
