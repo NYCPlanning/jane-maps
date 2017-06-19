@@ -119,6 +119,7 @@ MapLayer.propTypes = {
   paint: PropTypes.object,
   janeLayerId: PropTypes.string,
   previousMapLayer: PropTypes.string,
+  order: PropTypes.number,
   onClick: PropTypes.func,
   registerRedrawCallback: PropTypes.func.isRequired,
 };

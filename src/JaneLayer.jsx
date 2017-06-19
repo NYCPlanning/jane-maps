@@ -99,6 +99,7 @@ class JaneLayer extends React.Component {
     }
 
     let previousMapLayer = null;
+    let order = 0;
 
     return React.Children.map(this.props.children, (child) => {
       if (!child || !child.type) {
@@ -111,7 +112,8 @@ class JaneLayer extends React.Component {
             janeLayerId: this.props.id,
             registerRedrawCallback: this.registerRedrawCallback,
             map,
-            previousMapLayer
+            previousMapLayer,
+            order: order++,
           };
 
           const modifiedLayer = loadedSources[child.props.source]
