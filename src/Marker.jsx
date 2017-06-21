@@ -1,7 +1,8 @@
 import React from 'react'; // eslint-disable-line
 import PropTypes from 'prop-types';
+import _ from 'underscore';
 
-class PoiMarker extends React.Component {
+class Marker extends React.Component {
 
   componentDidMount() {
     const el = document.createElement('div');
@@ -31,7 +32,7 @@ class PoiMarker extends React.Component {
   }
 
   componentWillUpdate(nextProps) {
-    if (JSON.stringify(nextProps.feature) !== JSON.stringify(this.props.feature)) {
+    if (!_.isEqual(nextProps.feature, this.props.feature)) {
       this.updateMarker(nextProps.feature, nextProps.label);
     }
   }
@@ -46,26 +47,34 @@ class PoiMarker extends React.Component {
 
     this.marker
       .setLngLat(feature.geometry.coordinates)
-      .addTo(map.mapObject);
+      .addTo(map);
 
     this.label
       .setLngLat(feature.geometry.coordinates)
       .setHTML(`<p>${label}</p>`)
-      .addTo(map.mapObject);
+      .addTo(map);
 
-    map.flyMap(feature);
+    if (this.props.flyMap) {
+      map.flyMap(feature);
+    }
   }
 
   render() {
-    return (<div />);
+    return null;
   }
 }
 
-PoiMarker.propTypes = {
+Marker.propTypes = {
+  flyMap: PropTypes.bool,
   feature: PropTypes.object.isRequired,
-  map: PropTypes.object.isRequired,
+  map: PropTypes.object,
   label: PropTypes.string.isRequired,
 };
 
+Marker.defaultProps = {
+  flyMap: false,
+  map: {},
+};
 
-export default PoiMarker;
+
+export default Marker;

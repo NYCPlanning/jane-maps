@@ -4,7 +4,24 @@ import update from 'react/lib/update';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import IconButton from 'material-ui/IconButton';
+import _ from 'underscore';
+import cx from 'classnames';
 
+const style = {
+  fontIcon: {
+    fontSize: '15px',
+    margin: '7px 10px',
+    height: '15px',
+    width: '15px',
+    color: '#5F5F5F',
+    left: 0,
+  },
+  drawerIcon: {
+    width: 36,
+    height: 36,
+    padding: 0,
+  }
+};
 
 import ListItem from './ListItem';
 
@@ -21,20 +38,22 @@ class LayerList extends React.Component {
     };
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return !_.isEqual(this.props, nextProps) ||
+           !_.isEqual(this.state, nextState);
+  }
+
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      layers: nextProps.layers,
-    });
+    this.setState({ layers: nextProps.layers });
   }
 
   handleDrop = () => {
     // on drop pass the current state up to Jane
     this.props.onLayerReorder(this.state.layers);
-  }
+  };
 
   moveListItem = (dragIndex, hoverIndex) => {
-    const { layers } = this.state;
-    const dragLayer = layers[dragIndex];
+    const dragLayer = this.state.layers[dragIndex];
 
     this.setState(update(this.state, {
       layers: {
@@ -44,68 +63,49 @@ class LayerList extends React.Component {
         ],
       },
     }));
-  }
+  };
 
   render() {
-    const { disabledLayers } = this.props;
+    const drawerClassName = cx('jane-drawer', { expanded: this.props.expanded });
+    const drawerIconClassName = cx('fa', this.props.expanded ? 'fa-chevron-left' : 'fa-list-ul');
 
-    const style = {
-      fontIcon: {
-        fontSize: '15px',
-        margin: '7px 10px',
-        height: '15px',
-        width: '15px',
-        color: '#5F5F5F',
-        left: 0,
-      },
-    };
+    const layers = this.state.layers
+      // reverse layers so the list reflects the map (first in array will be bottom on map)
+      .map((layer, i) => {
+        const className = cx('list-item', {
+          selected: this.props.selectedLayer === layer.id,
+          disabled: layer.disabled,
+        });
 
-    let layers = this.state.layers.map((layer, i) => {
-      const disabled = disabledLayers.indexOf(layer.id) > -1;
-
-      let className = this.props.selectedLayer === layer.id ? 'list-item selected' : 'list-item';
-      if (disabled) className += ' disabled';
-
-      if (layer.hidden !== true) {
         return (
           <ListItem
             className={className}
             expanded={this.props.expanded}
-            disabled={disabled}
+            disabled={layer.disabled}
             layer={layer}
             moveListItem={this.moveListItem}
             index={i}
             onDrop={this.handleDrop}
             key={layer.id}
-            onClick={this.props.onLayerClick}
-            onLayerToggle={this.props.onLayerToggle}
+            onClick={this.props.onLayerSelect}
+            toggleLayer={this.props.toggleLayer}
           />
         );
-      }
-
-      return null;
-    });
-
-    // reverse layers so the list reflects the map (first in array will be bottom on map)
-    layers = layers.slice().reverse();
+      });
 
     return (
-      <div className={`jane-drawer ${this.props.expanded ? 'expanded' : ''}`}>
-        <div className={'jane-drawer-inner'}>
-          <div className="drawer-header" >
+      <div className={drawerClassName}>
+        <div className="jane-drawer-inner">
+          <div className="drawer-header">
             Layers
             <IconButton
-              style={{
-                width: 36,
-                height: 36,
-                padding: 0,
-              }}
-              iconClassName={this.props.expanded ? 'fa fa-chevron-left' : 'fa fa-list-ul'}
+              style={style.drawerIcon}
+              iconClassName={drawerIconClassName}
               iconStyle={style.fontIcon}
-              onTouchTap={this.props.onToggleExpanded}
+              onTouchTap={this.props.toggleList}
             />
           </div>
-          {layers}
+          { layers.slice().reverse() }
         </div>
       </div>
     );
@@ -116,11 +116,10 @@ LayerList.propTypes = {
   layers: PropTypes.array.isRequired,
   onLayerReorder: PropTypes.func.isRequired,
   expanded: PropTypes.bool.isRequired,
-  onLayerClick: PropTypes.func.isRequired,
+  onLayerSelect: PropTypes.func.isRequired,
   selectedLayer: PropTypes.string,
-  onToggleExpanded: PropTypes.func.isRequired,
-  onLayerToggle: PropTypes.func.isRequired,
-  disabledLayers: PropTypes.array.isRequired,
+  toggleList: PropTypes.func.isRequired,
+  toggleLayer: PropTypes.func.isRequired,
 };
 
 LayerList.defaultProps = {

@@ -4,7 +4,12 @@ import PropTypes from 'prop-types';
 class CartoRasterSource extends React.Component {
 
   componentWillMount() {
-    this.map = this.props.map.mapObject;
+    this.map = this.props.map;
+
+    if (this.props.isLoaded && !this.props.source.nocache) {
+      return;
+    }
+
     // fetch data if necessary, add layer to map
     if (!this.props.source.tiles) {
       this.fetchData(this.props.source.sql);
@@ -16,6 +21,12 @@ class CartoRasterSource extends React.Component {
 
     if (!(nextProps.source.sql === this.props.source.sql)) {
       this.fetchData(nextProps.source.sql);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.source.nocache) {
+      this.map.removeSource(this.props.source.id);
     }
   }
 
@@ -79,6 +90,8 @@ CartoRasterSource.propTypes = {
     sql: PropTypes.string,
   }).isRequired,
   onLoaded: PropTypes.func.isRequired,
+  isLoaded: PropTypes.bool,
+  nocache: PropTypes.bool,
 };
 
 export default CartoRasterSource;

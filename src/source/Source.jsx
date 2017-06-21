@@ -9,33 +9,37 @@ import CartoRasterSource from './CartoRasterSource';
 
 
 class Source extends React.Component {
-  componentWillUnmount() {
-    this.removeSource();
-  }
-
-  removeSource() {
-    this.props.map.mapObject.removeSource(this.props.source.id);
-    // let jane know what sources are still loaded
-    this.props.onLoaded(this.props.map.mapObject.getStyle().sources);
-  }
-
   render() {
-    const source = this.props.source;
+    const source = this.props;
+    const onLoaded = this.props.onSourceLoaded;
+    const map = this.props.map;
+    const isLoaded = !!this.context.loadedSources[this.props.id];
 
-    if (source.type === 'geojson') return <GeoJsonSource {...this.props} />;
-    if (source.type === 'vector') return <VectorSource {...this.props} />;
-    if (source.type === 'cartovector' && source.options) return <CartoVectorSource {...this.props} />;
-    if (source.type === 'raster') return <RasterSource {...this.props} />;
-    if (source.type === 'cartoraster') return <CartoRasterSource {...this.props} />;
+    if (source.type === 'geojson') return <GeoJsonSource map={map} source={source} onLoaded={onLoaded} isLoaded={isLoaded}/>;
+    if (source.type === 'vector') return <VectorSource map={map} source={source} onLoaded={onLoaded} isLoaded={isLoaded} />;
+    if (source.type === 'cartovector' && source.options) return <CartoVectorSource map={map} source={source} onLoaded={onLoaded} isLoaded={isLoaded} />;
+    if (source.type === 'raster') return <RasterSource map={map} source={source} onLoaded={onLoaded} isLoaded={isLoaded} />;
+    if (source.type === 'cartoraster') return <CartoRasterSource map={map} source={source} onLoaded={onLoaded} isLoaded={isLoaded} />;
 
     return null;
   }
 }
 
+Source.contextTypes = {
+  loadedSources: PropTypes.object,
+};
+
 Source.propTypes = {
-  map: PropTypes.object.isRequired,
-  source: PropTypes.object.isRequired,
-  onLoaded: PropTypes.func.isRequired,
+  id: PropTypes.string.isRequired,
+  map: PropTypes.object,
+  onSourceLoaded: PropTypes.func,
+  nocache: PropTypes.bool,
+};
+
+Source.defaultProps = {
+  map: null,
+  onSourceLoaded: null,
+  nocache: false,
 };
 
 export default Source;

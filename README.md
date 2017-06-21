@@ -38,7 +38,7 @@ Use Jane and JaneLayer to compose a map
 // Use `<Jane/>` to instantiate a map, and `<JaneLayer/>` as a child of `<Jane/>` to define a layer.  `JaneLayer` must include as props a unique `id`, a display `name`, an `icon` (fontawesome icon name), and a `component`.  The component renders the UI for the JaneLayer, and also manages the internal state and current map configuration for the layer.
 
     <Jane
-      mapInit={{
+      mapboxGLOptions={{
         mapbox_accessToken: 'youraccesstoken',
         center: [-74.0084, 40.7121],
         zoom: 13.62,
@@ -125,7 +125,7 @@ All components using Material UI must be wrapped in a `<MuiThemeProvider>` compo
 
 ### Props
 
-`mapInit` - object - configuration options used to instantiate the map
+`mapboxGLOptions` - object - configuration options used to instantiate the map
 
 ```
 {

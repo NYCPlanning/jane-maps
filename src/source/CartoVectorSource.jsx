@@ -5,7 +5,12 @@ import Carto from '../Carto';
 class CartoVectorSource extends React.Component {
 
   componentWillMount() {
-    this.map = this.props.map.mapObject;
+    this.map = this.props.map;
+
+    if (this.props.isLoaded) {
+      return;
+    }
+
     // fetch data if necessary, add layer to map
     if (!this.props.source.tiles) {
       this.fetchData(this.props.source.options.sql, this.addSource);
@@ -16,6 +21,12 @@ class CartoVectorSource extends React.Component {
     // compare sql
     if (!(nextProps.source.options.sql === this.props.source.options.sql)) {
       this.fetchData(nextProps.source.options.sql, this.updateSource);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.source.nocache) {
+      this.map.removeSource(this.props.source.id);
     }
   }
 
@@ -54,13 +65,13 @@ class CartoVectorSource extends React.Component {
     });
 
     this.props.onLoaded(this.map.getStyle().sources);
-  }
+  };
 
   updateSource = (template) => {
     const newStyle = this.map.getStyle();
     newStyle.sources[this.props.source.id].tiles = [template];
     this.map.setStyle(newStyle);
-  }
+  };
 
   render() {
     return null;
@@ -77,6 +88,8 @@ CartoVectorSource.propTypes = {
     id: PropTypes.string,
   }).isRequired,
   onLoaded: PropTypes.func.isRequired,
+  isLoaded: PropTypes.bool,
+  nocache: PropTypes.bool,
 };
 
 export default CartoVectorSource;

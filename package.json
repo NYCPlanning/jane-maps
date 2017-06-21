@@ -20,6 +20,7 @@
     "url": "https://github.com/NYCPlanning/jane-maps/issues"
   },
   "dependencies": {
+    "classnames": "^2.2.5",
     "jquery": "^3.1.1",
     "mapbox-gl": "^0.37.0",
     "material-ui": "^0.18.1",
@@ -60,6 +61,7 @@
     "scss": "./node_modules/.bin/node-sass --output-style compressed -o dist src",
     "prepublish": "babel --plugins transform-es2015-modules-umd src --out-dir ./dist && npm run scss",
     "build": "babel --plugins transform-es2015-modules-umd src --out-dir ./dist && npm run scss",
-    "watch": "npm-watch"
+    "watch": "npm-watch",
+    "lint": "eslint --ext .jsx --ext .js src/"
   }
 }

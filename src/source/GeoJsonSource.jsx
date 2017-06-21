@@ -6,7 +6,12 @@ import PropTypes from 'prop-types';
 class GeoJsonSource extends React.Component {
 
   componentWillMount() {
-    this.map = this.props.map.mapObject;
+    this.map = this.props.map;
+
+    if (this.props.isLoaded && !this.props.source.nocache) {
+      return;
+    }
+
     // fetch data if necessary, add layer to map
     if (!this.props.source.data) {
       this.fetchData();
@@ -21,6 +26,12 @@ class GeoJsonSource extends React.Component {
     if (!(nextProps.source.data === this.props.source.data)) {
       this.data = nextProps.source.data;
       this.map.getSource(this.props.source.id).setData(this.data);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.source.nocache) {
+      this.map.removeSource(this.props.source.id);
     }
   }
 
@@ -52,6 +63,8 @@ GeoJsonSource.propTypes = {
   map: PropTypes.object.isRequired,
   source: PropTypes.object.isRequired,
   onLoaded: PropTypes.func.isRequired,
+  isLoaded: PropTypes.bool,
+  nocache: PropTypes.bool,
 };
 
 export default GeoJsonSource;
