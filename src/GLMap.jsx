@@ -52,13 +52,6 @@ class GLMap extends React.Component {
     this.map.getCanvas().style.cursor = (layerFeatures && layerFeatures.length > 0) ? 'pointer' : '';
   };
 
-  flyMap(feature, zoom = 15) {
-    this.map.flyTo({
-      center: feature.geometry.coordinates,
-      zoom,
-    });
-  }
-
   render() {
     return (
       <div className="gl-map" ref={(node) => { this.container = node; }}/>

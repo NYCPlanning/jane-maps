@@ -54,8 +54,11 @@ class Marker extends React.Component {
       .setHTML(`<p>${label}</p>`)
       .addTo(map);
 
-    if (this.props.flyMap) {
-      map.flyMap(feature);
+    if (this.props.flyTo) {
+      map.flyTo({
+        center: feature.geometry.coordinates,
+        zoom: 15,
+      });
     }
   }
 
@@ -65,14 +68,14 @@ class Marker extends React.Component {
 }
 
 Marker.propTypes = {
-  flyMap: PropTypes.bool,
+  flyTo: PropTypes.bool,
   feature: PropTypes.object.isRequired,
   map: PropTypes.object,
   label: PropTypes.string.isRequired,
 };
 
 Marker.defaultProps = {
-  flyMap: false,
+  flyTo: false,
   map: {},
 };
 

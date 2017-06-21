@@ -227,7 +227,7 @@ class Jane extends React.Component {
           {
             this.state.searchResultMarker &&
             <JaneLayer id="searchResult" hidden>
-              <Marker {...this.state.searchResultMarker} flyMap />
+              <Marker {...this.state.searchResultMarker} flyTo />
             </JaneLayer>
           }
         </div>
