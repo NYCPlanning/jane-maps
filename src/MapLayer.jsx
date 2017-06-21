@@ -58,7 +58,7 @@ class MapLayer extends React.Component {
     this.props.map.addLayer(config, props.previousMapLayer);
 
     if (this.props.onClick) {
-      this.props.map.on('mousemove', this.onMouseMove);
+      this.props.map.__INTERNAL__hoverLayers[this.props.id] = true;
       this.props.map.on('click', this.onClick);
     }
   }
@@ -71,7 +71,7 @@ class MapLayer extends React.Component {
     this.props.map.removeLayer(this.props.id);
 
     if (this.props.onClick) {
-      this.props.map.off('mousemove', this.onMouseMove);
+      delete this.props.map.__INTERNAL__hoverLayers[this.props.id];
       this.props.map.off('click', this.onClick);
     }
   }
@@ -83,11 +83,6 @@ class MapLayer extends React.Component {
 
     this.removeLayer();
     this.addLayer(props || this.props);
-  };
-
-  onMouseMove = (event) => {
-    const layerFeatures = this.props.map.queryRenderedFeatures(event.point, { layers: [this.props.id] });
-    this.props.map.getCanvas().style.cursor = (layerFeatures && layerFeatures.length > 0) ? 'pointer' : '';
   };
 
   onClick = (event) => {

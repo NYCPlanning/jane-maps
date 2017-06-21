@@ -16,6 +16,10 @@ class GLMap extends React.Component {
     setTimeout(() => this.map && this.map.resize(), 500);
   }
 
+  componentWillUnmount() {
+    this.map.off('mousemove', this.onMouseMove);
+  }
+
   initializeMap() {
     mapboxgl.accessToken = this.props.mapbox_accessToken;
 
@@ -29,12 +33,24 @@ class GLMap extends React.Component {
       hash: this.props.hash,
     });
 
-    this.map.on('load', () => {
-      this.props.onLoad(this.map.getStyle());
-    });
+    this.map.__INTERNAL__hoverLayers = [];
+
+    this.map.on('load', () => this.props.onLoad(this.map.getStyle()));
+    this.map.on('mousemove', this.onMouseMove);
 
     if (this.props.navigationControl) this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
   }
+
+  onMouseMove = (event) => {
+    const layers = Object.keys(this.map.__INTERNAL__hoverLayers);
+
+    if (!layers.length) {
+      return;
+    }
+
+    const layerFeatures = this.map.queryRenderedFeatures(event.point, { layers });
+    this.map.getCanvas().style.cursor = (layerFeatures && layerFeatures.length > 0) ? 'pointer' : '';
+  };
 
   flyMap(feature, zoom = 15) {
     this.map.flyTo({
