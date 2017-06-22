@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 class RasterSource extends React.Component {
 
+  static displayName = 'RasterSource';
+
   componentWillMount() {
     this.map = this.props.map;
 

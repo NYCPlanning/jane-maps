@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 
 class GeoJsonSource extends React.Component {
 
+  static displayName = 'GeoJsonSource';
+
   componentWillMount() {
     this.map = this.props.map;
 

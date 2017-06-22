@@ -102,11 +102,11 @@ class JaneLayer extends React.Component {
     let order = 0;
 
     return React.Children.map(this.props.children, (child) => {
-      if (!child || !child.type) {
+      if (!child || !child.displayName) {
         return child;
       }
 
-      switch (child.type.name) {
+      switch (child.displayName) {
         case 'MapLayer': // eslint-disable-line
           const mapLayerProps = {
             janeLayerId: this.props.id,
