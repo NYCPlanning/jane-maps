@@ -146,10 +146,10 @@ class Jane extends React.Component {
     const { selectedLayer, layers } = this.state;
     const disabled = layers.find(layer => layer.id).disabled;
 
-    this.layers = layers.map((layer) => {
-      if (layer.id === layerId) return { ...layer, disabled: !layer.disabled };
-      return layer;
-    });
+    this.layers = layers.map((layer) =>
+      layer.id === layerId
+        ? ({ ...layer, disabled: !layer.disabled })
+        : layer);
 
     const newSelectedLayer = disabled
       ? layerId
@@ -159,6 +159,10 @@ class Jane extends React.Component {
       selectedLayer: newSelectedLayer,
       layers: this.layers,
     });
+
+    if (this.props.onLayerToggle) {
+      this.props.onLayerToggle(layerId, !disabled);
+    }
   };
 
   removeSearchResultMarker = () =>
@@ -245,6 +249,7 @@ Jane.propTypes = {
   fitBounds: PropTypes.array,
   onZoomEnd: PropTypes.func,
   onDragEnd: PropTypes.func,
+  onLayerToggle: PropTypes.func,
   children: PropTypes.node.isRequired,
 };
 
@@ -262,6 +267,7 @@ Jane.defaultProps = {
   fitBounds: null,
   onZoomEnd: () => {},
   onDragEnd: () => {},
+  onLayerToggle: () => {},
 };
 
 export default Jane;
