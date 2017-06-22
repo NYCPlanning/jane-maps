@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import _ from 'underscore';
 
 class GLMap extends React.Component {
+
+  static displayName = 'GLMap';
+
   componentDidMount() {
     this.initializeMap();
   }

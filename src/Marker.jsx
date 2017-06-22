@@ -4,6 +4,8 @@ import _ from 'underscore';
 
 class Marker extends React.Component {
 
+  static displayName = 'Marker';
+
   componentDidMount() {
     const el = document.createElement('div');
     el.className = 'marker';
