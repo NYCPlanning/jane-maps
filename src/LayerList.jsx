@@ -31,7 +31,6 @@ import ListItem from './ListItem';
 class LayerList extends React.Component {
 
   static displayName = 'LayerList';
-  _displayName = 'LayerList';
 
   constructor(props) {
     super(props);

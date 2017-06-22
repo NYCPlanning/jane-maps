@@ -5,7 +5,6 @@ import _ from 'underscore';
 class GLMap extends React.Component {
 
   static displayName = 'GLMap';
-  _displayName = 'GLMap';
 
   componentDidMount() {
     this.initializeMap();
