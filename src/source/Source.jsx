@@ -11,6 +11,7 @@ import CartoRasterSource from './CartoRasterSource';
 class Source extends React.Component {
 
   static displayName = 'Source';
+  _displayName = 'Source';
 
   render() {
     const source = this.props;

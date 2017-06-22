@@ -15,6 +15,7 @@ import Search from './Search';
 class Jane extends React.Component {
 
   static displayName = 'Jane';
+  _displayName = 'Jane';
 
   static childContextTypes = {
     registerLayer: PropTypes.func,

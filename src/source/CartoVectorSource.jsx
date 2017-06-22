@@ -5,6 +5,7 @@ import Carto from '../Carto';
 class CartoVectorSource extends React.Component {
 
   static displayName = 'CartoVectorSource';
+  _displayName = 'CartoVectorSource';
 
   componentWillMount() {
     this.map = this.props.map;

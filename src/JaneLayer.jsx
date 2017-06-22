@@ -51,6 +51,7 @@ const style = {
 class JaneLayer extends React.Component {
 
   static displayName = 'JaneLayer';
+  _displayName = 'JaneLayer';
 
   static contextTypes = {
     registerLayer: PropTypes.func,
@@ -104,11 +105,11 @@ class JaneLayer extends React.Component {
     let order = 0;
 
     return React.Children.map(this.props.children, (child) => {
-      if (!child || !child.displayName) {
+      if (!child || !child._displayName) {
         return child;
       }
 
-      switch (child.displayName) {
+      switch (child._displayName) {
         case 'MapLayer': // eslint-disable-line
           const mapLayerProps = {
             janeLayerId: this.props.id,

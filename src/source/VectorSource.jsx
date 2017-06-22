@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 class VectorSource extends React.Component {
 
   static displayName = 'VectorSource';
+  _displayName = 'VectorSource';
 
   componentWillMount() {
     this.map = this.props.map;

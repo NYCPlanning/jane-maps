@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 class CartoRasterSource extends React.Component {
 
   static displayName = 'CartoRasterSource';
+  _displayName = 'CartoRasterSource';
 
   componentWillMount() {
     this.map = this.props.map;

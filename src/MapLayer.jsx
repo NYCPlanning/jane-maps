@@ -7,6 +7,7 @@ const LAYER_TYPES = ['fill', 'line', 'symbol', 'circle', 'fill-extrusion', 'rast
 class MapLayer extends React.Component {
 
   static displayName = 'MapLayer';
+  _displayName = 'MapLayer';
 
   componentWillMount() {
     if (!this.props.janeLayerId) {

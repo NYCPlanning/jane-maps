@@ -5,6 +5,7 @@ import _ from 'underscore';
 class Legend extends React.Component {
 
   static displayName = 'Legend';
+  _displayName = 'Legend';
 
   static contextTypes = {
     addLegend: PropTypes.func,
