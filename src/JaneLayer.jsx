@@ -50,6 +50,8 @@ const style = {
 
 class JaneLayer extends React.Component {
 
+  static displayName = 'JaneLayer';
+
   static contextTypes = {
     registerLayer: PropTypes.func,
     unregisterLayer: PropTypes.func,
