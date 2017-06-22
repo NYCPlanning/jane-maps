@@ -21,15 +21,23 @@ class Legend extends React.Component {
   };
 
   componentDidMount() {
-    this.context.addLegend(this.props.children);
+    this.legend = this.props.children;
+
+    this.context.addLegend(this.legend);
   }
 
-  shouldComponentUpdate(nextProps) {
-    return !_.isEqual(this.props.children, nextProps.children);
+  componentWillReceiveProps(nextProps) {
+    if (!_.isEqual(this.props.children, nextProps.children)) {
+      this.context.removeLegend(this.legend);
+
+      this.legend = nextProps.children;
+
+      this.context.addLegend(this.legend);
+    }
   }
 
   componentWillUnmount() {
-    this.context.removeLegend(this.props.children);
+    this.context.removeLegend(this.legend);
   }
 
   render() {
