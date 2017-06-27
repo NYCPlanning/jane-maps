@@ -139,16 +139,13 @@ class Jane extends React.Component {
 
   toggleLayer = (layerId) => {
     const { selectedLayer, layers } = this.state;
-    const disabled = layers.find(layer => layer.id).disabled;
+    const wasDisabled = layers.find(layer => layer.id === layerId).disabled;
 
-    this.layers = layers.map((layer) =>
-      layer.id === layerId
-        ? ({ ...layer, disabled: !layer.disabled })
-        : layer);
+    this.layers = layers.map(layer => layer.id === layerId ? ({ ...layer, disabled: !layer.disabled }) : layer);
 
-    const newSelectedLayer = disabled
+    const newSelectedLayer = wasDisabled
       ? layerId
-      : selectedLayer ? null : selectedLayer;
+      : selectedLayer === layerId ? null : selectedLayer;
 
     this.setState({
       selectedLayer: newSelectedLayer,
@@ -158,7 +155,7 @@ class Jane extends React.Component {
     this.GLMap.map.once('render', () => this.layers.forEach((layer) => layer.redrawChildren()));
 
     if (this.props.onLayerToggle) {
-      this.props.onLayerToggle(layerId, !disabled);
+      this.props.onLayerToggle(layerId, !wasDisabled);
     }
   };
 
