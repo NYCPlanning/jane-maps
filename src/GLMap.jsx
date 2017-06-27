@@ -38,7 +38,7 @@ class GLMap extends React.Component {
 
     this.map.__INTERNAL__hoverLayers = [];
 
-    this.map.on('load', () => this.props.onLoad(this.map.getStyle()));
+    this.map.once('load', () => this.props.onLoad(this.map.getStyle()));
     this.map.on('mousemove', this.onMouseMove);
 
     if (this.props.navigationControl) this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');

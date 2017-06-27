@@ -77,13 +77,6 @@ class Jane extends React.Component {
     if (!_.isEqual(prevProps.fitBounds, this.props.fitBounds)) {
       this.GLMap.map.fitBounds(this.props.fitBounds);
     }
-
-    const prevDisabledCount = prevState.layers.reduce((acc, l) => l.disabled ? acc + 1 : acc, 0);
-    const currentDisabledCount = this.state.layers.reduce((acc, l) => l.disabled ? acc + 1 : acc, 0);
-
-    if (prevDisabledCount !== currentDisabledCount) {
-      prevState.layers.forEach((layer) => layer.redrawChildren());
-    }
   }
 
   componentWillUnmount() {
@@ -161,6 +154,8 @@ class Jane extends React.Component {
       selectedLayer: newSelectedLayer,
       layers: this.layers,
     });
+
+    this.GLMap.map.once('render', () => this.layers.forEach((layer) => layer.redrawChildren()));
 
     if (this.props.onLayerToggle) {
       this.props.onLayerToggle(layerId, !disabled);
