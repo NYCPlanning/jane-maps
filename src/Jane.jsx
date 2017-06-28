@@ -9,9 +9,6 @@ import JaneLayer from './JaneLayer';
 import Marker from './Marker';
 import Search from './Search';
 
-// const {whyDidYouUpdate} = require('why-did-you-update');
-// whyDidYouUpdate(React)
-
 class Jane extends React.Component {
 
   static displayName = 'Jane';
