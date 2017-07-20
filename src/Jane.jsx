@@ -20,6 +20,7 @@ class Jane extends React.Component {
     loadedSources: PropTypes.object,
     selectedLayer: PropTypes.string,
     getJaneLayer: PropTypes.func,
+    toggleLayer: PropTypes.func,
     onLayerClose: PropTypes.func,
     addLegend: PropTypes.func,
     removeLegend: PropTypes.func,

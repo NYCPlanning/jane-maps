@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import FontIcon from 'material-ui/FontIcon';
 import IconButton from 'material-ui/IconButton';
+import Toggle from 'material-ui/Toggle';
 
 const style = {
   fontIcon: {
@@ -13,11 +14,8 @@ const style = {
     left: 0,
   },
   toggle: {
-    position: 'absolute',
-    display: 'initial',
     width: 'auto',
-    right: '28px',
-    top: '7px',
+    display: 'inline-block',
   },
   closeIcon: {
     width: 36,
@@ -46,6 +44,15 @@ const style = {
     paddingTop: 35,
     zIndex: 1000000,
   },
+  track: {
+    backgroundColor: '#9c9c9c',
+  },
+  thumbSwitched: {
+    backgroundColor: '#d96b27',
+  },
+  trackSwitched: {
+    backgroundColor: 'rgba(217, 107, 39, 0.48)',
+  },
 };
 
 class JaneLayer extends React.Component {
@@ -59,6 +66,7 @@ class JaneLayer extends React.Component {
     selectedLayer: PropTypes.string,
     onSourceLoaded: PropTypes.func,
     getJaneLayer: PropTypes.func,
+    toggleLayer: PropTypes.func,
     onLayerClose: PropTypes.func,
     map: PropTypes.object,
   };
@@ -138,6 +146,10 @@ class JaneLayer extends React.Component {
     });
   }
 
+  toggleLayer() {
+    this.context.toggleLayer(this.props.id);
+  }
+
   render() {
     const SidebarComponent = this.props.component;
     const janeLayer = this.context.getJaneLayer(this.props.id);
@@ -145,6 +157,14 @@ class JaneLayer extends React.Component {
     return (
       <div style={{ display: this.props.id === this.context.selectedLayer ? 'inline' : 'none' }}>
         <div className="drawer-header">
+          <Toggle
+            trackStyle={style.track}
+            thumbSwitchedStyle={style.thumbSwitched}
+            trackSwitchedStyle={style.trackSwitched}
+            toggled={janeLayer && !janeLayer.disabled}
+            onToggle={this.toggleLayer.bind(this)}
+            style={style.toggle}
+          />
           <FontIcon className={`fa fa-${this.props.icon}`} style={style.fontIcon} />
           {this.props.name}
           <IconButton
