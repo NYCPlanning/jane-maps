@@ -81,7 +81,7 @@ class JaneLayer extends React.Component {
     }
   }
 
-  registerRedrawCallback = (redrawMapLayerCallback) =>
+  registerRedrawCallback = redrawMapLayerCallback =>
     this.redrawCallbacks.push(redrawMapLayerCallback);
 
   redrawChildren = () => {

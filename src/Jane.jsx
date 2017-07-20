@@ -48,6 +48,7 @@ class Jane extends React.Component {
     loadedSources: this.state.loadedSources,
     selectedLayer: this.state.selectedLayer,
     getJaneLayer: janeLayerId => this.layers.find(({ id }) => id === janeLayerId),
+    toggleLayer: this.toggleLayer,
     onSourceLoaded: this.handleSourceLoaded,
     onLayerClose: this.deselectLayer,
     addLegend: this.addLegend,
@@ -69,7 +70,7 @@ class Jane extends React.Component {
     return propsChanged || stateChanged;
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     // fit map to fitBounds property if it is different from previous props
     if (!_.isEqual(prevProps.fitBounds, this.props.fitBounds)) {
       this.GLMap.map.fitBounds(this.props.fitBounds);
@@ -84,10 +85,10 @@ class Jane extends React.Component {
   onMapLoad = () =>
     this.setState({ mapLoaded: true });
 
-  removeLegend = (legend) =>
+  removeLegend = legend =>
     this.setState({ legend: this.state.legend.filter(item => item !== legend) });
 
-  addLegend = (legend) =>
+  addLegend = legend =>
     this.setState({ legend: this.state.legend.concat(legend) });
 
   unregisterLayer = (layerId) => {
@@ -103,7 +104,7 @@ class Jane extends React.Component {
       ...layerConfig,
       selected: layerConfig.defaultSelected || false,
       disabled: layerConfig.defaultDisabled || false,
-      redrawChildren
+      redrawChildren,
     };
 
     this.layers.push(layer);
@@ -122,16 +123,16 @@ class Jane extends React.Component {
     this.setState(newState);
   };
 
-  handleSourceLoaded = (loadedSources) =>
+  handleSourceLoaded = loadedSources =>
     this.setState({ loadedSources });
 
   handleLayerReorder = (layers) => {
     this.layers = layers;
 
-    this.setState({ layers: this.layers }, () => layers.forEach((layer) => layer.redrawChildren()));
+    this.setState({ layers: this.layers }, () => layers.forEach(layer => layer.redrawChildren()));
   };
 
-  selectLayer = (layerid) =>
+  selectLayer = layerid =>
     this.setState({ selectedLayer: layerid });
 
   toggleLayer = (layerId) => {
@@ -140,16 +141,14 @@ class Jane extends React.Component {
 
     this.layers = layers.map(layer => layer.id === layerId ? ({ ...layer, disabled: !layer.disabled }) : layer);
 
-    const newSelectedLayer = wasDisabled
-      ? layerId
-      : selectedLayer === layerId ? null : selectedLayer;
+    const newSelectedLayer = wasDisabled ? layerId : selectedLayer === layerId ? null : selectedLayer;
 
     this.setState({
       selectedLayer: newSelectedLayer,
       layers: this.layers,
     });
 
-    this.GLMap.map.once('render', () => this.layers.forEach((layer) => layer.redrawChildren()));
+    this.GLMap.map.once('render', () => this.layers.forEach(layer => layer.redrawChildren()));
 
     if (this.props.onLayerToggle) {
       this.props.onLayerToggle(layerId, !wasDisabled);
