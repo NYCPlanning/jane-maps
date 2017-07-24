@@ -137,15 +137,12 @@ class Jane extends React.Component {
     this.setState({ selectedLayer: layerid });
 
   toggleLayer = (layerId) => {
-    const { selectedLayer, layers } = this.state;
+    const { layers } = this.state;
     const wasDisabled = layers.find(layer => layer.id === layerId).disabled;
 
     this.layers = layers.map(layer => layer.id === layerId ? ({ ...layer, disabled: !layer.disabled }) : layer);
 
-    const newSelectedLayer = wasDisabled ? layerId : selectedLayer === layerId ? null : selectedLayer;
-
     this.setState({
-      selectedLayer: newSelectedLayer,
       layers: this.layers,
     });
 
