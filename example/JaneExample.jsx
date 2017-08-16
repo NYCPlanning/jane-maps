@@ -73,7 +73,7 @@ const JaneExample = () => {
           mapboxGLOptions={mapboxGLOptions}
           search
           searchConfig={searchConfig}
-          >
+        >
           <JaneLayer
             id="feature"
             name="Feature"
@@ -84,14 +84,16 @@ const JaneExample = () => {
 
             <Source id="feature" type="geojson" data={featureSource} />
 
-            <MapLayer id="feature"
-                      source="feature"
-                      type="circle"
-                      paint={{
-                        'circle-radius': 10,
-                        'circle-color': 'steelblue',
-                        'circle-opacity': 0.7,
-                      }}/>
+            <MapLayer
+              id="feature"
+              source="feature"
+              type="circle"
+              paint={{
+                'circle-radius': 10,
+                'circle-color': 'steelblue',
+                'circle-opacity': 0.7,
+              }}
+            />
 
             <Marker label="Example Marker" feature={markerFeature} />
 
@@ -104,7 +106,7 @@ const JaneExample = () => {
 
           </JaneLayer>
 
-          <TransportationJaneLayer />
+          <TransportationJaneLayer defaultDisabled />
         </Jane>
       </div>
     </MuiThemeProvider>

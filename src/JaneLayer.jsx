@@ -16,6 +16,7 @@ const style = {
   toggle: {
     width: 'auto',
     display: 'inline-block',
+    height: '23px',
   },
   closeIcon: {
     width: 36,

@@ -1,11 +1,7 @@
 import React from 'react';
 
-class DummyComponent extends React.Component {
-  render() {
-    return (
-      <div>Dummy Layer</div>
-    );
-  }
-}
+const DummyComponent = () => (
+  <div style={{ padding: '15px' }}>Dummy Layer</div>
+);
 
-export default DummyComponent
+export default DummyComponent;

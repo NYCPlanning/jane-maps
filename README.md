@@ -26,81 +26,53 @@ Install via npm:
 
 Include the top-level component `Jane` and `JaneLayer`, and include the css
 ```
-import { Jane, JaneLayer } from 'jane-maps';
+import {  Jane, JaneLayer, Source, MapLayer } from 'jane-maps';
 
 import 'jane-maps/dist/styles.css'
 ```
 
-Use Jane and JaneLayer to compose a map
+Use `Jane`, `JaneLayer`, `Source`, and `MapLayer` to compose a map
 ```
+<Jane
+  mapboxGLOptions={
+    mapbox_accessToken: 'youraccesstoken',
+    center: [-74.0084, 40.7121],
+    zoom: 13.62,
+    minZoom: 9,
+    maxZoom: null,
+    pitch: 0,
+    hash: false,
+    navigationControlPosition: 'bottom-right',
+  }
+  search
+  searchConfig={searchConfig}
+>
+  <JaneLayer
+    id="feature"
+    name="Feature"
+    icon="university"
+    defaultSelected
+    component={<div> This is a simple feature </div>}
+  >
 
+    <Source id="feature" type="geojson" data={featureSource} />
 
-// Use `<Jane/>` to instantiate a map, and `<JaneLayer/>` as a child of `<Jane/>` to define a layer.  `JaneLayer` must include as props a unique `id`, a display `name`, an `icon` (fontawesome icon name), and a `component`.  The component renders the UI for the JaneLayer, and also manages the internal state and current map configuration for the layer.
-
-    <Jane
-      mapboxGLOptions={{
-        mapbox_accessToken: 'youraccesstoken',
-        center: [-74.0084, 40.7121],
-        zoom: 13.62,
+    <MapLayer
+      id="feature"
+      source="feature"
+      type="circle"
+      paint={{
+        'circle-radius': 10,
+        'circle-color': 'steelblue',
+        'circle-opacity': 0.7,
       }}
     />
-      <JaneLayer
-        id="feature"
-        name="Feature"
-        icon="university"
-        component={<MyJaneLayerComponent />}
-      />
-    </Jane>
+
+  </JaneLayer>
+</Jane>
+
+
 ```
-
-`JaneLayer`'s component prop is cloned by `Jane` and given an `onUpdate` prop.  When `JaneLayer` updates, it should call `onUpdate` with the latest mapConfig. mapConfig is an object that includes mapboxGL sources and layers, and legend content.
-
-class MyJaneLayerComponent extends React.Component {
-  componentDidUpdate() {
-    this.props.onUpdate({
-      sources: [
-        {
-          id: 'feature',
-          type: 'geojson',
-          data: {
-            "type": "FeatureCollection",
-            "features": [
-              {
-                "type": "Feature",
-                "properties": {},
-                "geometry": {
-                  "type": "Point",
-                  "coordinates": [
-                    -74.00836944580078,
-                    40.71213418976525
-                  ]
-                }
-              }
-            ]
-          },
-        },
-      ],
-      mapLayers = [
-        {
-          id: 'feature',
-          source: 'feature',
-          type: 'circle',
-          paint: {
-            'circle-radius': 10,
-            'circle-color': 'steelblue',
-            'circle-opacity': 0.7,
-          },
-        },
-      ],
-    })
-  }
-
-  render() {
-    return (
-        <div>About this JaneLayer</div>
-    )
-  }
-}
 
 ## Material UI
 

@@ -1,21 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { JaneLayer, Source, MapLayer } from 'jane-maps';
+import { JaneLayer, Source, MapLayer } from '../../dist';
 
 import SidebarComponent from './SidebarComponent';
 import { sources, mapLayers } from './config';
 
 class TransportationJaneLayer extends React.Component {
-
-  static propTypes = {
-    defaultSelected: PropTypes.bool,
-    defaultDisabled: PropTypes.bool,
-  };
-
-  static defaultProps = {
-    defaultSelected: false,
-    defaultDisabled: false,
-  };
 
   constructor() {
     super();
@@ -119,5 +109,16 @@ class TransportationJaneLayer extends React.Component {
     );
   }
 }
+
+TransportationJaneLayer.propTypes = {
+  defaultSelected: PropTypes.bool,
+  defaultDisabled: PropTypes.bool,
+};
+
+TransportationJaneLayer.defaultProps = {
+  defaultSelected: false,
+  defaultDisabled: false,
+};
+
 
 export default TransportationJaneLayer;

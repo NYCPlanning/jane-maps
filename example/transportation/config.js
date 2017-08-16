@@ -6,7 +6,7 @@ const appConfig = {
 export const mapLayers = {
   bus_stops: {
     type: 'circle',
-    'source-layer': 'layer0',
+    sourceLayer: 'layer0',
     minzoom: 12,
     paint: {
       'circle-color': 'rgba(66, 182, 244, 1)',
@@ -332,7 +332,6 @@ export const mapLayers = {
   path_stops: {
     type: 'circle',
     minzoom: 12,
-    // 'source-layer': 'layer0',
     paint: {
       'circle-color': 'rgba(233, 237, 28, 1)',
       'circle-radius': {
@@ -373,7 +372,7 @@ export const mapLayers = {
   },
   bike_routes: {
     type: 'line',
-    'source-layer': 'layer0',
+    sourceLayer: 'layer0',
     minzoom: 11,
     paint: {
       'line-color': {

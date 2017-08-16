@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --config webpack.dev.config.js --progress --colors --inline",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "webpack-dev-server --config webpack.dev.config.js --progress --colors --inline"
   },
   "author": "",
   "license": "BSD-2-Clause",
@@ -14,6 +13,7 @@
     "extract-text-webpack-plugin": "^2.0.0",
     "jane-maps": "^0.1.0",
     "material-ui": "^0.17.0",
+    "prop-types": "^15.5.10",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-tap-event-plugin": "^2.0.1",
