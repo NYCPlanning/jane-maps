@@ -153,11 +153,22 @@ class Jane extends React.Component {
     }
   };
 
-  removeSearchResultMarker = () =>
+  removeSearchResultMarker = () => {
     this.setState({ searchResultMarker: null });
+    this.props.onSearchTrigger({
+      action: 'clear',
+      coordinates: [],
+    });
+  };
 
-  addSearchResultMarker = (feature, label) =>
+  addSearchResultMarker = (feature, label) => {
     this.setState({ searchResultMarker: { feature, label } });
+    this.props.onSearchTrigger({
+      action: 'set',
+      coordinates: feature.geometry.coordinates,
+    });
+  };
+
 
   deselectLayer = () =>
     this.setState({ selectedLayer: null });
@@ -238,6 +249,7 @@ Jane.propTypes = {
   onZoomEnd: PropTypes.func,
   onDragEnd: PropTypes.func,
   onLayerToggle: PropTypes.func,
+  onSearchTrigger: PropTypes.func,
   children: PropTypes.node.isRequired,
 };
 
