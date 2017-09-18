@@ -93,7 +93,7 @@ class MapLayer extends React.Component {
     const uniqueFeatures = _.uniq(features, feature => feature.id);
 
     if (uniqueFeatures.length > 0) {
-      this.props.onClick(uniqueFeatures);
+      this.props.onClick(uniqueFeatures, event);
     }
   };
 
