@@ -1,6 +1,6 @@
 {
   "name": "jane-maps",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "author": "",
   "description": "a modular web mapping framework for react and mapboxGL",
   "main": "dist/index.js",
