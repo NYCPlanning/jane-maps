@@ -1,6 +1,6 @@
 const appConfig = {
-  carto_user: 'cpp',
-  carto_domain: 'cartoprod.capitalplanning.nyc',
+  carto_user: 'data',
+  carto_domain: 'carto.planninglabs.nyc',
 };
 
 export const mapLayers = {
